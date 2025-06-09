@@ -1,0 +1,42 @@
+// Use the correct import for Angular Material 19
+@use '@angular/material' as mat;
+
+// Import the AB Gov components CSS
+@import "@abgov/web-components/index.css";
+
+// Include the common styles for Angular Material
+@include mat.core();
+
+$myapp-theme-primary: mat.m2-define-palette(mat.$m2-indigo-palette, A400, A100, A700);
+$myapp-theme-accent: mat.m2-define-palette(mat.$m2-indigo-palette);
+$myapp-theme-warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+$myapp-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $myapp-theme-primary,
+    accent: $myapp-theme-accent,
+    warn: $myapp-theme-warn,
+  )
+));
+
+@include mat.all-component-themes($myapp-theme);
+
+// Other styles
+.mt-1 {
+    margin-top: 0.25rem;
+}
+
+.space-4 {
+    padding: 1rem;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+app-home {
+  /* styles directly for the component element */
+  margin: 20px;
+  display: block;
+  width: 100%
+}

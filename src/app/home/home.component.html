@@ -1,0 +1,182 @@
+<goa-container accent="thin" padding="relaxed" width="full">
+
+  <div class="flex-container">
+
+    <!-- First Row: Dropdowns + Chart Type -->
+    <div class="row">
+      <div class="col-8">
+        <div class="row">
+          <div class="col">
+            <div class="data-setting-wrapper">
+              <div class="data-setting-component">
+                <goa-form-item label="Region" labelSize="regular">
+                  <goa-dropdown name="region" value="" 
+                  matTooltip="Select region" 
+                  matTooltipPosition="above" 
+                  value="Alberta" 
+                  width="180px"
+                  (_change)="onChange($event, 'region')"
+                  >
+                  <goa-dropdown-item value="Alberta" label="Alberta"></goa-dropdown-item>
+                  <goa-dropdown-item value="Canada" label="Canada"></goa-dropdown-item>
+                  <goa-dropdown-item value="British Columbia" label="British Columbia"></goa-dropdown-item>
+                  <goa-dropdown-item value="Manitoba" label="Manitoba"></goa-dropdown-item>
+                  <goa-dropdown-item value="New Brunswick" label="New Brunswick"></goa-dropdown-item>
+                  <goa-dropdown-item value="Newfoundland and Labrador" label="Newfoundland and Labrador"></goa-dropdown-item>
+                  <goa-dropdown-item value="Nova Scotia" label="Nova Scotia"></goa-dropdown-item>
+                  <goa-dropdown-item value="Ontario" label="Ontario"></goa-dropdown-item>
+                  <goa-dropdown-item value="Prince Edward Island" label="Prince Edward Island"></goa-dropdown-item>
+                  <goa-dropdown-item value="Quebec" label="Quebec"></goa-dropdown-item>
+                  <goa-dropdown-item value="Saskatchewan" label="Saskatchewan"></goa-dropdown-item>
+                  </goa-dropdown>
+                </goa-form-item>
+              </div>
+            </div>
+          </div>
+          
+          <goa-spacer hspacing="m"></goa-spacer>
+
+          <div class="col">
+            <div class="data-setting-wrapper">
+              <div class="data-setting-component">
+                <goa-form-item label="Year" labelSize="regular">
+                  <goa-dropdown name="year" 
+                  value="" 
+                  matTooltip="Select year" 
+                  matTooltipPosition="above" 
+                  value="2023" 
+                  width="180px"
+                  (_change)="onChange($event, 'year')"
+                  >
+                  <goa-dropdown-item value="2023" label="2023"></goa-dropdown-item>
+                  <goa-dropdown-item value="2022" label="2022"></goa-dropdown-item>
+                  <goa-dropdown-item value="2021" label="2021"></goa-dropdown-item>
+                  <goa-dropdown-item value="2020" label="2020"></goa-dropdown-item>
+                  <goa-dropdown-item value="2019" label="2019"></goa-dropdown-item>
+                  <goa-dropdown-item value="2018" label="2018"></goa-dropdown-item>
+                  <goa-dropdown-item value="2017" label="2017"></goa-dropdown-item>
+                  <goa-dropdown-item value="2016" label="2016"></goa-dropdown-item>
+                  <goa-dropdown-item value="2015" label="2015"></goa-dropdown-item>
+                  <goa-dropdown-item value="2014" label="2014"></goa-dropdown-item>
+                  </goa-dropdown>
+                </goa-form-item>
+              </div>
+            </div>
+          </div>
+
+          <goa-spacer hspacing="m"></goa-spacer>
+
+          <div class="col">
+            <div class="data-setting-wrapper">
+              <div class="data-setting-component">
+                <goa-form-item label="Grouping" labelSize="regular">
+                  <goa-dropdown name="grouping" 
+                  value="" 
+                  matTooltip="Select HS digit grouping" 
+                  matTooltipPosition="above" 
+                  value="HS2" 
+                  width="180px"
+                  (_change)="onChange($event, 'grouping')"
+                  >
+                  <goa-dropdown-item value="HS2" label="HS 2 Digits"></goa-dropdown-item>
+                  <goa-dropdown-item value="HS4" label="HS 4 Digits"></goa-dropdown-item>
+                  <goa-dropdown-item value="HS6" label="HS 6 Digits"></goa-dropdown-item>
+                  </goa-dropdown>
+                </goa-form-item>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-4">
+        <goa-form-item label="Chart Type" labelSize="regular">
+          <mat-button-toggle-group name="chartType" aria-label="Chart Type" value="ProductSpace" (change)="onChartTypeChange($event)">
+            <mat-button-toggle value="ProductSpace">Product Space</mat-button-toggle>
+            <mat-button-toggle value="Feasible">Feasible</mat-button-toggle>
+            <mat-button-toggle value="Trends">Trends</mat-button-toggle>
+            <mat-button-toggle value="Exports">Exports</mat-button-toggle>
+            <mat-button-toggle value="ECI">ECI</mat-button-toggle>
+          </mat-button-toggle-group>
+        </goa-form-item>
+      </div>
+    </div>
+
+    <goa-spacer vspacing="m"></goa-spacer>
+
+    <!-- Second Row: Title + Stats + Controls -->
+    <div class="row align-items-center space-between">
+      <div class="col">
+        <goa-text mt="none" mb="none" as="h4">
+          Export Dashboard
+        </goa-text>
+      </div>
+
+      <div class="col">
+        <goa-text mt="none" mb="none" as="h6">
+          Total Value: $2.4B
+        </goa-text>
+      </div>
+
+      <div class="col">
+        <goa-text mt="none" mb="none" as="h6">
+          Number of Products: 1,247
+        </goa-text>
+      </div>
+
+      <div class="col">
+        <goa-button type="secondary" size="compact">
+          <goa-icon name="filter" slot="prefix"></goa-icon>
+          Filter
+        </goa-button>
+      </div>
+
+      <div class="col">
+        <goa-input name="search" type="search" placeholder="Search products..." width="200px"></goa-input>
+      </div>
+    </div>
+
+    <goa-spacer vspacing="m"></goa-spacer>
+
+    <!-- Third Row: Charts -->
+    <div class="row" *ngIf="selectedChartType === 'ProductSpace'">
+      <div class="col-12">
+          <app-product-space-chart 
+          #productSpaceChart 
+          [showGroupLabels]="true"
+           [tooltipEnabled]="true"
+          [highlightConnections]="true"
+           (nodeSelected)="onNodeSelected($event)"
+          (nodeHovered)="onNodeHovered($event)"
+          (rowHighlight)="onRowHighlight($event)"
+          ></app-product-space-chart>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="selectedChartType === 'Feasible'">
+      <div class="col-12">
+        <div id="feasiblediv"></div>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="selectedChartType === 'Trends'">
+      <div class="col-12">
+        <div id="timediv"></div>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="selectedChartType === 'Exports'">
+      <div class="col-12">
+        <div id="graphdiv2"></div>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="selectedChartType === 'ECI'">
+      <div class="col-12 px-0">
+        <div id="ecidiv"></div>
+      </div>
+    </div>
+
+  </div>  
+
+</goa-container>
