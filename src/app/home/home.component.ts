@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import {ChangeDetectionStrategy} from '@angular/core';
 import {MatChipsModule} from '@angular/material/chips';
@@ -13,72 +13,79 @@ import { ChipListComponent } from '../filter/chip-list.component';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ProductSpaceChartComponent } from '../productspace/product-space-chart.component';
+import { DisplayMode, FeasibleEventData, FilterType, GroupingType } from '../feasible/feasible-chart-model';
+import { ChartCoordinationService } from '../service/chart-coordination.service';
+import { Subject, takeUntil } from 'rxjs';
+import { FeasibleChartComponent } from '../feasible/feasible-chart.component';
 
+interface NodeData {
+  node: any;
+  data: any;
+}
+
+interface ChartStats {
+  totalSum: number;
+  nodeCount: number;
+  dataCount: number;
+}
+
+interface GroupLabel {
+  name: string;
+  text: string;
+  x: number;
+  y: number;
+  fontSize?: number;
+  // ... other properties
+}
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [MatChipsModule, CommonModule,  MatButtonToggleModule, ProductSpaceChartComponent ],
+  imports: [MatChipsModule, CommonModule,  MatButtonToggleModule, ProductSpaceChartComponent, FeasibleChartComponent ],
   standalone: true,
   encapsulation: ViewEncapsulation.None
 })
 
 export class HomeComponent implements OnInit {
 
+  selectedNode: NodeData | null = null;
+  hoveredNode: NodeData | null = null;
+  chartStats: ChartStats | null = null;
+  showLabels: boolean = true; // Control group labels visibility
+  customLabels?: Partial<GroupLabel>[] = undefined; // Use default labels
   selectedChartType: string = 'ProductSpace'; // Default chart type
+  
 
+  //
+  currentRegion: string = '';
+  currentYear: string = '';
+  currentGrouping: GroupingType = GroupingType.HS4;
+  currentDisplayMode: DisplayMode = DisplayMode.DEFAULT;
+  currentFilterType: FilterType = FilterType.ALL;
+
+  //
+    private destroy$ = new Subject<void>();
+
+  //
+  @ViewChild('productSpaceChart') productSpaceChart: any;
+  @ViewChild('feasibleChart') feasibleChart: any;
+
+    // Feasible chart properties
+  selectedFeasiblePoint: FeasibleEventData | null = null;
+  feasibleStats: { dataCount: number, eci: number } | null = null;
+    
  onChartTypeChange(event: MatButtonToggleChange): void {
     this.selectedChartType = event.value;
     console.log('Chart type changed to:', event.value);
+
     
     // Call appropriate chart rendering method based on selection
-    this.renderSelectedChart();
+    //this.renderSelectedChart();
   }
 
 
-  private renderSelectedChart(): void {
-    // Clear any existing charts first if needed
-    
-    switch(this.selectedChartType) {
-      case 'ProductSpace':
-        // Initialize your product space chart in #graphdiv
-        break;
-      case 'Feasible':
-        // Initialize your feasible chart in #feasiblediv
-        this.renderFeasibleChart();
-        break;
-      case 'Trends':
-        // Initialize your trends chart in #timediv
-        this.renderTrendsChart();
-        break;
-      case 'Exports':
-        // Initialize your exports chart in #graphdiv2
-        this.renderExportsChart();
-        break;
-      case 'ECI':
-        // Initialize your ECI chart in #ecidiv
-        this.renderECIChart();
-        break;
-    }
-  }
-
-  private renderFeasibleChart(): void {
-    // Your feasible chart logic
-  }
-
-  private renderTrendsChart(): void {
-    // Your trends chart logic
-  }
-
-  private renderExportsChart(): void {
-    // Your exports chart logic
-  }
-
-  private renderECIChart(): void {
-    // Your ECI chart logic
-  }
 
   readonly maxFilters = 2;
   selectedValue: string = 'recent'; // Default value
@@ -192,7 +199,8 @@ export class HomeComponent implements OnInit {
 
   constructor(private router: Router, 
     private chartService: ChartSignalService, 
-    public filterSvc: FilterService
+    public filterSvc: FilterService,
+    private coordinationService: ChartCoordinationService
   ) 
     {}
   
@@ -200,6 +208,16 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     //this.sendData();
     this.chartService.initialize();
+
+       this.coordinationService.state$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(state => {
+        this.currentRegion = state.selectedRegion;
+        this.currentYear = state.selectedYear;
+        this.currentGrouping = state.selectedGrouping;
+        this.currentDisplayMode = state.displayMode;
+        this.currentFilterType = state.filterType;
+      });
    }
 
 
@@ -253,12 +271,13 @@ export class HomeComponent implements OnInit {
      // Event handlers for chart interactions
   onNodeSelected(event: {node: any, data: any}): void {
     console.log('Node selected:', event);
+        this.selectedNode = event;
     
   }
 
   onNodeHovered(event: {node: any, data: any}): void {
     console.log('Node hovered:', event);
-    
+        this.hoveredNode = event;
   }
 
   onRowHighlight(productId: number): void {
@@ -266,6 +285,23 @@ export class HomeComponent implements OnInit {
     
     // Add your table highlighting logic here
     // Example: this.dataTableService.highlightRow(productId);
+  }
+
+   clearSelection(): void {
+    this.selectedNode = null;
+    if (this.productSpaceChart) {
+      this.productSpaceChart.clearSelections();
+    }
+  }
+
+    // Feasible Chart Event Handlers
+  onFeasiblePointSelected(event: {node: any, data: any}): void {
+    console.log('Feasible point selected:', event);
+    
+  }
+
+  onFeasiblePointHovered(event: {node: any, data: any}): void {
+    console.log('Feasible point hovered:', event);
   }
 
 

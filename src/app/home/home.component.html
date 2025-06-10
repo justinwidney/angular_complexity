@@ -140,29 +140,75 @@
 
     <!-- Third Row: Charts -->
     <div class="row" *ngIf="selectedChartType === 'ProductSpace'">
-      <div class="col-12">
-          <app-product-space-chart 
-          #productSpaceChart 
-          [showGroupLabels]="true"
-           [tooltipEnabled]="true"
+      <div class="col-12" style="position: relative;">
+        
+        <app-product-space-chart 
+          #productSpaceChart
+          [showGroupLabels]="showLabels"
+          [customGroupLabels]="customLabels"
+          [tooltipEnabled]="true"
           [highlightConnections]="true"
-           (nodeSelected)="onNodeSelected($event)"
+          (nodeSelected)="onNodeSelected($event)"
           (nodeHovered)="onNodeHovered($event)"
           (rowHighlight)="onRowHighlight($event)"
-          ></app-product-space-chart>
+          >
+        </app-product-space-chart>
+
+        <!-- Floating Info Panel for Selected Node -->
+        <div class="floating-info-panel" *ngIf="selectedNode">
+          <div class="card">
+            <div class="card-header">
+              <h6 class="mb-0">Selected Product: {{selectedNode!.node.id}}</h6>
+            </div>
+            <div class="card-body p-3">
+              <p class="mb-2"><strong>Cluster:</strong> {{selectedNode!.node.cluster_name}}</p>
+              <p class="mb-2"><strong>Value:</strong> {{selectedNode!.data?.Value | number}}</p>
+              <p class="mb-2"><strong>RCA:</strong> {{selectedNode!.data?.rca | number:'1.4-4'}}</p>
+              <p class="mb-2"><strong>Description:</strong> {{selectedNode!.data?.description}}</p>
+              <p class="mb-3"><strong>Industry:</strong> {{selectedNode!.data?.naics_description}}</p>
+              <button class="btn btn-sm btn-secondary w-100" (click)="clearSelection()">Clear Selection</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional: Chart Statistics -->
+    <div class="row" *ngIf="chartStats">
+      <div class="col-12">
+        <div class="card mt-3">
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-md-4">
+                <h6>Total Value</h6>
+                <p class="h5">{{chartStats.totalSum | number}}</p>
+              </div>
+              <div class="col-md-4">
+                <h6>Products</h6>
+                <p class="h5">{{chartStats.nodeCount}}</p>
+              </div>
+              <div class="col-md-4">
+                <h6>Data Points</h6>
+                <p class="h5">{{chartStats.dataCount}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="row" *ngIf="selectedChartType === 'Feasible'">
-      <div class="col-12">
-        <div id="feasiblediv"></div>
-      </div>
+           <app-feasible-chart 
+            #feasibleChart
+            [showTooltips]="true"
+            [enableIconFiltering]="true"
+            [enableTracking]="true"
+            >
+        </app-feasible-chart>
     </div>
 
     <div class="row" *ngIf="selectedChartType === 'Trends'">
-      <div class="col-12">
-        <div id="timediv"></div>
-      </div>
+     
     </div>
 
     <div class="row" *ngIf="selectedChartType === 'Exports'">

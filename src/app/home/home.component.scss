@@ -128,3 +128,53 @@ dl.accordion-example {
   .space-between {
     justify-content: space-between;
   }
+
+  .floating-info-panel {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 350px;
+  min-width: 280px;
+  
+  .card {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    
+    .card-header {
+      background-color: rgba(248, 249, 250, 0.8);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 8px 12px;
+      
+      h6 {
+        color: #495057;
+        font-weight: 600;
+      }
+    }
+    
+    .card-body {
+      font-size: 14px;
+      
+      p {
+        margin-bottom: 8px;
+        line-height: 1.4;
+        
+        strong {
+          color: #495057;
+          font-weight: 600;
+        }
+      }
+      
+      .btn {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+    }
+  }
+  
+  // Animation when appearing
+  animation: slideInFromRight 0.3s ease-out;
+}
