@@ -1,0 +1,157 @@
+// overtime-chart.component.scss
+
+.overtime-chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    
+    .loading-spinner {
+      padding: 20px;
+      font-size: 16px;
+      color: #333;
+    }
+  }
+  
+  .error-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffebee;
+    border: 1px solid #f44336;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+    z-index: 100;
+    
+    .error-message {
+      color: #d32f2f;
+      margin-bottom: 10px;
+    }
+    
+    .retry-button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: #d32f2f;
+      }
+    }
+  }
+  
+  .chart-container {
+    transition: opacity 0.3s ease;
+  }
+  
+  .tooltip-container {
+    pointer-events: none;
+  }
+  
+  .icons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 50;
+    
+    .icon-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      
+      i {
+        font-size: 24px;
+        color: #666;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          color: #333;
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        &.active {
+          color: #1976d2;
+          background-color: rgba(25, 118, 210, 0.1);
+        }
+      }
+    }
+  }
+  
+  .cache-status, .debug-info {
+    position: absolute;
+    bottom: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 200;
+  }
+
+  .cache-status {
+    left: 10px;
+  }
+
+  .debug-info {
+    left: 250px;
+    background-color: rgba(255, 140, 0, 0.8);
+    color: black;
+    max-width: 400px;
+  }
+}
+
+// Global styles for D3 elements
+:host ::ng-deep {
+  .tooltip2 {
+    pointer-events: none;
+    z-index: 1000;
+  }
+  
+  .area {
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+  
+  .axis {
+    .domain {
+      stroke: #000;
+    }
+    
+    .tick {
+      line {
+        stroke: #000;
+      }
+      
+      text {
+        fill: #000;
+        font-size: 12px;
+      }
+    }
+  }
+  
+  #hover-line {
+    pointer-events: none;
+  }
+}

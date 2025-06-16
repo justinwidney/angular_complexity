@@ -31,6 +31,7 @@ export class FeasibleChartUtils {
       }
     };
   }
+  
 
   // Icon mappings for product categories
   public static getIconMapping(): IconMapping {

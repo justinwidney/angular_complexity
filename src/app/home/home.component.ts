@@ -17,6 +17,9 @@ import { DisplayMode, FeasibleEventData, FilterType, GroupingType } from '../fea
 import { ChartCoordinationService } from '../service/chart-coordination.service';
 import { Subject, takeUntil } from 'rxjs';
 import { FeasibleChartComponent } from '../feasible/feasible-chart.component';
+import { OvertimeChartComponent } from '../timeChart/overtime-chart.component';
+import { ECIChartComponent } from '../eci/eci-chart.component';
+import { TreemapChartComponent } from '../treemap/treemap-chart.component';
 
 interface NodeData {
   node: any;
@@ -43,9 +46,13 @@ interface GroupLabel {
   styleUrls: ['./home.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [MatChipsModule, CommonModule,  MatButtonToggleModule, ProductSpaceChartComponent, FeasibleChartComponent ],
+  imports: [MatChipsModule, CommonModule,  
+    MatButtonToggleModule,
+     ProductSpaceChartComponent, 
+    FeasibleChartComponent, 
+    OvertimeChartComponent, ECIChartComponent, TreemapChartComponent ],
   standalone: true,
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 
 export class HomeComponent implements OnInit {
@@ -57,20 +64,17 @@ export class HomeComponent implements OnInit {
   customLabels?: Partial<GroupLabel>[] = undefined; // Use default labels
   selectedChartType: string = 'ProductSpace'; // Default chart type
   
-
-  //
   currentRegion: string = '';
   currentYear: string = '';
   currentGrouping: GroupingType = GroupingType.HS4;
   currentDisplayMode: DisplayMode = DisplayMode.DEFAULT;
   currentFilterType: FilterType = FilterType.ALL;
 
-  //
-    private destroy$ = new Subject<void>();
+   private destroy$ = new Subject<void>();
 
-  //
   @ViewChild('productSpaceChart') productSpaceChart: any;
   @ViewChild('feasibleChart') feasibleChart: any;
+  @ViewChild('overtimeChart', { static: false }) overtimeChart?: any; // Your new overtime chart
 
     // Feasible chart properties
   selectedFeasiblePoint: FeasibleEventData | null = null;

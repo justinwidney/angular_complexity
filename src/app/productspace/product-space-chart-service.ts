@@ -3,6 +3,7 @@
 import { Injectable } from '@angular/core';
 import { forkJoin, map, Observable, of } from 'rxjs';
 import { Link, Node, GroupedData, HSDescription, RawNode } from './product-space-chart.models';
+import { UnifiedDataService } from '../service/chart-data-service';
 
 @Injectable({
   providedIn: 'root'
@@ -22497,7 +22498,16 @@ export class ProductSpaceChartService {
 
 
 
- constructor() { }
+ constructor(private unifiedDataService: UnifiedDataService) { 
+
+  this.unifiedDataService.setHSDescriptions([
+    { HS4: "8518", "HS4 Short Name": "Electronic Equipment" },
+    { HS4: "8535", "HS4 Short Name": "Electrical Machinery" },
+    // Add your actual HS descriptions here
+  ]);
+
+
+ }
 
   // Process raw nodes data
   private processNodes(rawNodes: RawNode[]): Node[] {
@@ -22565,43 +22575,10 @@ export class ProductSpaceChartService {
     return recent;
   }
 
-  // Process grouped data
-  private async processGroupedData(region: keyof typeof this.apiMap): Promise<GroupedData[]> {
-    const values = await this.fetchData(region);
-    const thresholdDate = new Date("2021-01-01T00:00:00");
-    
-    const recent = values.filter(item => {
-      const itemDate = new Date(item.Date);
-      return itemDate > thresholdDate;
-    });
-
-    const processedRecent = recent.map((d: any) => {
-      let description = this.hsDescriptions.filter((x) => {
-        return x['HS4'] == d.product;
-      })[0]?.['HS4 Short Name'] || 'Unknown';
-      
-      d['description'] = description;
-      return d;
-    });
-
-    const grouped = Object.values(processedRecent).map((d: any) => {
-      d['prio'] = 0;
-      return d;
-    });
-
-    return grouped;
-  }
 
   // Calculate total sum
   calcTotalSum(data: GroupedData[]): number {
-    return data.reduce((accumulator, currentObject) => {
-      if (typeof currentObject.Value === "number") {
-        return accumulator + currentObject.Value;
-      } else {
-        console.log('Invalid or missing Value:', currentObject.Value);
-        return accumulator;
-      }
-    }, 0);
+    return this.unifiedDataService.calculateTotalSum(data as any[]);
   }
 
   // Find category function - implement your actual logic
@@ -22619,26 +22596,28 @@ export class ProductSpaceChartService {
     return of(this.processLinks(this.rawLinks));
   }
 
-  getGroupedData(region: keyof typeof this.apiMap): Observable<GroupedData[]> {
-    return new Observable(observer => {
-      this.processGroupedData(region).then(data => {
-        observer.next(data);
-        observer.complete();
-      }).catch(error => {
-        observer.error(error);
-      });
-    });
+  getGroupedData(region: keyof typeof this.unifiedDataService['apiMap']): Observable<GroupedData[]> {
+    return this.unifiedDataService.getProductSpaceData(region).pipe(
+      map(result => result.groupedData)
+    );
   }
 
-  getAllData(region: keyof typeof this.apiMap): Observable<{nodes: Node[], links: Link[], grouped: GroupedData[], totalSum: number}> {
+  getAllData(region: keyof typeof this.unifiedDataService['apiMap']): Observable<{
+    nodes: Node[], 
+    links: Link[], 
+    grouped: GroupedData[], 
+    totalSum: number
+  }> {
     return forkJoin({
       nodes: this.getProcessedNodes(),
       links: this.getProcessedLinks(),
-      grouped: this.getGroupedData(region)
+      productSpaceData: this.unifiedDataService.getProductSpaceData(region)
     }).pipe(
       map(result => ({
-        ...result,
-        totalSum: this.calcTotalSum(result.grouped)
+        nodes: result.nodes,
+        links: result.links,
+        grouped: result.productSpaceData.groupedData,
+        totalSum: result.productSpaceData.totalSum
       }))
     );
   }
@@ -22649,14 +22628,11 @@ export class ProductSpaceChartService {
   }
 
   findGroupedDataByProduct(grouped: GroupedData[], productId: string): GroupedData | undefined {
-
-    const found = grouped.find(item => (item.product).toString() === productId);
-
-    return found
+    return this.unifiedDataService.findDataByProduct(grouped as any[], productId) as GroupedData;
   }
 
   // Methods to update data if needed
   setHSDescriptions(descriptions: HSDescription[]): void {
-    this.hsDescriptions = descriptions;
+    this.unifiedDataService.setHSDescriptions(descriptions);
   }
 }

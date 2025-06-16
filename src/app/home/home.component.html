@@ -90,19 +90,40 @@
       </div>
       
       <div class="col-4">
-        <goa-form-item label="Chart Type" labelSize="regular">
-          <mat-button-toggle-group name="chartType" aria-label="Chart Type" value="ProductSpace" (change)="onChartTypeChange($event)">
-            <mat-button-toggle value="ProductSpace">Product Space</mat-button-toggle>
-            <mat-button-toggle value="Feasible">Feasible</mat-button-toggle>
-            <mat-button-toggle value="Trends">Trends</mat-button-toggle>
-            <mat-button-toggle value="Exports">Exports</mat-button-toggle>
-            <mat-button-toggle value="ECI">ECI</mat-button-toggle>
-          </mat-button-toggle-group>
-        </goa-form-item>
+        <div class="row">
+          <div class="col">
+
+
+            <goa-form-item label="Chart Type" labelSize="small">
+              <div class="modern-chart-toggles"
+              
+              >
+                <mat-button-toggle-group 
+                  name="chartType" 
+                  aria-label="Chart Type" 
+                  value="ProductSpace" 
+                  (change)="onChartTypeChange($event)">
+                  <mat-button-toggle value="ProductSpace">Product Space</mat-button-toggle>
+                  <mat-button-toggle value="Feasible">Feasible</mat-button-toggle>
+                  <mat-button-toggle value="Trends">Trends</mat-button-toggle>
+                  <mat-button-toggle value="Exports">Exports</mat-button-toggle>
+                  <mat-button-toggle value="ECI">ECI</mat-button-toggle>
+                </mat-button-toggle-group>
+              </div>
+            </goa-form-item>
+        </div>
+        </div>
       </div>
     </div>
 
+        <goa-spacer vspacing="m"></goa-spacer>
+    <div class="row">
+      <div class="col-12">
+        <goa-divider></goa-divider>
+      </div>
+    </div>
     <goa-spacer vspacing="m"></goa-spacer>
+
 
     <!-- Second Row: Title + Stats + Controls -->
     <div class="row align-items-center space-between">
@@ -113,13 +134,13 @@
       </div>
 
       <div class="col">
-        <goa-text mt="none" mb="none" as="h6">
+        <goa-text mt="none" mb="none" as="h5">
           Total Value: $2.4B
         </goa-text>
       </div>
 
       <div class="col">
-        <goa-text mt="none" mb="none" as="h6">
+        <goa-text mt="none" mb="none" as="h5">
           Number of Products: 1,247
         </goa-text>
       </div>
@@ -198,6 +219,7 @@
     </div>
 
     <div class="row" *ngIf="selectedChartType === 'Feasible'">
+      <div class="col-12">
            <app-feasible-chart 
             #feasibleChart
             [showTooltips]="true"
@@ -205,21 +227,44 @@
             [enableTracking]="true"
             >
         </app-feasible-chart>
+        </div>  
     </div>
 
     <div class="row" *ngIf="selectedChartType === 'Trends'">
-     
+      <div class="col-12">
+        <app-overtime-chart
+          #overtimeChart
+          [showDebugInfo]="true"
+          [showTooltips]="true"
+          [enableCategoryToggling]="true"
+          [enableDataTable]="true">
+        </app-overtime-chart>
+      </div>  
+
     </div>
 
     <div class="row" *ngIf="selectedChartType === 'Exports'">
       <div class="col-12">
-        <div id="graphdiv2"></div>
+        <app-treemap-chart
+        [enableZoomPan]="true"
+        [showControls]="true"
+        [showDebugInfo]="true">
+      </app-treemap-chart>
       </div>
     </div>
 
     <div class="row" *ngIf="selectedChartType === 'ECI'">
-      <div class="col-12 px-0">
-        <div id="ecidiv"></div>
+      <div class="col-12">
+        <app-eci-chart
+          #eciChart
+          [showControls]="true"
+          [showStats]="true"
+          [enableTooltips]="true"
+          [enableLegend]="true"
+          [chartWidth]="1440"
+          [chartHeight]="650"
+         >
+        </app-eci-chart>
       </div>
     </div>
 

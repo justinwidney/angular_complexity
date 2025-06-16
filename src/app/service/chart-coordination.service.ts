@@ -9,6 +9,12 @@ import { GroupingType, DisplayMode, FilterType, ChartCoordinationState } from '.
 })
 export class ChartCoordinationService {
   
+  setYear(year: string) {
+     
+  }
+  setRegion(region: string) {
+  }
+  
   private readonly initialState: ChartCoordinationState = {
     selectedRegion: 'Alberta',
     selectedYear: '2023',

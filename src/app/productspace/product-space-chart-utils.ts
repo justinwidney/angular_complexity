@@ -90,25 +90,7 @@ export class ProductSpaceChartUtils {
     });
   }
 
-  // Update specific group label
-  static updateGroupLabel(
-    svgGroup: d3.Selection<any, unknown, null, undefined>,
-    labelName: string, 
-    updates: Partial<GroupLabel>
-  ): void {
-    const labelElement = svgGroup.select(`#${labelName}`);
-    
-    if (!labelElement.empty()) {
-      if (updates.text) labelElement.text(updates.text);
-      if (updates.x !== undefined) labelElement.attr("x", updates.x);
-      if (updates.y !== undefined) labelElement.attr("y", updates.y);
-      if (updates.fill) labelElement.style("fill", updates.fill);
-      if (updates.fontSize) labelElement.style("font-size", `${updates.fontSize}px`);
-      if (updates.fontWeight) labelElement.style("font-weight", updates.fontWeight);
-      if (updates.transform) labelElement.attr("transform", updates.transform);
-      if (updates.className) labelElement.attr("class", updates.className);
-    }
-  }
+  
 
   // Get label by cluster name (useful for dynamic labeling)
   static getLabelByClusterName(clusterName: string): GroupLabel | undefined {
@@ -127,13 +109,6 @@ export class ProductSpaceChartUtils {
     return this.getGroupLabels().find(label => label.name === labelName);
   }
 
-  // Remove group labels (useful for chart updates)
-  static removeGroupLabels(svgGroup: d3.Selection<any, unknown, null, undefined>): void {
-    const labels = this.getGroupLabels();
-    labels.forEach(label => {
-      svgGroup.select(`#${label.name}`).remove();
-    });
-  }
 
   // Color scale function
   static getColorScale() {

@@ -3,6 +3,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import * as d3 from 'd3';
+import { UnifiedDataService } from '../service/chart-data-service'; // Import the unified service
 import { FeasibleChartService } from './feasible-chart-service';
 import { FeasibleChartUtils } from './feasible-chart-utils';
 import { ChartCoordinationService } from '../service/chart-coordination.service';
@@ -18,11 +19,25 @@ import {
   QuadrantInfo
 } from './feasible-chart-model';
 import { GroupedData } from '../productspace/product-space-chart.models';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-feasible-chart',
-  template: `<div #chartContainer id="feasiblediv"></div>`,
-  styleUrls: ['./feasible-chart.component.scss']
+  template: `
+  <div #chartContainer id="feasiblediv">
+    <!-- Loading indicator -->
+    <div *ngIf="loading" class="loading-overlay">
+      <div class="loading-spinner">Loading chart data...</div>
+    </div>
+    
+    <!-- Error display -->
+    <div *ngIf="error" class="error-overlay">
+      <div class="error-message">{{ error }}</div>
+    </div>
+  </div>
+`,
+  styleUrls: ['./feasible-chart.component.scss'],
+  imports: [CommonModule]
 })
 export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -49,6 +64,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private centerX: number = 0;
   private centerY: number = 0;
   private bounds: any = {};
+  private rawData: any[] = []; // Store raw data for re-processing
 
   // UI elements
   private trackingLines: { lineX: any, lineY: any } = { lineX: null, lineY: null };
@@ -61,10 +77,15 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private currentGrouping: GroupingType = GroupingType.HS4;
   private currentDisplayMode: DisplayMode = DisplayMode.DEFAULT;
   private currentFilterType: FilterType = FilterType.ALL;
-    pointSelected: any;
-    pointHovered: any;
+  pointSelected: any;
+  pointHovered: any;
+
+  // Loading and error states
+  loading = false;
+  error: string | null = null;
 
   constructor(
+    private unifiedDataService: UnifiedDataService, // Inject unified service
     private chartService: FeasibleChartService,
     private coordinationService: ChartCoordinationService
   ) {
@@ -73,6 +94,8 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngOnInit(): void {
     this.subscribeToCoordinationService();
+    this.subscribeToUnifiedService();
+
   }
 
   ngAfterViewInit(): void {
@@ -104,14 +127,14 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.coordinationService.region$
       .pipe(takeUntil(this.destroy$))
       .subscribe(region => {
-        this.loadData();
+        //this.loadData();
       });
 
     // Subscribe to year changes
     this.coordinationService.year$
       .pipe(takeUntil(this.destroy$))
       .subscribe(year => {
-        this.loadData();
+        //this.loadData();
       });
 
     // Subscribe to grouping changes
@@ -139,32 +162,63 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       });
   }
 
-  private loadData(): void {
-    const region = this.coordinationService.currentRegion;
-    const year = this.coordinationService.currentYear;
-    
-    this.chartService.getAllData(region, year).subscribe(result => {
-      this.data = result.feasibleData;
-      this.eci = result.eci;
-      this.centerX = result.centerX;
-      this.centerY = result.centerY;
-      this.bounds = {
-        minDistance: result.minDistance,
-        maxDistance: result.maxDistance,
-        minPci: result.minPci,
-        maxPci: result.maxPci
-      };
-
-
-
-      // Emit data loaded event
-      this.chartDataLoaded.emit({
-        dataCount: this.data.length,
-        eci: this.eci
+  private subscribeToUnifiedService(): void {
+    // Subscribe to loading state
+    this.unifiedDataService.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(loading => {
+        this.loading = loading;
       });
 
-      this.initializeChart();
-    });
+    // Subscribe to error state
+    this.unifiedDataService.error$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(error => {
+        this.error = error;
+      });
+
+    // Subscribe to current region changes
+    this.unifiedDataService.currentRegion$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(region => {
+        //this.loadData();
+      });
+  }
+
+  private loadData(): void {
+    const region = this.coordinationService.currentRegion || this.unifiedDataService.getCurrentRegion();
+    
+    console.log(`Loading feasible chart data for region: ${region}`);
+
+    this.unifiedDataService.getFeasibleChartData(region as any)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (result) => {
+          console.log("Feasible chart data loaded:", result);
+          
+          // Store the raw data for reprocessing
+          this.rawData = result.rawData;
+          
+          // Process the data for current grouping
+          this.data = this.processDataForGrouping(result.feasibleData);
+          this.eci = result.eci;
+          this.bounds = result.bounds;
+          this.centerX = result.bounds.centerX;
+          this.centerY = result.bounds.centerY;
+
+          // Emit data loaded event
+          this.chartDataLoaded.emit({
+            dataCount: this.data.length,
+            eci: this.eci
+          });
+
+          this.initializeChart();
+        },
+        error: (error) => {
+          console.error("Error loading feasible chart data:", error);
+          this.error = `Failed to load chart data: ${error.message}`;
+        }
+      });
   }
 
   private initializeChart(): void {
@@ -185,6 +239,29 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     d3.selectAll('.tooltip').remove();
   }
+
+
+  private extractNaicsDescriptions(data: any[]): any {
+    const naicsDescriptions: any = {};
+    data.forEach(item => {
+      if (item.naics && item.naics_description) {
+        naicsDescriptions[item.naics] = item.naics_description;
+      }
+    });
+    return naicsDescriptions;
+  }
+    /**
+   * Process data for current grouping type
+   */
+    private processDataForGrouping(feasibleData: any[]): FeasiblePoint[] {
+      // If the data is already processed for the current grouping, return it
+      // Otherwise, use the chart service to aggregate it properly
+      return this.chartService.aggregateData(
+        feasibleData,
+        this.currentGrouping,
+        this.extractNaicsDescriptions(feasibleData)
+      );
+    }
 
   private setupSVG(): void {
 

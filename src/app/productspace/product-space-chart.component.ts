@@ -62,17 +62,13 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private loadData(): void {
+    
     this.chartService.getAllData(this.selectedRegion).subscribe(({ nodes, links, grouped, totalSum }) => {
       this.nodes = nodes;
       this.links = links;
       this.grouped = grouped;
       this.totalSum = totalSum;
       
-      console.log('Total Sum:', totalSum);
-      console.log('Nodes count:', nodes.length);
-      console.log('Links count:', links.length);
-      console.log('Grouped data count:', grouped.length);
-
     this.chartDataLoaded.emit({
         totalSum: totalSum,
         nodeCount: nodes.length,
@@ -270,9 +266,6 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
     
     const svgElement = this.svg.node()
 
-    const [xcord, ycord] = d3.pointer(event, d);
-    const [xpos, ypos] = d3.pointer(event, svgElement);
-    
     if (this.highlightConnections) {
       const edges = this.links.filter((x) => {
         return x.source === d.id || x.target === d.id;

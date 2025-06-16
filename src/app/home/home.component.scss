@@ -1,7 +1,62 @@
 
 @use '@angular/material' as mat;
 
+.modern-chart-toggles .mat-pseudo-checkbox {
+  width: 18px !important;
+  height: 18px !important;
+  --mat-minimal-pseudo-checkbox-selected-checkmark-color: white !important;
+}
 
+.modern-chart-toggles {
+  
+  .mat-button-toggle-group {
+    border-radius: 6px;
+    height: 42px;
+  }
+
+  .mat-button-toggle-label-content {
+    line-height: normal !important;
+  }
+
+
+  .mat-button-toggle {
+
+    
+    /* Remove border from last button */
+    &:last-child {
+      border-right: none;
+    }
+    
+    &:hover:not(.mat-button-toggle-checked) {
+      background: #f8f9fa;
+      color: #495057;
+    }
+
+    &.mat-button-toggle-checked {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+  }
+
+  
+
+  .mat-button-toggle-button {
+    height: 42px;
+    width: 100%;
+  
+  }
+
+
+  /* Clean up focus and ripple effects */
+  .mat-button-toggle-focus-overlay {
+    background: transparent;
+  }
+
+  .mat-ripple.mat-button-toggle-ripple {
+    border-radius: 0;
+  }
+}
 
 .flex-container {
   display: flex;
@@ -16,7 +71,6 @@
 .row {
     display: flex;
     flex-wrap: wrap;
-    margin: 0 -15px;
     width: 100%;
 }
 
@@ -32,7 +86,6 @@
 
 /* Column base styles */
 [class^="col-"] {
-    padding: 0 15px;
     box-sizing: border-box;
 }
 
@@ -55,65 +108,6 @@
   margin: 0;
 }
 
-goa-accordion{
-    width: 100%;
-}
-
-dl.accordion-example {
-    margin: 0 0;
-  }
-  
-  .accordion-example dt {
-    color: var(--goa-color-text-default);
-    font: var(--goa-typography-heading-s);
-    margin-bottom: var(--goa-space-xs);
-  }
-  
-  .accordion-example dd {
-    margin: 0 0 var(--goa-space-l);
-    font: var(--goa-typography-body-m);
-    font-size: small;
-  }
-  
-  .accordion-example dd:last-of-type {
-    margin-bottom: 0;
-  }
-
-  goa-accordion .title {
-    flex-direction: column !important;
-  }
-
-  goa-accordion .title.svelte-1g8h5ss {
-    flex-direction: column !important;
-  }
-
-  .filter-buttons{
-    width: 90%;
-    flex-wrap: wrap;
-    background-color: #fff;
-    color: black;
-    border-color: #d3d3d3 !important;  
-    cursor: pointer;
-    outline: none !important;
-    border-style: solid;
-    font-size: 12px;
-    height: 40px;
-    border-width: 1px !important;
-    justify-content: center;
-    border: none;
-    text-align: left; 
-
-    display: flex !important;
-    justify-content: flex-start;
-    flex-direction: row;
-    align-items: center;
-  
-
-  }
-  
-  .filter-buttons:hover {
-    background-color: #d6d6d6 !important;
-  }
 
   mat-chip-row  {
     background-color: white !important;
@@ -174,6 +168,11 @@ dl.accordion-example {
       }
     }
   }
+
+ 
+
+
+
   
   // Animation when appearing
   animation: slideInFromRight 0.3s ease-out;

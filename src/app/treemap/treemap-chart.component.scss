@@ -1,0 +1,328 @@
+// treemap-chart.component.scss
+
+.treemap-chart-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      
+      .loading-spinner {
+        padding: 20px;
+        font-size: 16px;
+        color: #333;
+        
+        &::after {
+          content: '';
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+          margin-left: 10px;
+          border: 2px solid #ccc;
+          border-top-color: #333;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+    
+    .error-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #ffebee;
+      border: 1px solid #f44336;
+      border-radius: 4px;
+      padding: 20px;
+      text-align: center;
+      z-index: 100;
+      
+      .error-message {
+        color: #d32f2f;
+        margin-bottom: 10px;
+        font-weight: 500;
+      }
+      
+      .retry-button {
+        background-color: #f44336;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        
+        &:hover {
+          background-color: #d32f2f;
+        }
+      }
+    }
+    
+    .chart-container {
+      transition: opacity 0.3s ease;
+      
+      &.zoom-enabled {
+        cursor: grab;
+        
+        &:active {
+          cursor: grabbing;
+        }
+      }
+    }
+    
+    .tooltip-container {
+      pointer-events: none;
+      
+      .treemap-tooltip-container {
+        position: absolute;
+        background-color: rgba(0, 33, 69, 0.95);
+        color: white;
+        padding: 12px;
+        border-radius: 6px;
+        pointer-events: none;
+        font-size: 13px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        max-width: 300px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(2px);
+        
+        .treemap-tooltip {
+          .tooltip-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #fff;
+          }
+          
+          .tooltip-value {
+            font-size: 16px;
+            color: #4fc3f7;
+            margin-bottom: 4px;
+            font-weight: 600;
+          }
+          
+          .tooltip-percentage {
+            font-size: 12px;
+            color: #e1f5fe;
+            margin-bottom: 4px;
+          }
+          
+          .tooltip-naics {
+            font-size: 11px;
+            color: #b3e5fc;
+            opacity: 0.8;
+          }
+        }
+      }
+    }
+    
+    .zoom-controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 50;
+      display: flex;
+      gap: 5px;
+      
+      .reset-zoom-btn, .zoom-fit-btn {
+        background-color: rgba(0, 33, 69, 0.9);
+        color: white;
+        border: none;
+        padding: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          background-color: rgba(0, 33, 69, 1);
+          transform: scale(1.05);
+        }
+        
+        i {
+          font-size: 18px;
+        }
+      }
+    }
+    
+    .treemap-controls {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 6px;
+      padding: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      z-index: 50;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      
+      .control-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        label {
+          font-size: 12px;
+          font-weight: 500;
+          color: #333;
+        }
+        
+        select {
+          padding: 4px 8px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 12px;
+          
+          &:focus {
+            outline: none;
+            border-color: #1976d2;
+          }
+        }
+        
+        .control-btn {
+          background-color: #1976d2;
+          color: white;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 4px;
+          font-size: 12px;
+          cursor: pointer;
+          transition: background-color 0.2s;
+          
+          &:hover {
+            background-color: #1565c0;
+          }
+        }
+      }
+    }
+    
+    .cache-status, .debug-info {
+      position: absolute;
+      bottom: 10px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      z-index: 200;
+    }
+  
+    .cache-status {
+      left: 10px;
+    }
+  
+    .debug-info {
+      left: 250px;
+      background-color: rgba(255, 140, 0, 0.8);
+      color: black;
+      max-width: 500px;
+      line-height: 1.4;
+    }
+  }
+  
+  // Global styles for D3 elements
+  :host ::ng-deep {
+    .treemap-node {
+      transition: all 0.2s ease;
+      
+      rect {
+        transition: all 0.2s ease;
+      }
+      
+      &:hover {
+        rect {
+          stroke: #333;
+          stroke-width: 2;
+          filter: brightness(1.1);
+        }
+      }
+      
+      text {
+        user-select: none;
+        pointer-events: none;
+      }
+    }
+    
+    .treemap-group {
+      .treemap-node {
+        &.selected {
+          rect {
+            stroke: #ff5722;
+            stroke-width: 3;
+            filter: brightness(1.2);
+          }
+        }
+        
+        &.highlighted {
+          rect {
+            stroke: #4caf50;
+            stroke-width: 2;
+            filter: brightness(1.15);
+          }
+        }
+      }
+    }
+    
+    // Animation for node entrance
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    .treemap-node {
+      animation: fadeInScale 0.3s ease-out;
+    }
+  }
+  
+  // Spinner animation
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .treemap-chart-wrapper {
+      .treemap-controls {
+        position: static;
+        margin-bottom: 10px;
+        justify-content: center;
+      }
+      
+      .zoom-controls {
+        top: auto;
+        bottom: 10px;
+        left: 10px;
+      }
+      
+      .debug-info {
+        position: static;
+        margin-top: 10px;
+        max-width: none;
+      }
+    }
+  }
