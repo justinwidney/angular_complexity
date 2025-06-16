@@ -22476,13 +22476,6 @@ export class ProductSpaceChartService {
     }
   ]
 
-  private hsDescriptions: HSDescription[] = [
-    { HS4: "8518", "HS4 Short Name": "Electronic Equipment" },
-    { HS4: "8535", "HS4 Short Name": "Electrical Machinery" },
-    // Add your actual HS descriptions here
-  ];
-
- 
  private apiMap = {
   'Alberta': 'https://api.economicdata.alberta.ca/api/data?code=e786bd96-d36d-4933-b36b-8e5d1cfd549b',
   'British Columbia': 'https://api.economicdata.alberta.ca/api/data?code=e6429f6a-0a6d-4475-a3f1-400a5fa1e0b3',
@@ -22501,10 +22494,6423 @@ export class ProductSpaceChartService {
  constructor(private unifiedDataService: UnifiedDataService) { 
 
   this.unifiedDataService.setHSDescriptions([
-    { HS4: "8518", "HS4 Short Name": "Electronic Equipment" },
-    { HS4: "8535", "HS4 Short Name": "Electrical Machinery" },
-    // Add your actual HS descriptions here
-  ]);
+  {
+    "HS4": "0101",
+    "HS4 Short Name": "Horses",
+    "HS4 Description": "Live horses, asses, mules and hinnies."
+  },
+  {
+    "HS4": "0102",
+    "HS4 Short Name": "Bovine",
+    "HS4 Description": "Live bovine animals."
+  },
+  {
+    "HS4": "0103",
+    "HS4 Short Name": "Pigs",
+    "HS4 Description": "Live swine."
+  },
+  {
+    "HS4": "0104",
+    "HS4 Short Name": "Sheep and Goats",
+    "HS4 Description": "Live sheep and goats."
+  },
+  {
+    "HS4": "0105",
+    "HS4 Short Name": "Poultry",
+    "HS4 Description": "Live poultry, that is to say, fowls of the species Gallus domesticus, ducks, geese, turkeys and guinea fowls."
+  },
+  {
+    "HS4": "0106",
+    "HS4 Short Name": "Other Animals",
+    "HS4 Description": "Other live animals."
+  },
+  {
+    "HS4": "0201",
+    "HS4 Short Name": "Bovine Meat",
+    "HS4 Description": "Meat of bovine animals, fresh or chilled."
+  },
+  {
+    "HS4": "0202",
+    "HS4 Short Name": "Frozen Bovine Meat",
+    "HS4 Description": "Meat of bovine animals, frozen."
+  },
+  {
+    "HS4": "0203",
+    "HS4 Short Name": "Pig Meat",
+    "HS4 Description": "Meat of swine, fresh, chilled or frozen."
+  },
+  {
+    "HS4": "0204",
+    "HS4 Short Name": "Sheep and Goat Meat",
+    "HS4 Description": "Meat of sheep or goats, fresh, chilled or frozen."
+  },
+  {
+    "HS4": "0205",
+    "HS4 Short Name": "Horse Meat",
+    "HS4 Description": "Meat of horses, asses, mules or hinnies, fresh, chilled or frozen."
+  },
+  {
+    "HS4": "0206",
+    "HS4 Short Name": "Edible Offal",
+    "HS4 Description": "Edible offal of bovine animals, swine, sheep, goats, horses, asses, mules or hinnies, fresh, chilled or frozen."
+  },
+  {
+    "HS4": "0207",
+    "HS4 Short Name": "Poultry Meat",
+    "HS4 Description": "Meat and edible offal, of the poultry of heading 01.05, fresh, chilled or frozen."
+  },
+  {
+    "HS4": "0208",
+    "HS4 Short Name": "Other Meat",
+    "HS4 Description": "Other meat and edible meat offal, fresh, chilled or frozen."
+  },
+  {
+    "HS4": "0209",
+    "HS4 Short Name": "Animal Fat",
+    "HS4 Description": "Pig fat, free of lean meat, and poultry fat, not rendered or otherwise extracted, fresh, chilled, frozen, salted, in brine, dried or smoked."
+  },
+  {
+    "HS4": "0210",
+    "HS4 Short Name": "Preserved Meat",
+    "HS4 Description": "Meat and edible meat offal, salted, in brine, dried or smoked; edible flours and meals of meat or meat offal."
+  },
+  {
+    "HS4": "0301",
+    "HS4 Short Name": "Live Fish",
+    "HS4 Description": "Live fish."
+  },
+  {
+    "HS4": "0302",
+    "HS4 Short Name": "Non-fillet Fresh Fish",
+    "HS4 Description": "Fish, fresh or chilled, excluding fish fillets and other fish meat of heading 03.04."
+  },
+  {
+    "HS4": "0303",
+    "HS4 Short Name": "Non-fillet Frozen Fish",
+    "HS4 Description": "Fish, frozen, excluding fish fillets and other fish meat of heading 03.04."
+  },
+  {
+    "HS4": "0304",
+    "HS4 Short Name": "Fish Fillets",
+    "HS4 Description": "Fish fillets and other fish meat (whether or not minced), fresh, chilled or frozen."
+  },
+  {
+    "HS4": "0305",
+    "HS4 Short Name": "Processed Fish",
+    "HS4 Description": "Fish, dried, salted or in brine; smoked fish, whether or not cooked before or during the smoking process; flours, meals and pellets of fish, fit for human consumption."
+  },
+  {
+    "HS4": "0306",
+    "HS4 Short Name": "Crustaceans",
+    "HS4 Description": "Crustaceans, whether in shell or not, live, fresh, chilled, frozen, dried, salted or in brine; smoked crustaceans, whether in shell or not, whether or not cooked before or during the smoking process; crustaceans, in shell, cooked by steaming or by boiling"
+  },
+  {
+    "HS4": "0307",
+    "HS4 Short Name": "Molluscs",
+    "HS4 Description": "Molluscs, whether in shell or not, live, fresh, chilled, frozen, dried, salted or in brine; smoked molluscs, whether in shell or not, whether or not cooked before or during the smoking process; flours, meals and pellets of molluscs, fit for human consumpt"
+  },
+  {
+    "HS4": "0308",
+    "HS4 Short Name": "Aquatic invertebrates other than crustaceans and molluscs",
+    "HS4 Description": "Aquatic invertebrates other than crustaceans and molluscs, live, fresh, chilled, frozen, dried, salted or in brine; smoked aquatic invertebrates other than crustaceans and molluscs, whether or not cooked before or during the smoking process; flours, meals"
+  },
+  {
+    "HS4": "0401",
+    "HS4 Short Name": "Milk",
+    "HS4 Description": "Milk and cream, not concentrated nor containing added sugar or other sweetening matter."
+  },
+  {
+    "HS4": "0402",
+    "HS4 Short Name": "Concentrated Milk",
+    "HS4 Description": "Milk and cream, concentrated or containing added sugar or other sweetening matter."
+  },
+  {
+    "HS4": "0403",
+    "HS4 Short Name": "Fermented Milk Products",
+    "HS4 Description": "Buttermilk, curdled milk and cream, yogurt, kephir and other fermented or acidified milk and cream, whether or not concentrated or containing added sugar or other sweetening matter or flavoured or containing added fruit, nuts or cocoa."
+  },
+  {
+    "HS4": "0404",
+    "HS4 Short Name": "Whey",
+    "HS4 Description": "Whey, whether or not concentrated or containing added sugar or other sweetening matter; products consisting of natural milk constituents, whether or not containing added sugar or other sweetening matter, not elsewhere specified or included."
+  },
+  {
+    "HS4": "0405",
+    "HS4 Short Name": "Butter",
+    "HS4 Description": "Butter and other fats and oils derived from milk; dairy spreads."
+  },
+  {
+    "HS4": "0406",
+    "HS4 Short Name": "Cheese",
+    "HS4 Description": "Cheese and curd."
+  },
+  {
+    "HS4": "0407",
+    "HS4 Short Name": "Eggs",
+    "HS4 Description": "Birds' eggs, in shell, fresh, preserved or cooked."
+  },
+  {
+    "HS4": "0408",
+    "HS4 Short Name": "Processed Egg Products",
+    "HS4 Description": "Birds' eggs, not in shell, and egg yolks, fresh, dried, cooked by steaming or by boiling in water, moulded, frozen or otherwise preserved, whether or not containing added sugar or other sweetening matter."
+  },
+  {
+    "HS4": "0409",
+    "HS4 Short Name": "Honey",
+    "HS4 Description": "Natural honey."
+  },
+  {
+    "HS4": "0410",
+    "HS4 Short Name": "Other Edible Animal Products",
+    "HS4 Description": "Edible products of animal origin, not elsewhere specified or included."
+  },
+  {
+    "HS4": "0501",
+    "HS4 Short Name": "Human Hair",
+    "HS4 Description": "Human hair, unworked, whether or not washed or scoured; waste of human hair."
+  },
+  {
+    "HS4": "0502",
+    "HS4 Short Name": "Pig Hair",
+    "HS4 Description": "Pigs', hogs' or boars' bristles and hair; badger hair and other brush making hair; waste of such bristles or hair."
+  },
+  {
+    "HS4": "0503",
+    "HS4 Short Name": "Horse Hair",
+    "HS4 Description": "(-2006) Horsehair and horsehair waste, whether or not put up as a layer, with or without supporting material"
+  },
+  {
+    "HS4": "0504",
+    "HS4 Short Name": "Animal Organs",
+    "HS4 Description": "Guts, bladders and stomachs of animals (other than fish), whole and pieces thereof, fresh, chilled, frozen, salted, in brine, dried or smoked."
+  },
+  {
+    "HS4": "0505",
+    "HS4 Short Name": "Bird Feathers and Skins",
+    "HS4 Description": "Skins and other parts of birds, with their feathers or down, feathers and parts of feathers (whether or not with trimmed edges) and down, not further worked than cleaned, disinfected or treated for preservation; powder and waste of feathers or parts of fe"
+  },
+  {
+    "HS4": "0506",
+    "HS4 Short Name": "Processed Bones",
+    "HS4 Description": "Bones and horn-cores, unworked, defatted, simply prepared (but not cut to shape), treated with acid or degelatinised; powder and waste of these products."
+  },
+  {
+    "HS4": "0507",
+    "HS4 Short Name": "Raw Bones",
+    "HS4 Description": "Ivory, tortoise-shell, whalebone and whalebone hair, horns, antlers, hooves, nails, claws and beaks, unworked or simply prepared but not cut to shape; powder and waste of these products."
+  },
+  {
+    "HS4": "0508",
+    "HS4 Short Name": "Coral and Shells",
+    "HS4 Description": "Coral and similar materials, unworked or simply prepared but not otherwise worked; shells of molluscs, crustaceans or echinoderms and cuttle-bone, unworked or simply prepared but not cut to shape, powder and waste thereof."
+  },
+  {
+    "HS4": "0509",
+    "HS4 Short Name": "Sponges",
+    "HS4 Description": "(-2006) Natural sponges of animal origin"
+  },
+  {
+    "HS4": "0510",
+    "HS4 Short Name": "Pharmaceutical Animal Products",
+    "HS4 Description": "Ambergris, castoreum, civet and musk; cantharides; bile, whether or not dried; glands and other animal products used in the preparation of pharmaceutical products, fresh, chilled, frozen or otherwise provisionally preserved."
+  },
+  {
+    "HS4": "0511",
+    "HS4 Short Name": "Other Inedible Animal Products",
+    "HS4 Description": "Animal products not elsewhere specified or included; dead animals of Chapter 1 or 3, unfit for human consumption."
+  },
+  {
+    "HS4": "0601",
+    "HS4 Short Name": "Bulbs and Roots",
+    "HS4 Description": "Bulbs, tubers, tuberous roots, corms, crowns and rhizomes, dormant, in growth or in flower; chicory plants and roots other than roots of heading 12.12."
+  },
+  {
+    "HS4": "0602",
+    "HS4 Short Name": "Other Live Plants",
+    "HS4 Description": "Other live plants (including their roots), cuttings and slips; mushroom spawn."
+  },
+  {
+    "HS4": "0603",
+    "HS4 Short Name": "Cut Flowers",
+    "HS4 Description": "Cut flowers and flower buds of a kind suitable for bouquets or for ornamental purposes, fresh, dried, dyed, bleached, impregnated or otherwise prepared."
+  },
+  {
+    "HS4": "0604",
+    "HS4 Short Name": "Foliage",
+    "HS4 Description": "Foliage, branches and other parts of plants, without flowers or flower buds, and grasses, mosses and lichens, being goods of a kind suitable for bouquets or for ornamental purposes, fresh, dried, dyed, bleached, impregnated or otherwise prepared."
+  },
+  {
+    "HS4": "0701",
+    "HS4 Short Name": "Potatoes",
+    "HS4 Description": "Potatoes, fresh or chilled."
+  },
+  {
+    "HS4": "0702",
+    "HS4 Short Name": "Tomatoes",
+    "HS4 Description": "Tomatoes, fresh or chilled."
+  },
+  {
+    "HS4": "0703",
+    "HS4 Short Name": "Onions",
+    "HS4 Description": "Onions, shallots, garlic, leeks and other alliaceous vegetables, fresh or chilled."
+  },
+  {
+    "HS4": "0704",
+    "HS4 Short Name": "Cabbages",
+    "HS4 Description": "Cabbages, cauliflowers, kohlrabi, kale and similar edible brassicas, fresh or chilled."
+  },
+  {
+    "HS4": "0705",
+    "HS4 Short Name": "Lettuce",
+    "HS4 Description": "Lettuce (Lactuca sativa) and chicory (Cichorium spp.), fresh or chilled."
+  },
+  {
+    "HS4": "0706",
+    "HS4 Short Name": "Root Vegetables",
+    "HS4 Description": "Carrots, turnips, salad beetroot, salsify, celeriac, radishes and similar edible roots, fresh or chilled."
+  },
+  {
+    "HS4": "0707",
+    "HS4 Short Name": "Cucumbers",
+    "HS4 Description": "Cucumbers and gherkins, fresh or chilled."
+  },
+  {
+    "HS4": "0708",
+    "HS4 Short Name": "Legumes",
+    "HS4 Description": "Leguminous vegetables, shelled or unshelled, fresh or chilled."
+  },
+  {
+    "HS4": "0709",
+    "HS4 Short Name": "Other Vegetables",
+    "HS4 Description": "Other vegetables, fresh or chilled."
+  },
+  {
+    "HS4": "0710",
+    "HS4 Short Name": "Frozen Vegetables",
+    "HS4 Description": "Vegetables (uncooked or cooked by steaming or boiling in water), frozen."
+  },
+  {
+    "HS4": "0711",
+    "HS4 Short Name": "Preserved Vegetables",
+    "HS4 Description": "Vegetables provisionally preserved (for example, by sulphur dioxide gas, in brine, in sulphur water or in other preservative solutions), but unsuitable in that state for immediate consumption."
+  },
+  {
+    "HS4": "0712",
+    "HS4 Short Name": "Dried Vegetables",
+    "HS4 Description": "Dried vegetables, whole, cut, sliced, broken or in powder, but not further prepared."
+  },
+  {
+    "HS4": "0713",
+    "HS4 Short Name": "Dried Legumes",
+    "HS4 Description": "Dried leguminous vegetables, shelled, whether or not skinned or split."
+  },
+  {
+    "HS4": "0714",
+    "HS4 Short Name": "Cassava",
+    "HS4 Description": "Manioc, arrowroot, salep, Jerusalem artichokes, sweet potatoes and similar roots and tubers with high starch or inulin content, fresh, chilled, frozen or dried, whether or not sliced or in the form of pellets; sago pith."
+  },
+  {
+    "HS4": "0801",
+    "HS4 Short Name": "Coconuts, Brazil Nuts, and Cashews",
+    "HS4 Description": "Coconuts, Brazil nuts and cashew nuts, fresh or dried, whether or not shelled or peeled."
+  },
+  {
+    "HS4": "0802",
+    "HS4 Short Name": "Other Nuts",
+    "HS4 Description": "Other nuts, fresh or dried, whether or not shelled or peeled."
+  },
+  {
+    "HS4": "0803",
+    "HS4 Short Name": "Bananas",
+    "HS4 Description": "Bananas, including plantains, fresh or dried."
+  },
+  {
+    "HS4": "0804",
+    "HS4 Short Name": "Tropical Fruits",
+    "HS4 Description": "Dates, figs, pineapples, avocados, guavas, mangoes and mangosteens, fresh or dried."
+  },
+  {
+    "HS4": "0805",
+    "HS4 Short Name": "Citrus",
+    "HS4 Description": "Citrus fruit, fresh or dried."
+  },
+  {
+    "HS4": "0806",
+    "HS4 Short Name": "Grapes",
+    "HS4 Description": "Grapes, fresh or dried."
+  },
+  {
+    "HS4": "0807",
+    "HS4 Short Name": "Melons",
+    "HS4 Description": "Melons (including watermelons) and papaws (papayas), fresh."
+  },
+  {
+    "HS4": "0808",
+    "HS4 Short Name": "Apples and Pears",
+    "HS4 Description": "Apples, pears and quinces, fresh."
+  },
+  {
+    "HS4": "0809",
+    "HS4 Short Name": "Pitted Fruits",
+    "HS4 Description": "Apricots, cherries, peaches (including nectarines), plums and sloes, fresh."
+  },
+  {
+    "HS4": "0810",
+    "HS4 Short Name": "Other Fruits",
+    "HS4 Description": "Other fruit, fresh."
+  },
+  {
+    "HS4": "0811",
+    "HS4 Short Name": "Frozen Fruits and Nuts",
+    "HS4 Description": "Fruit and nuts, uncooked or cooked by steaming or boiling in water, frozen, whether or not containing added sugar or other sweetening matter."
+  },
+  {
+    "HS4": "0812",
+    "HS4 Short Name": "Preserved Fruits and Nuts",
+    "HS4 Description": "Fruit and nuts, provisionally preserved (for example, by sulphur dioxide gas, in brine, in sulphur water or in other preservative solutions), but unsuitable in that state for immediate consumption."
+  },
+  {
+    "HS4": "0813",
+    "HS4 Short Name": "Dried Fruits",
+    "HS4 Description": "Fruit, dried, other than that of headings 08.01 to 08.06; mixtures of nuts or dried fruits of this Chapter."
+  },
+  {
+    "HS4": "0814",
+    "HS4 Short Name": "Citrus and Melon Peels",
+    "HS4 Description": "Peel of citrus fruit or melons (including watermelons), fresh, frozen, dried or provisionally preserved in brine, in sulphur water or in other preservative solutions."
+  },
+  {
+    "HS4": "0901",
+    "HS4 Short Name": "Coffee",
+    "HS4 Description": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion."
+  },
+  {
+    "HS4": "0902",
+    "HS4 Short Name": "Tea",
+    "HS4 Description": "Tea, whether or not flavoured."
+  },
+  {
+    "HS4": "0903",
+    "HS4 Short Name": "Maté",
+    "HS4 Description": "Maté"
+  },
+  {
+    "HS4": "0904",
+    "HS4 Short Name": "Pepper",
+    "HS4 Description": "Pepper of the genus Piper; dried or crushed or ground fruits of the genus Capsicum or of the genus Pimenta."
+  },
+  {
+    "HS4": "0905",
+    "HS4 Short Name": "Vanilla",
+    "HS4 Description": "Vanilla."
+  },
+  {
+    "HS4": "0906",
+    "HS4 Short Name": "Cinnamon",
+    "HS4 Description": "Cinnamon and cinnamon-tree flowers."
+  },
+  {
+    "HS4": "0907",
+    "HS4 Short Name": "Cloves",
+    "HS4 Description": "Cloves (whole fruit, cloves and stems)."
+  },
+  {
+    "HS4": "0908",
+    "HS4 Short Name": "Nutmeg",
+    "HS4 Description": "Nutmeg, mace and cardamoms."
+  },
+  {
+    "HS4": "0909",
+    "HS4 Short Name": "Spice Seeds",
+    "HS4 Description": "Seeds of anise, badian, fennel, coriander, cumin or caraway; juniper berries."
+  },
+  {
+    "HS4": "0910",
+    "HS4 Short Name": "Spices",
+    "HS4 Description": "Ginger, saffron, turmeric (curcuma), thyme, bay leaves, curry and other spices."
+  },
+  {
+    "HS4": "1001",
+    "HS4 Short Name": "Wheat",
+    "HS4 Description": "Wheat and meslin."
+  },
+  {
+    "HS4": "1002",
+    "HS4 Short Name": "Rye",
+    "HS4 Description": "Rye."
+  },
+  {
+    "HS4": "1003",
+    "HS4 Short Name": "Barley",
+    "HS4 Description": "Barley."
+  },
+  {
+    "HS4": "1004",
+    "HS4 Short Name": "Oats",
+    "HS4 Description": "Oats."
+  },
+  {
+    "HS4": "1005",
+    "HS4 Short Name": "Corn",
+    "HS4 Description": "Maize (corn)."
+  },
+  {
+    "HS4": "1006",
+    "HS4 Short Name": "Rice",
+    "HS4 Description": "Rice."
+  },
+  {
+    "HS4": "1007",
+    "HS4 Short Name": "Sorghum",
+    "HS4 Description": "Grain sorghum."
+  },
+  {
+    "HS4": "1008",
+    "HS4 Short Name": "Buckwheat",
+    "HS4 Description": "Buckwheat, millet and canary seeds; other cereals."
+  },
+  {
+    "HS4": "1101",
+    "HS4 Short Name": "Wheat Flours",
+    "HS4 Description": "Wheat or meslin flour."
+  },
+  {
+    "HS4": "1102",
+    "HS4 Short Name": "Cereal Flours",
+    "HS4 Description": "Cereal flours other than of wheat or meslin."
+  },
+  {
+    "HS4": "1103",
+    "HS4 Short Name": "Cereal Meal and Pellets",
+    "HS4 Description": "Cereal groats, meal and pellets."
+  },
+  {
+    "HS4": "1104",
+    "HS4 Short Name": "Processed Cereals",
+    "HS4 Description": "Cereal grains otherwise worked (for example, hulled, rolled, flaked, pearled, sliced or kibbled), except rice of heading 10.06; germ of cereals, whole, rolled, flaked or ground."
+  },
+  {
+    "HS4": "1105",
+    "HS4 Short Name": "Potato Flours",
+    "HS4 Description": "Flour, meal, powder, flakes, granules and pellets of potatoes."
+  },
+  {
+    "HS4": "1106",
+    "HS4 Short Name": "Legume Flours",
+    "HS4 Description": "Flour, meal and powder of the dried leguminous vegetables of heading 07.13, of sago or of roots or tubers of heading 07.14 or of the products of Chapter 8."
+  },
+  {
+    "HS4": "1107",
+    "HS4 Short Name": "Malt",
+    "HS4 Description": "Malt, whether or not roasted."
+  },
+  {
+    "HS4": "1108",
+    "HS4 Short Name": "Starches",
+    "HS4 Description": "Starches; inulin."
+  },
+  {
+    "HS4": "1109",
+    "HS4 Short Name": "Wheat Gluten",
+    "HS4 Description": "Wheat gluten, whether or not dried."
+  },
+  {
+    "HS4": "1201",
+    "HS4 Short Name": "Soybeans",
+    "HS4 Description": "Soya beans, whether or not broken."
+  },
+  {
+    "HS4": "1202",
+    "HS4 Short Name": "Ground Nuts",
+    "HS4 Description": "Ground-nuts, not roasted or otherwise cooked, whether or not shelled or broken."
+  },
+  {
+    "HS4": "1203",
+    "HS4 Short Name": "Copra",
+    "HS4 Description": "Copra."
+  },
+  {
+    "HS4": "1204",
+    "HS4 Short Name": "Linseed",
+    "HS4 Description": "Linseed, whether or not broken."
+  },
+  {
+    "HS4": "1205",
+    "HS4 Short Name": "Canola",
+    "HS4 Description": "Canola or colza seeds, whether or not broken."
+  },
+  {
+    "HS4": "1206",
+    "HS4 Short Name": "Sunflower Seeds",
+    "HS4 Description": "Sunflower seeds, whether or not broken."
+  },
+  {
+    "HS4": "1207",
+    "HS4 Short Name": "Other Oily Seeds",
+    "HS4 Description": "Other oil seeds and oleaginous fruits, whether or not broken."
+  },
+  {
+    "HS4": "1208",
+    "HS4 Short Name": "Oil Seed Flower",
+    "HS4 Description": "Flours and meals of oil seeds or oleaginous fruits, other than those of mustard."
+  },
+  {
+    "HS4": "1209",
+    "HS4 Short Name": "Sowing Seeds",
+    "HS4 Description": "Seeds, fruit and spores, of a kind used for sowing."
+  },
+  {
+    "HS4": "1210",
+    "HS4 Short Name": "Hops",
+    "HS4 Description": "Hop cones, fresh or dried, whether or not ground, powdered or in the form of pellets; lupulin."
+  },
+  {
+    "HS4": "1211",
+    "HS4 Short Name": "Perfume Plants",
+    "HS4 Description": "Plants and parts of plants (including seeds and fruits), of a kind used primarily in perfumery, in pharmacy or for insecticidal, fungicidal or similar purposes, fresh or dried, whether or not cut, crushed or powdered."
+  },
+  {
+    "HS4": "1212",
+    "HS4 Short Name": "Locust beans, seaweed, sugar beet, cane, for food",
+    "HS4 Description": "Locust beans, seaweeds and other algae, sugar beet and sugar cane, fresh, chilled, frozen or dried, whether or not ground; fruit stones and kernels and other vegetable products (including unroasted chicory roots of the variety Cichorium intybus sativum) o"
+  },
+  {
+    "HS4": "1213",
+    "HS4 Short Name": "Cereal Straws",
+    "HS4 Description": "Cereal straw and husks, unprepared, whether or not chopped, ground, pressed or in the form of pellets."
+  },
+  {
+    "HS4": "1214",
+    "HS4 Short Name": "Forage Crops",
+    "HS4 Description": "Swedes, mangolds, fodder roots, hay, lucerne (alfalfa), clover, sainfoin, forage kale, lupines, vetches and similar forage products, whether or not in the form of pellets."
+  },
+  {
+    "HS4": "1301",
+    "HS4 Short Name": "Insect Resins",
+    "HS4 Description": "Lac; natural gums, resins, gum-resins and oleoresins (for example, balsams)."
+  },
+  {
+    "HS4": "1302",
+    "HS4 Short Name": "Vegetable Saps",
+    "HS4 Description": "Vegetable saps and extracts; pectic substances, pectinates and pectates; agar-agar and other mucilages and thickeners, whether or not modified, derived from vegetable products."
+  },
+  {
+    "HS4": "1401",
+    "HS4 Short Name": "Vegetable Plaiting Materials",
+    "HS4 Description": "Vegetable materials of a kind used primarily for plaiting (for example, bamboos, rattans, reeds, rushes, osier, raffia, cleaned, bleached or dyed cereal straw, and lime bark)."
+  },
+  {
+    "HS4": "1402",
+    "HS4 Short Name": "Vegetable Stuffing Materials",
+    "HS4 Description": "(-2006) Vegetable materials of a kind used primarily as stuffing or as padding, e.g. kapok, vegetable hair and eelgrass, whether or not put up as a layer, with or without supporting material"
+  },
+  {
+    "HS4": "1403",
+    "HS4 Short Name": "Vegetable Brush Materials",
+    "HS4 Description": "(-2006) Vegetable materials, such as broom-corn, piassava, couch grass and istle, of a kind used primarily in brooms or in brushes, whether or not in hanks or bundles"
+  },
+  {
+    "HS4": "1404",
+    "HS4 Short Name": "Other Vegetable Products",
+    "HS4 Description": "Vegetable products not elsewhere specified or included."
+  },
+  {
+    "HS4": "1501",
+    "HS4 Short Name": "Pig and Poultry Fat",
+    "HS4 Description": "Pig fat (including lard) and poultry fat, other than that of heading 02.09 or 15.03."
+  },
+  {
+    "HS4": "1502",
+    "HS4 Short Name": "Bovine, Sheep, and Goat Fat",
+    "HS4 Description": "Fats of bovine animals, sheep or goats, other than those of heading 15.03."
+  },
+  {
+    "HS4": "1503",
+    "HS4 Short Name": "Lard",
+    "HS4 Description": "Lard stearin, lard oil, oleostearin, oleo-oil and tallow oil, not emulsified or mixed or otherwise prepared."
+  },
+  {
+    "HS4": "1504",
+    "HS4 Short Name": "Fish Oil",
+    "HS4 Description": "Fats and oils and their fractions, of fish or marine mammals, whether or not refined, but not chemically modified."
+  },
+  {
+    "HS4": "1505",
+    "HS4 Short Name": "Wool Grease",
+    "HS4 Description": "Wool grease and fatty substances derived therefrom (including lanolin)."
+  },
+  {
+    "HS4": "1506",
+    "HS4 Short Name": "Other Animal Fats",
+    "HS4 Description": "Other animal fats and oils and their fractions, whether or not refined, but not chemically modified."
+  },
+  {
+    "HS4": "1507",
+    "HS4 Short Name": "Soybean Oil",
+    "HS4 Description": "Soya-bean oil and its fractions, whether or not refined, but not chemically modified."
+  },
+  {
+    "HS4": "1508",
+    "HS4 Short Name": "Ground Nut Oil",
+    "HS4 Description": "Ground-nut oil and its fractions, whether or not refined, but not chemically modified."
+  },
+  {
+    "HS4": "1509",
+    "HS4 Short Name": "Pure Olive Oil",
+    "HS4 Description": "Olive oil and its fractions, whether or not refined, but not chemically modified."
+  },
+  {
+    "HS4": "1510",
+    "HS4 Short Name": "Olive Oil",
+    "HS4 Description": "Other oils and their fractions, obtained solely from olives, whether or not refined, but not chemically modified, including blends of these oils or fractions with oils or fractions of heading 15.09."
+  },
+  {
+    "HS4": "1511",
+    "HS4 Short Name": "Palm Oil",
+    "HS4 Description": "Palm oil and its fractions, whether or not refined, but not chemically modified."
+  },
+  {
+    "HS4": "1512",
+    "HS4 Short Name": "Seed Oils",
+    "HS4 Description": "Sunflower-seed, safflower or cotton-seed oil and fractions thereof, whether or not refined, but not chemically modified."
+  },
+  {
+    "HS4": "1513",
+    "HS4 Short Name": "Coconut Oil",
+    "HS4 Description": "Coconut (copra), palm kernel or babassu oil and fractions thereof, whether or not refined, but not chemically modified."
+  },
+  {
+    "HS4": "1514",
+    "HS4 Short Name": "Canola Oil",
+    "HS4 Description": "Canola, colza or mustard oil and fractions thereof, whether or not refined, but not chemically modified."
+  },
+  {
+    "HS4": "1515",
+    "HS4 Short Name": "Other Pure Vegetable Oils",
+    "HS4 Description": "Other fixed vegetable fats and oils (including jojoba oil) and their fractions, whether or not refined, but not chemically modified."
+  },
+  {
+    "HS4": "1516",
+    "HS4 Short Name": "Other Vegetable Oils",
+    "HS4 Description": "Animal or vegetable fats and oils and their fractions, partly or wholly hydrogenated, inter-esterified, re-esterified or elaidinised, whether or not refined, but not further prepared."
+  },
+  {
+    "HS4": "1517",
+    "HS4 Short Name": "Margarine",
+    "HS4 Description": "Margarine; edible mixtures or preparations of animal or vegetable fats or oils or of fractions of different fats or oils of this Chapter, other than edible fats or oils or their fractions of heading 15.16."
+  },
+  {
+    "HS4": "1518",
+    "HS4 Short Name": "Inedible Fats and Oils",
+    "HS4 Description": "Animal or vegetable fats and oils and their fractions, boiled, oxidised, dehydrated, sulphurised, blown, polymerised by heat in vacuum or in inert gas or otherwise chemically modified, excluding those of heading 15.16; inedible mixtures or preparations of"
+  },
+  {
+    "HS4": "1519",
+    "HS4 Short Name": "Stearic Acid",
+    "HS4 Description": "(-1996) Industrial monocarboxylic fatty acids; acid oils from refining; industrial fatty alcohols"
+  },
+  {
+    "HS4": "1520",
+    "HS4 Short Name": "Glycerol",
+    "HS4 Description": "Glycerol, crude; glycerol waters and glycerol lyes."
+  },
+  {
+    "HS4": "1521",
+    "HS4 Short Name": "Waxes",
+    "HS4 Description": "Vegetable waxes (other than triglycerides), beeswax, other insect waxes and spermaceti, whether or not refined or coloured."
+  },
+  {
+    "HS4": "1522",
+    "HS4 Short Name": "Fat and Oil Residues",
+    "HS4 Description": "Degras; residues resulting from the treatment of fatty substances or animal or vegetable waxes."
+  },
+  {
+    "HS4": "1601",
+    "HS4 Short Name": "Sausages",
+    "HS4 Description": "Sausages and similar products, of meat, meat offal or blood; food preparations based on these products."
+  },
+  {
+    "HS4": "1602",
+    "HS4 Short Name": "Other Prepared Meat",
+    "HS4 Description": "Other prepared or preserved meat, meat offal or blood."
+  },
+  {
+    "HS4": "1603",
+    "HS4 Short Name": "Animal Extracts",
+    "HS4 Description": "Extracts and juices of meat, fish or crustaceans, molluscs or other aquatic invertebrates."
+  },
+  {
+    "HS4": "1604",
+    "HS4 Short Name": "Processed Fish",
+    "HS4 Description": "Prepared or preserved fish; caviar and caviar substitutes prepared from fish eggs."
+  },
+  {
+    "HS4": "1605",
+    "HS4 Short Name": "Processed Crustaceans",
+    "HS4 Description": "Crustaceans, molluscs and other aquatic invertebrates, prepared or preserved."
+  },
+  {
+    "HS4": "1701",
+    "HS4 Short Name": "Raw Sugar",
+    "HS4 Description": "Cane or beet sugar and chemically pure sucrose, in solid form."
+  },
+  {
+    "HS4": "1702",
+    "HS4 Short Name": "Other Sugars",
+    "HS4 Description": "Other sugars, including chemically pure lactose, maltose, glucose and fructose, in solid form; sugar syrups not containing added flavouring or colouring matter; artificial honey, whether or not mixed with natural honey; caramel."
+  },
+  {
+    "HS4": "1703",
+    "HS4 Short Name": "Molasses",
+    "HS4 Description": "Molasses resulting from the extraction or refining of sugar."
+  },
+  {
+    "HS4": "1704",
+    "HS4 Short Name": "Confectionery Sugar",
+    "HS4 Description": "Sugar confectionery (including white chocolate), not containing cocoa."
+  },
+  {
+    "HS4": "1801",
+    "HS4 Short Name": "Cocoa Beans",
+    "HS4 Description": "Cocoa beans, whole or broken, raw or roasted."
+  },
+  {
+    "HS4": "1802",
+    "HS4 Short Name": "Cocoa Shells",
+    "HS4 Description": "Cocoa shells, husks, skins and other cocoa waste."
+  },
+  {
+    "HS4": "1803",
+    "HS4 Short Name": "Cocoa Paste",
+    "HS4 Description": "Cocoa paste, whether or not defatted."
+  },
+  {
+    "HS4": "1804",
+    "HS4 Short Name": "Cocoa Butter",
+    "HS4 Description": "Cocoa butter, fat and oil."
+  },
+  {
+    "HS4": "1805",
+    "HS4 Short Name": "Cocoa Powder",
+    "HS4 Description": "Cocoa powder, not containing added sugar or other sweetening matter."
+  },
+  {
+    "HS4": "1806",
+    "HS4 Short Name": "Chocolate",
+    "HS4 Description": "Chocolate and other food preparations containing cocoa."
+  },
+  {
+    "HS4": "1901",
+    "HS4 Short Name": "Malt Extract",
+    "HS4 Description": "Malt extract; food preparations of flour, groats, meal, starch or malt extract, not containing cocoa or containing less than 40 % by weight of cocoa calculated on a totally defatted basis, not elsewhere specified or included; food preparations of goods of"
+  },
+  {
+    "HS4": "1902",
+    "HS4 Short Name": "Pasta",
+    "HS4 Description": "Pasta, whether or not cooked or stuffed (with meat or other substances) or otherwise prepared, such as spaghetti, macaroni, noodles, lasagne, gnocchi, ravioli, cannelloni; couscous, whether or not prepared."
+  },
+  {
+    "HS4": "1903",
+    "HS4 Short Name": "Tapioca",
+    "HS4 Description": "Tapioca and substitutes therefor prepared from starch, in the form of flakes, grains, pearls, siftings or in similar forms."
+  },
+  {
+    "HS4": "1904",
+    "HS4 Short Name": "Prepared Cereals",
+    "HS4 Description": "Prepared foods obtained by the swelling or roasting of cereals or cereal products (for example, corn flakes); cereals (other than maize (corn)) in grain form or in the form of flakes or other worked grains (except flour, groats and meal), pre-cooked, or o"
+  },
+  {
+    "HS4": "1905",
+    "HS4 Short Name": "Baked Goods",
+    "HS4 Description": "Bread, pastry, cakes, biscuits and other bakers' wares, whether or not containing cocoa; communion wafers, empty cachets of a kind suitable for pharmaceutical use, sealing wafers, rice paper and similar products."
+  },
+  {
+    "HS4": "2001",
+    "HS4 Short Name": "Pickled Foods",
+    "HS4 Description": "Vegetables, fruit, nuts and other edible parts of plants, prepared or preserved by vinegar or acetic acid."
+  },
+  {
+    "HS4": "2002",
+    "HS4 Short Name": "Processed Tomatoes",
+    "HS4 Description": "Tomatoes prepared or preserved otherwise than by vinegar or acetic acid."
+  },
+  {
+    "HS4": "2003",
+    "HS4 Short Name": "Processed Mushrooms",
+    "HS4 Description": "Mushrooms and truffles, prepared or preserved otherwise than by vinegar or acetic acid."
+  },
+  {
+    "HS4": "2004",
+    "HS4 Short Name": "Other Frozen Vegetables",
+    "HS4 Description": "Other vegetables prepared or preserved otherwise than by vinegar or acetic acid, frozen, other than products of heading 20.06."
+  },
+  {
+    "HS4": "2005",
+    "HS4 Short Name": "Other Processed Vegetables",
+    "HS4 Description": "Other vegetables prepared or preserved otherwise than by vinegar or acetic acid, not frozen, other than products of heading 20.06."
+  },
+  {
+    "HS4": "2006",
+    "HS4 Short Name": "Sugar Preserved Foods",
+    "HS4 Description": "Vegetables, fruit, nuts, fruit-peel and other parts of plants, preserved by sugar (drained, glacé or crystallised)."
+  },
+  {
+    "HS4": "2007",
+    "HS4 Short Name": "Jams",
+    "HS4 Description": "Jams, fruit jellies, marmalades, fruit or nut purée and fruit or nut pastes, obtained by cooking, whether or not containing added sugar or other sweetening matter."
+  },
+  {
+    "HS4": "2008",
+    "HS4 Short Name": "Other Processed Fruits and Nuts",
+    "HS4 Description": "Fruit, nuts and other edible parts of plants, otherwise prepared or preserved, whether or not containing added sugar or other sweetening matter or spirit, not elsewhere specified or included."
+  },
+  {
+    "HS4": "2009",
+    "HS4 Short Name": "Fruit Juice",
+    "HS4 Description": "Fruit juices (including grape must) and vegetable juices, unfermented and not containing added spirit, whether or not containing added sugar or other sweetening matter."
+  },
+  {
+    "HS4": "2101",
+    "HS4 Short Name": "Coffee and Tea Extracts",
+    "HS4 Description": "Extracts, essences and concentrates, of coffee, tea or maté and preparations with a basis of these products or with a basis of coffee, tea or maté; roasted chicory and other roasted coffee substitutes, and extracts, essences and concentrates thereof."
+  },
+  {
+    "HS4": "2102",
+    "HS4 Short Name": "Yeast",
+    "HS4 Description": "Yeasts (active or inactive); other single-cell micro-organisms, dead (but not including vaccines of heading 30.02); prepared baking powders."
+  },
+  {
+    "HS4": "2103",
+    "HS4 Short Name": "Sauces and Seasonings",
+    "HS4 Description": "Sauces and preparations therefor; mixed condiments and mixed seasonings; mustard flour and meal and prepared mustard."
+  },
+  {
+    "HS4": "2104",
+    "HS4 Short Name": "Soups and Broths",
+    "HS4 Description": "Soups and broths and preparations therefor; homogenised composite food preparations."
+  },
+  {
+    "HS4": "2105",
+    "HS4 Short Name": "Ice Cream",
+    "HS4 Description": "Ice cream and other edible ice, whether or not containing cocoa."
+  },
+  {
+    "HS4": "2106",
+    "HS4 Short Name": "Other Edible Preparations",
+    "HS4 Description": "Food preparations not elsewhere specified or included."
+  },
+  {
+    "HS4": "2201",
+    "HS4 Short Name": "Water",
+    "HS4 Description": "Waters, including natural or artificial mineral waters and aerated waters, not containing added sugar or other sweetening matter nor flavoured; ice and snow."
+  },
+  {
+    "HS4": "2202",
+    "HS4 Short Name": "Flavored Water",
+    "HS4 Description": "Waters, including mineral waters and aerated waters, containing added sugar or other sweetening matter or flavoured, and other non-alcoholic beverages, not including fruit or vegetable juices of heading 20.09."
+  },
+  {
+    "HS4": "2203",
+    "HS4 Short Name": "Beer",
+    "HS4 Description": "Beer made from malt."
+  },
+  {
+    "HS4": "2204",
+    "HS4 Short Name": "Wine",
+    "HS4 Description": "Wine of fresh grapes, including fortified wines; grape must other than that of heading 20.09."
+  },
+  {
+    "HS4": "2205",
+    "HS4 Short Name": "Vermouth",
+    "HS4 Description": "Vermouth and other wine of fresh grapes flavoured with plants or aromatic substances."
+  },
+  {
+    "HS4": "2206",
+    "HS4 Short Name": "Other Fermented Beverages",
+    "HS4 Description": "Other fermented beverages (for example, cider, perry, mead); mixtures of fermented beverages and mixtures of fermented beverages and non-alcoholic beverages, not elsewhere specified or included."
+  },
+  {
+    "HS4": "2207",
+    "HS4 Short Name": "Alcohol > 80% ABV",
+    "HS4 Description": "Undenatured ethyl alcohol of an alcoholic strength by volume of 80 % vol. or higher; ethyl alcohol and other spirits, denatured, of any strength."
+  },
+  {
+    "HS4": "2208",
+    "HS4 Short Name": "Hard Liquor",
+    "HS4 Description": "Undenatured ethyl alcohol of an alcoholic strength by volume of less than 80 % vol.; spirits, liqueurs and other spirituous beverages."
+  },
+  {
+    "HS4": "2209",
+    "HS4 Short Name": "Vinegar",
+    "HS4 Description": "Vinegar and substitutes for vinegar obtained from acetic acid."
+  },
+  {
+    "HS4": "2301",
+    "HS4 Short Name": "Animal Meal and Pellets",
+    "HS4 Description": "Flours, meals and pellets, of meat or meat offal, of fish or of crustaceans, molluscs or other aquatic invertebrates, unfit for human consumption; greaves."
+  },
+  {
+    "HS4": "2302",
+    "HS4 Short Name": "Bran",
+    "HS4 Description": "Bran, sharps and other residues, whether or not in the form of pellets, derived from the sifting, milling or other working of cereals or of leguminous plants."
+  },
+  {
+    "HS4": "2303",
+    "HS4 Short Name": "Starch Residue",
+    "HS4 Description": "Residues of starch manufacture and similar residues, beet-pulp, bagasse and other waste of sugar manufacture, brewing or distilling dregs and waste, whether or not in the form of pellets."
+  },
+  {
+    "HS4": "2304",
+    "HS4 Short Name": "Soybean Meal",
+    "HS4 Description": "Oil-cake and other solid residues, whether or not ground or in the form of pellets, resulting from the extraction of soyabean oil."
+  },
+  {
+    "HS4": "2305",
+    "HS4 Short Name": "Ground Nut Meal",
+    "HS4 Description": "Oil-cake and other solid residues, whether or not ground or in the form of pellets, resulting from the extraction of ground-nut oil."
+  },
+  {
+    "HS4": "2306",
+    "HS4 Short Name": "Other Vegetable Residues",
+    "HS4 Description": "Oil-cake and other solid residues, whether or not ground or in the form of pellets, resulting from the extraction of vegetable fats or oils, other than those of heading 23.04 or 23.05."
+  },
+  {
+    "HS4": "2307",
+    "HS4 Short Name": "Wine Lees",
+    "HS4 Description": "Wine lees; argol."
+  },
+  {
+    "HS4": "2308",
+    "HS4 Short Name": "Other Vegetable Residues and Waste",
+    "HS4 Description": "Vegetable materials and vegetable waste, vegetable residues and by-products, whether or not in the form of pellets, of a kind used in animal feeding, not elsewhere specified or included."
+  },
+  {
+    "HS4": "2309",
+    "HS4 Short Name": "Animal Food",
+    "HS4 Description": "Preparations of a kind used in animal feeding."
+  },
+  {
+    "HS4": "2401",
+    "HS4 Short Name": "Raw Tobacco",
+    "HS4 Description": "Unmanufactured tobacco; tobacco refuse."
+  },
+  {
+    "HS4": "2402",
+    "HS4 Short Name": "Rolled Tobacco",
+    "HS4 Description": "Cigars, cheroots, cigarillos and cigarettes, of tobacco or of tobacco substitutes."
+  },
+  {
+    "HS4": "2403",
+    "HS4 Short Name": "Processed Tobacco",
+    "HS4 Description": "Other manufactured tobacco and manufactured tobacco substitutes; “homogenised” or “reconstituted” tobacco; tobacco extracts and essences."
+  },
+  {
+    "HS4": "2404",
+    "HS4 Short Name": "Products intended for oral application of nicotine into the human body,",
+    "HS4 Description": "Products intended for the intake of nicotine into the human body, for oral application"
+  },
+  {
+    "HS4": "2501",
+    "HS4 Short Name": "Salt",
+    "HS4 Description": "Salt (including table salt and denatured salt) and pure sodium chloride, whether or not in aqueous solution or containing added anti-caking or free-flowing agents; sea water."
+  },
+  {
+    "HS4": "2502",
+    "HS4 Short Name": "Iron Pyrites",
+    "HS4 Description": "Unroasted iron pyrites."
+  },
+  {
+    "HS4": "2503",
+    "HS4 Short Name": "Sulphur",
+    "HS4 Description": "Sulphur of all kinds, other than sublimed sulphur, precipitated sulphur and colloidal sulphur."
+  },
+  {
+    "HS4": "2504",
+    "HS4 Short Name": "Graphite",
+    "HS4 Description": "Natural graphite."
+  },
+  {
+    "HS4": "2505",
+    "HS4 Short Name": "Sand",
+    "HS4 Description": "Natural sands of all kinds, whether or not coloured, other than metalbearing sands of Chapter 26."
+  },
+  {
+    "HS4": "2506",
+    "HS4 Short Name": "Quartz",
+    "HS4 Description": "Quartz (other than natural sands); quartzite, whether or not roughly trimmed or merely cut, by sawing or otherwise, into blocks or slabs of a rectangular (including square) shape."
+  },
+  {
+    "HS4": "2507",
+    "HS4 Short Name": "Kaolin",
+    "HS4 Description": "Kaolin and other kaolinic clays, whether or not calcined."
+  },
+  {
+    "HS4": "2508",
+    "HS4 Short Name": "Clays",
+    "HS4 Description": "Other clays (not including expanded clays of heading 68.06), andalusite, kyanite and sillimanite, whether or not calcined; mullite; chamotte or dinas earths."
+  },
+  {
+    "HS4": "2509",
+    "HS4 Short Name": "Chalk",
+    "HS4 Description": "Chalk."
+  },
+  {
+    "HS4": "2510",
+    "HS4 Short Name": "Calcium Phosphates",
+    "HS4 Description": "Natural calcium phosphates, natural aluminium calcium phosphates and phosphatic chalk."
+  },
+  {
+    "HS4": "2511",
+    "HS4 Short Name": "Barium Sulphate",
+    "HS4 Description": "Natural barium sulphate (barytes); natural barium carbonate (witherite), whether or not calcined, other than barium oxide of heading 28.16."
+  },
+  {
+    "HS4": "2512",
+    "HS4 Short Name": "Siliceous Fossil Meals",
+    "HS4 Description": "Siliceous fossil meals (for example, kieselguhr, tripolite and diatomite) and similar siliceous earths, whether or not calcined, of an apparent specific gravity of 1 or less."
+  },
+  {
+    "HS4": "2513",
+    "HS4 Short Name": "Pumice",
+    "HS4 Description": "Pumice stone; emery; natural corundum, natural garnet and other natural abrasives, whether or not heat-treated."
+  },
+  {
+    "HS4": "2514",
+    "HS4 Short Name": "Slate",
+    "HS4 Description": "Slate, whether or not roughly trimmed or merely cut, by sawing or otherwise, into blocks or slabs of a rectangular (including square) shape."
+  },
+  {
+    "HS4": "2515",
+    "HS4 Short Name": "Marble, Travertine and Alabaster",
+    "HS4 Description": "Marble, travertine, ecaussine and other calcareous monumental or building stone of an apparent specific gravity of 2.5 or more, and alabaster, whether or not roughly trimmed or merely cut, by sawing or otherwise, into blocks or slabs of a rectangular (inc"
+  },
+  {
+    "HS4": "2516",
+    "HS4 Short Name": "Granite",
+    "HS4 Description": "Granite, porphyry, basalt, sandstone and other monumental or building stone, whether or not roughly trimmed or merely cut, by sawing or otherwise, into blocks or slabs of a rectangular (including square) shape."
+  },
+  {
+    "HS4": "2517",
+    "HS4 Short Name": "Gravel and Crushed Stone",
+    "HS4 Description": "Pebbles, gravel, broken or crushed stone, of a kind commonly used for concrete aggregates, for road metalling or for railway or other ballast, shingle and flint, whether or not heat-treated; macadam of slag, dross or similar industrial waste, whether or n"
+  },
+  {
+    "HS4": "2518",
+    "HS4 Short Name": "Dolomite",
+    "HS4 Description": "Dolomite, whether or not calcined or sintered, including dolomite roughly trimmed or merely cut, by sawing or otherwise, into blocks or slabs of a rectangular (including square) shape; dolomite ramming mix."
+  },
+  {
+    "HS4": "2519",
+    "HS4 Short Name": "Magnesium Carbonate",
+    "HS4 Description": "Natural magnesium carbonate (magnesite); fused magnesia; dead-burned (sintered) magnesia, whether or not containing small quantities of other oxides added before sintering; other magnesium oxide, whether or not pure."
+  },
+  {
+    "HS4": "2520",
+    "HS4 Short Name": "Gypsum",
+    "HS4 Description": "Gypsum; anhydrite; plasters (consisting of calcined gypsum or calcium sulphate) whether or not coloured, with or without small quantities of accelerators or retarders."
+  },
+  {
+    "HS4": "2521",
+    "HS4 Short Name": "Limestone",
+    "HS4 Description": "Limestone flux; limestone and other calcareous stone, of a kind used for the manufacture of lime or cement."
+  },
+  {
+    "HS4": "2522",
+    "HS4 Short Name": "Quicklime",
+    "HS4 Description": "Quicklime, slaked lime and hydraulic lime, other than calcium oxide and hydroxide of heading 28.25."
+  },
+  {
+    "HS4": "2523",
+    "HS4 Short Name": "Cement",
+    "HS4 Description": "Portland cement, aluminous cement, slag cement, supersulphate cement and similar hydraulic cements, whether or not coloured or in the form of clinkers."
+  },
+  {
+    "HS4": "2524",
+    "HS4 Short Name": "Asbestos",
+    "HS4 Description": "Asbestos."
+  },
+  {
+    "HS4": "2525",
+    "HS4 Short Name": "Mica",
+    "HS4 Description": "Mica, including spliiting; mica waste."
+  },
+  {
+    "HS4": "2526",
+    "HS4 Short Name": "Soapstone",
+    "HS4 Description": "Natural steatite, whether or not roughly trimmed or merely cut, by sawing or otherwise, into blocks or slabs of a rectangular (including square) shape; talc."
+  },
+  {
+    "HS4": "2527",
+    "HS4 Short Name": "Cryolite",
+    "HS4 Description": "(-2001) Natural cryolite and natural chiolite"
+  },
+  {
+    "HS4": "2528",
+    "HS4 Short Name": "Borax",
+    "HS4 Description": "Natural borates and concentrates thereof (whether or not calcined), but not including borates separated from natural brine; natural boric acid containing not more than 85 % of H3BO3 calculated on the dry weight."
+  },
+  {
+    "HS4": "2529",
+    "HS4 Short Name": "Feldspar",
+    "HS4 Description": "Feldspar; leucite, nepheline and nepheline syenite; fluorspar."
+  },
+  {
+    "HS4": "2530",
+    "HS4 Short Name": "Other Mineral",
+    "HS4 Description": "Mineral substances not elsewhere specified or included."
+  },
+  {
+    "HS4": "2601",
+    "HS4 Short Name": "Iron Ore",
+    "HS4 Description": "Iron ores and concentrates, including roasted iron pyrites."
+  },
+  {
+    "HS4": "2602",
+    "HS4 Short Name": "Manganese Ore",
+    "HS4 Description": "Manganese ores and concentrates, including ferruginous manganese ores and concentrates with a manganese content of 20 % or more, calculated on the dry weight."
+  },
+  {
+    "HS4": "2603",
+    "HS4 Short Name": "Copper Ore",
+    "HS4 Description": "Copper ores and concentrates."
+  },
+  {
+    "HS4": "2604",
+    "HS4 Short Name": "Nickel Ore",
+    "HS4 Description": "Nickel ores and concentrates."
+  },
+  {
+    "HS4": "2605",
+    "HS4 Short Name": "Cobalt Ore",
+    "HS4 Description": "Cobalt ores and concentrates."
+  },
+  {
+    "HS4": "2606",
+    "HS4 Short Name": "Aluminium Ore",
+    "HS4 Description": "Aluminium ores and concentrates."
+  },
+  {
+    "HS4": "2607",
+    "HS4 Short Name": "Lead Ore",
+    "HS4 Description": "Lead ores and concentrates."
+  },
+  {
+    "HS4": "2608",
+    "HS4 Short Name": "Zinc Ore",
+    "HS4 Description": "Zinc ores and concentrates."
+  },
+  {
+    "HS4": "2609",
+    "HS4 Short Name": "Tin Ores",
+    "HS4 Description": "Tin ores and concentrates."
+  },
+  {
+    "HS4": "2610",
+    "HS4 Short Name": "Chromium Ore",
+    "HS4 Description": "Chromium ores and concentrates."
+  },
+  {
+    "HS4": "2611",
+    "HS4 Short Name": "Tungsten Ore",
+    "HS4 Description": "Tungsten ores and concentrates."
+  },
+  {
+    "HS4": "2612",
+    "HS4 Short Name": "Uranium and Thorium Ore",
+    "HS4 Description": "Uranium or thorium ores and concentrates."
+  },
+  {
+    "HS4": "2613",
+    "HS4 Short Name": "Molybdenum Ore",
+    "HS4 Description": "Molybdenum ores and concentrates."
+  },
+  {
+    "HS4": "2614",
+    "HS4 Short Name": "Titanium Ore",
+    "HS4 Description": "Titanium ores and concentrates."
+  },
+  {
+    "HS4": "2615",
+    "HS4 Short Name": "Niobium, Tantalum, Vanadium and Zirconium Ore",
+    "HS4 Description": "Niobium, tantalum, vanadium or zirconium ores and concentrates."
+  },
+  {
+    "HS4": "2616",
+    "HS4 Short Name": "Precious Metal Ore",
+    "HS4 Description": "Precious metal ores and concentrates."
+  },
+  {
+    "HS4": "2617",
+    "HS4 Short Name": "Other Ores",
+    "HS4 Description": "Other ores and concentrates."
+  },
+  {
+    "HS4": "2618",
+    "HS4 Short Name": "Granulated Slag",
+    "HS4 Description": "Granulated slag (slag sand) from the manufacture of iron or steel."
+  },
+  {
+    "HS4": "2619",
+    "HS4 Short Name": "Slag Dross",
+    "HS4 Description": "Slag, dross (other than granulated slag), scalings and other waste from the manufacture of iron or steel."
+  },
+  {
+    "HS4": "2620",
+    "HS4 Short Name": "Non-Iron and Steel Slag, Ash and Residues",
+    "HS4 Description": "Slag, ash and residues (other than from the manufacture of iron or steel) containing metals, arsenic or their compounds."
+  },
+  {
+    "HS4": "2621",
+    "HS4 Short Name": "Other Slag and Ash",
+    "HS4 Description": "Other slag and ash, including seaweed ash (kelp); ash and residues from the incineration of municipal waste."
+  },
+  {
+    "HS4": "2701",
+    "HS4 Short Name": "Coal Briquettes",
+    "HS4 Description": "Coal; briquettes, ovoids and similar solid fuels manufactured from coal."
+  },
+  {
+    "HS4": "2702",
+    "HS4 Short Name": "Lignite",
+    "HS4 Description": "Lignite, whether or not agglomerated, excluding jet."
+  },
+  {
+    "HS4": "2703",
+    "HS4 Short Name": "Peat",
+    "HS4 Description": "Peat (including peat litter), whether or not agglomerated."
+  },
+  {
+    "HS4": "2704",
+    "HS4 Short Name": "Coke",
+    "HS4 Description": "Coke and semi-coke of coal, of lignite or of peat, whether or not agglomerated; retort carbon."
+  },
+  {
+    "HS4": "2705",
+    "HS4 Short Name": "Non-Petroleum Gas",
+    "HS4 Description": "Coal gas, water gas, producer gas and similar gases, other than petroleum gases and other gaseous hydrocarbons."
+  },
+  {
+    "HS4": "2706",
+    "HS4 Short Name": "Tar",
+    "HS4 Description": "Tar distilled from coal, from lignite or from peat, and other mineral tars, whether or not dehydrated or partially distilled, including reconstituted tars."
+  },
+  {
+    "HS4": "2707",
+    "HS4 Short Name": "Coal Tar Oil",
+    "HS4 Description": "Oils and other products of the distillation of high temperature coal tar; similar products in which the weight of the aromatic constituents exceeds that of the non-aromatic constituents."
+  },
+  {
+    "HS4": "2708",
+    "HS4 Short Name": "Pitch Coke",
+    "HS4 Description": "Pitch and pitch coke, obtained from coal tar or from other mineral tars."
+  },
+  {
+    "HS4": "2709",
+    "HS4 Short Name": "Crude Petroleum",
+    "HS4 Description": "Petroleum oils and oils obtained from bituminous minerals, crude."
+  },
+  {
+    "HS4": "2710",
+    "HS4 Short Name": "Refined Petroleum",
+    "HS4 Description": "Petroleum oils and oils obtained from bituminous minerals, other than crude; preparations not elsewhere specified or included, containing by weight 70 % or more of petroleum oils or of oils obtained from bituminous minerals, these oils being the basic con"
+  },
+  {
+    "HS4": "2711",
+    "HS4 Short Name": "Petroleum Gas",
+    "HS4 Description": "Petroleum gases and other gaseous hydrocarbons."
+  },
+  {
+    "HS4": "2712",
+    "HS4 Short Name": "Petroleum Jelly",
+    "HS4 Description": "Petroleum jelly; paraffin wax, micro-crystalline petroleum wax, slack wax, ozokerite, lignite wax, peat wax, other mineral waxes, and similar products obtained by synthesis or by other processes, whether or not coloured."
+  },
+  {
+    "HS4": "2713",
+    "HS4 Short Name": "Petroleum Coke",
+    "HS4 Description": "Petroleum coke, petroleum bitumen and other residues of petroleum oils or of oils obtained from bituminous minerals."
+  },
+  {
+    "HS4": "2714",
+    "HS4 Short Name": "Asphalt",
+    "HS4 Description": "Bitumen and asphalt, natural; bituminous or oil shale and tar sands; asphaltites and asphaltic rocks."
+  },
+  {
+    "HS4": "2715",
+    "HS4 Short Name": "Asphalt Mixtures",
+    "HS4 Description": "Bituminous mixtures based on natural asphalt, on natural bitumen, on petroleum bitumen, on mineral tar or on mineral tar pitch (for example, bituminous mastics, cut-backs)."
+  },
+  {
+    "HS4": "2716",
+    "HS4 Short Name": "Electricity",
+    "HS4 Description": "Electrical energy. (optional heading)"
+  },
+  {
+    "HS4": "2801",
+    "HS4 Short Name": "Halogens",
+    "HS4 Description": "Fluorine, chlorine, bromine and iodine."
+  },
+  {
+    "HS4": "2802",
+    "HS4 Short Name": "Sulfur",
+    "HS4 Description": "Sulphur, sublimed or precipitated; colloidal sulphur."
+  },
+  {
+    "HS4": "2803",
+    "HS4 Short Name": "Carbon",
+    "HS4 Description": "Carbon (carbon blacks and other forms of carbon not elsewhere specified or included)."
+  },
+  {
+    "HS4": "2804",
+    "HS4 Short Name": "Hydrogen",
+    "HS4 Description": "Hydrogen, rare gases and other non-metals."
+  },
+  {
+    "HS4": "2805",
+    "HS4 Short Name": "Alkaline Metals",
+    "HS4 Description": "Alkali or alkaline-earth metals; rare-earth metals, scandium and yttrium, whether or not intermixed or interalloyed; mercury."
+  },
+  {
+    "HS4": "2806",
+    "HS4 Short Name": "Hydrochloric Acid",
+    "HS4 Description": "Hydrogen chloride (hydrochloric acid); chlorosulphuric acid."
+  },
+  {
+    "HS4": "2807",
+    "HS4 Short Name": "Sulfuric Acid",
+    "HS4 Description": "Sulphuric acid; oleum."
+  },
+  {
+    "HS4": "2808",
+    "HS4 Short Name": "Nitric Acids",
+    "HS4 Description": "Nitric acid; sulphonitric acids."
+  },
+  {
+    "HS4": "2809",
+    "HS4 Short Name": "Phosphoric Acid",
+    "HS4 Description": "Diphosphorus pentaoxide; phosphoric acid; polyphosphoric acids, whether or not chemically defined."
+  },
+  {
+    "HS4": "2810",
+    "HS4 Short Name": "Boron",
+    "HS4 Description": "Oxides of boron; boric acids."
+  },
+  {
+    "HS4": "2811",
+    "HS4 Short Name": "Other Inorganic Acids",
+    "HS4 Description": "Other inorganic acids and other inorganic oxygen compounds of non-metals."
+  },
+  {
+    "HS4": "2812",
+    "HS4 Short Name": "Halides",
+    "HS4 Description": "Halides and halide oxides of non-metals."
+  },
+  {
+    "HS4": "2813",
+    "HS4 Short Name": "Nonmetal Sulfides",
+    "HS4 Description": "Sulphides of non-metals; commercial phosphorus trisulphide."
+  },
+  {
+    "HS4": "2814",
+    "HS4 Short Name": "Ammonia",
+    "HS4 Description": "Ammonia, anhydrous or in aqueous solution."
+  },
+  {
+    "HS4": "2815",
+    "HS4 Short Name": "Sodium or Potassium Peroxides",
+    "HS4 Description": "Sodium hydroxide (caustic soda); potassium hydroxide (caustic potash); peroxides of sodium or potassium."
+  },
+  {
+    "HS4": "2816",
+    "HS4 Short Name": "Magnesium Hydroxide and Peroxide",
+    "HS4 Description": "Hydroxide and peroxide of magnesium; oxides, hydroxides and peroxides, of strontium or barium."
+  },
+  {
+    "HS4": "2817",
+    "HS4 Short Name": "Zinc Oxide and Peroxide",
+    "HS4 Description": "Zinc oxide; zinc peroxide."
+  },
+  {
+    "HS4": "2818",
+    "HS4 Short Name": "Aluminium Oxide",
+    "HS4 Description": "Artificial corundum, whether or not chemically defined; aluminium oxide; aluminium hydroxide."
+  },
+  {
+    "HS4": "2819",
+    "HS4 Short Name": "Chromium Oxides and Hydroxides",
+    "HS4 Description": "Chromium oxides and hydroxides."
+  },
+  {
+    "HS4": "2820",
+    "HS4 Short Name": "Manganese Oxides",
+    "HS4 Description": "Manganese oxides."
+  },
+  {
+    "HS4": "2821",
+    "HS4 Short Name": "Iron Oxides and Hydroxides",
+    "HS4 Description": "Iron oxides and hydroxides; earth colours containing 70 % or more by weight of combined iron evaluated as Fe2O3."
+  },
+  {
+    "HS4": "2822",
+    "HS4 Short Name": "Cobalt Oxides and Hydroxides",
+    "HS4 Description": "Cobalt oxides and hydroxides; commercial cobalt oxides."
+  },
+  {
+    "HS4": "2823",
+    "HS4 Short Name": "Titanium Oxides",
+    "HS4 Description": "Titanium oxides."
+  },
+  {
+    "HS4": "2824",
+    "HS4 Short Name": "Lead Oxides",
+    "HS4 Description": "Lead oxides; red lead and orange lead."
+  },
+  {
+    "HS4": "2825",
+    "HS4 Short Name": "Inorganic Salts",
+    "HS4 Description": "Hydrazine and hydroxylamine and their inorganic salts; other inorganic bases; other metal oxides, hydroxides and peroxides."
+  },
+  {
+    "HS4": "2826",
+    "HS4 Short Name": "Fluorides",
+    "HS4 Description": "Fluorides; fluorosilicates, fluoroaluminates and other complex fluorine salts."
+  },
+  {
+    "HS4": "2827",
+    "HS4 Short Name": "Chlorides",
+    "HS4 Description": "Chlorides, chloride oxides and chloride hydroxides; bromides and bromide oxides; iodides and iodide oxides."
+  },
+  {
+    "HS4": "2828",
+    "HS4 Short Name": "Hypochlorites",
+    "HS4 Description": "Hypochlorites; commercial calcium hypochlorite; chlorites; hypobromites."
+  },
+  {
+    "HS4": "2829",
+    "HS4 Short Name": "Chlorates and Perchlorates",
+    "HS4 Description": "Chlorates and perchlorates; bromates and perbromates; iodates and periodates."
+  },
+  {
+    "HS4": "2830",
+    "HS4 Short Name": "Sulfides",
+    "HS4 Description": "Sulphides; polysulphides, whether or not chemically defined."
+  },
+  {
+    "HS4": "2831",
+    "HS4 Short Name": "Dithionites and Sulfoxylates",
+    "HS4 Description": "Dithionites and sulphoxylates."
+  },
+  {
+    "HS4": "2832",
+    "HS4 Short Name": "Sulfites",
+    "HS4 Description": "Sulphites; thiosulphates."
+  },
+  {
+    "HS4": "2833",
+    "HS4 Short Name": "Sulfates",
+    "HS4 Description": "Sulphates; alums; peroxosulphates (persulphates)."
+  },
+  {
+    "HS4": "2834",
+    "HS4 Short Name": "Nitrites and Nitrates",
+    "HS4 Description": "Nitrites; nitrates."
+  },
+  {
+    "HS4": "2835",
+    "HS4 Short Name": "Phosphinates and Phosphonates",
+    "HS4 Description": "Phosphinates (hypophosphites), phosphonates (phosphites) and phosphates; polyphosphates, whether or not chemically defined."
+  },
+  {
+    "HS4": "2836",
+    "HS4 Short Name": "Carbonates",
+    "HS4 Description": "Carbonates; peroxocarbonates (percarbonates); commercial ammonium carbonate containing ammonium carbamate."
+  },
+  {
+    "HS4": "2837",
+    "HS4 Short Name": "Cyanides",
+    "HS4 Description": "Cyanides, cyanide oxides and complex cyanides."
+  },
+  {
+    "HS4": "2838",
+    "HS4 Short Name": "Fulminates",
+    "HS4 Description": "(-2006) Fulminates, cyanates and thiocyanates"
+  },
+  {
+    "HS4": "2839",
+    "HS4 Short Name": "Silicates",
+    "HS4 Description": "Silicates; commercial alkali metal silicates."
+  },
+  {
+    "HS4": "2840",
+    "HS4 Short Name": "Borates",
+    "HS4 Description": "Borates; peroxoborates (perborates)."
+  },
+  {
+    "HS4": "2841",
+    "HS4 Short Name": "Oxometallic or Peroxometallic Acid Salts",
+    "HS4 Description": "Salts of oxometallic or peroxometallic acids."
+  },
+  {
+    "HS4": "2842",
+    "HS4 Short Name": "Other Inorganic Acids Salts",
+    "HS4 Description": "Other salts of inorganic acids or peroxoacids (including aluminosilicates whether or not chemically defined), other than azides."
+  },
+  {
+    "HS4": "2843",
+    "HS4 Short Name": "Precious Metal Compounds",
+    "HS4 Description": "Colloidal precious metals; inorganic or organic compounds of precious metals, whether or not chemically defined; amalgams of precious metals."
+  },
+  {
+    "HS4": "2844",
+    "HS4 Short Name": "Radioactive Chemicals",
+    "HS4 Description": "Radioactive chemical elements and radioactive isotopes (including the fissile or fertile chemical elements and isotopes) and their compounds; mixtures and residues containing these products."
+  },
+  {
+    "HS4": "2845",
+    "HS4 Short Name": "Other Isotopes",
+    "HS4 Description": "Isotopes other than those of heading 28.44; compounds, inorganic or organic, of such isotopes, whether or not chemically defined."
+  },
+  {
+    "HS4": "2846",
+    "HS4 Short Name": "Rare-Earth Metal Compounds",
+    "HS4 Description": "Compounds, inorganic or organic, of rare-earth metals, of yttrium or of scandium or of mixtures of these metals."
+  },
+  {
+    "HS4": "2847",
+    "HS4 Short Name": "Hydrogen peroxide",
+    "HS4 Description": "Hydrogen peroxide, whether or not solidified with urea."
+  },
+  {
+    "HS4": "2848",
+    "HS4 Short Name": "Phosphides",
+    "HS4 Description": "Phosphides, whether or not chemically defined, excluding ferrophosphorus."
+  },
+  {
+    "HS4": "2849",
+    "HS4 Short Name": "Carbides",
+    "HS4 Description": "Carbides, whether or not chemically defined."
+  },
+  {
+    "HS4": "2850",
+    "HS4 Short Name": "Hydrides and other anions",
+    "HS4 Description": "Hydrides, nitrides, azides, silicides and borides, whether or not chemically defined, other than compounds which are also carbides of heading 28.49."
+  },
+  {
+    "HS4": "2851",
+    "HS4 Short Name": "Inorganic Compounds",
+    "HS4 Description": "(-2006) Inorganic compounds, incl. distilled or conductivity water and water of similar purity, n.e.s.; liquid air, whether or not rare gases have been removed; compressed air; amalgams (other than amalgams of precious metals)"
+  },
+  {
+    "HS4": "2852",
+    "HS4 Short Name": "Mercury compounds",
+    "HS4 Description": "Inorganic or organic compounds of mercury, whether or not chemically defined, excluding amalgams."
+  },
+  {
+    "HS4": "2853",
+    "HS4 Short Name": "Other inorganic compounds",
+    "HS4 Description": "Other inorganic compounds (including distilled or conductivity water and water of similar purity); liquid air (whether or not rare gases have been removed); compressed air; amalgams, other than amalgams of precious metals."
+  },
+  {
+    "HS4": "2901",
+    "HS4 Short Name": "Acyclic Hydrocarbons",
+    "HS4 Description": "Acyclic hydrocarbons."
+  },
+  {
+    "HS4": "2902",
+    "HS4 Short Name": "Cyclic Hydrocarbons",
+    "HS4 Description": "Cyclic hydrocarbons."
+  },
+  {
+    "HS4": "2903",
+    "HS4 Short Name": "Halogenated Hydrocarbons",
+    "HS4 Description": "Halogenated derivatives of hydrocarbons."
+  },
+  {
+    "HS4": "2904",
+    "HS4 Short Name": "Sulfonated, Nitrated or Nitrosated Hydrocarbons",
+    "HS4 Description": "Sulphonated, nitrated or nitrosated derivatives of hydrocarbons, whether or not halogenated."
+  },
+  {
+    "HS4": "2905",
+    "HS4 Short Name": "Acyclic Alcohols",
+    "HS4 Description": "Acyclic alcohols and their halogenated, sulphonated, nitrated or nitrosated derivatives."
+  },
+  {
+    "HS4": "2906",
+    "HS4 Short Name": "Cyclic Alcohols",
+    "HS4 Description": "Cyclic alcohols and their halogenated, sulphonated, nitrated or nitrosated derivatives."
+  },
+  {
+    "HS4": "2907",
+    "HS4 Short Name": "Phenols",
+    "HS4 Description": "Phenols; phenol-alcohols."
+  },
+  {
+    "HS4": "2908",
+    "HS4 Short Name": "Phenol Derivatives",
+    "HS4 Description": "Halogenated, sulphonated, nitrated or nitrosated derivatives of phenols or phenol-alcohols."
+  },
+  {
+    "HS4": "2909",
+    "HS4 Short Name": "Ethers",
+    "HS4 Description": "Ethers, ether-alcohols, ether-phenols, ether-alcohol-phenols, alcohol peroxides, ether peroxides, ketone peroxides (whether or not chemically defined), and their halogenated, sulphonated, nitrated or nitrosated derivatives."
+  },
+  {
+    "HS4": "2910",
+    "HS4 Short Name": "Epoxides",
+    "HS4 Description": "Epoxides, epoxyalcohols, epoxyphenols and epoxyethers, with a three-membered ring, and their halogenated, sulphonated, nitrated or nitrosated derivatives."
+  },
+  {
+    "HS4": "2911",
+    "HS4 Short Name": "Acetals and Hemiacetals",
+    "HS4 Description": "Acetals and hemiacetals, whether or not with other oxygen function, and their halogenated, sulphonated, nitrated or nitrosated derivatives."
+  },
+  {
+    "HS4": "2912",
+    "HS4 Short Name": "Aldehydes",
+    "HS4 Description": "Aldehydes, whether or not with other oxygen function; cyclic polymers of aldehydes; paraformaldehyde."
+  },
+  {
+    "HS4": "2913",
+    "HS4 Short Name": "Aldehyde Derivatives",
+    "HS4 Description": "Halogenated, sulphonated, nitrated or nitrosated derivatives of products of heading 29.12."
+  },
+  {
+    "HS4": "2914",
+    "HS4 Short Name": "Ketones and Quinones",
+    "HS4 Description": "Ketones and quinones, whether or not with other oxygen function, and their halogenated, sulphonated, nitrated or nitrosated derivatives."
+  },
+  {
+    "HS4": "2915",
+    "HS4 Short Name": "Saturated Acyclic Monocarboxylic Acids",
+    "HS4 Description": "Saturated acyclic monocarboxylic acids and their anhydrides, halides, peroxides and peroxyacids; their halogenated, sulphonated, nitrated or nitrosated derivatives."
+  },
+  {
+    "HS4": "2916",
+    "HS4 Short Name": "Unsaturated Acyclic Monocarboxylic Acids",
+    "HS4 Description": "Unsaturated acyclic monocarboxylic acids, cyclic monocarboxylic acids, their anhydrides, halides, peroxides and peroxyacids; their halogenated, sulphonated, nitrated or nitrosated derivatives."
+  },
+  {
+    "HS4": "2917",
+    "HS4 Short Name": "Polycarboxylic Acids",
+    "HS4 Description": "Polycarboxylic acids, their anhydrides, halides, peroxides and peroxyacids; their halogenated, sulphonated, nitrated or nitrosated derivatives."
+  },
+  {
+    "HS4": "2918",
+    "HS4 Short Name": "Carboxylic Acid",
+    "HS4 Description": "Carboxylic Acid, Added Oxygen & Anhy Etc, Hal Etc"
+  },
+  {
+    "HS4": "2919",
+    "HS4 Short Name": "Phosphoric Esters and Salts",
+    "HS4 Description": "Phosphoric esters and their salts, including lactophosphates; their halogenated, sulphonated, nitrated or nitrosated derivatives."
+  },
+  {
+    "HS4": "2920",
+    "HS4 Short Name": "Other Esters",
+    "HS4 Description": "Esters of other inorganic acids of non-metals (excluding esters of hydrogen halides) and their salts; their halogenated, sulphonated, nitrated or nitrosated derivatives."
+  },
+  {
+    "HS4": "2921",
+    "HS4 Short Name": "Amine Compounds",
+    "HS4 Description": "Amine-function compounds."
+  },
+  {
+    "HS4": "2922",
+    "HS4 Short Name": "Oxygen Amino Compounds",
+    "HS4 Description": "Oxygen-function amino-compounds."
+  },
+  {
+    "HS4": "2923",
+    "HS4 Short Name": "Quaternary Ammonium Salts and Hydroxides",
+    "HS4 Description": "Quaternary ammonium salts and hydroxides; lecithins and other phosphoaminolipids, whether or not chemically defined."
+  },
+  {
+    "HS4": "2924",
+    "HS4 Short Name": "Carboxyamide Compounds",
+    "HS4 Description": "Carboxyamide-function compounds; amide-function compounds of carbonic acid."
+  },
+  {
+    "HS4": "2925",
+    "HS4 Short Name": "Carboxyimide Compounds",
+    "HS4 Description": "Carboxyimide-function compounds (including saccharin and its salts) and imine-function compounds."
+  },
+  {
+    "HS4": "2926",
+    "HS4 Short Name": "Nitrile Compounds",
+    "HS4 Description": "Nitrile-function compounds."
+  },
+  {
+    "HS4": "2927",
+    "HS4 Short Name": "Diazo, Azo or Aoxy Compounds",
+    "HS4 Description": "Diazo-, azoor azoxy-compounds."
+  },
+  {
+    "HS4": "2928",
+    "HS4 Short Name": "Hydrazine or Hydroxylamine Derivatives",
+    "HS4 Description": "Organic derivatives of hydrazine or of hydroxylamine."
+  },
+  {
+    "HS4": "2929",
+    "HS4 Short Name": "Other Nitrogen Compounds",
+    "HS4 Description": "Compounds with other nitrogen function."
+  },
+  {
+    "HS4": "2930",
+    "HS4 Short Name": "Organo-Sulfur Compounds",
+    "HS4 Description": "Organo-sulphur compounds."
+  },
+  {
+    "HS4": "2931",
+    "HS4 Short Name": "Other Organo-Inorganic Compounds",
+    "HS4 Description": "Other organo-inorganic compounds."
+  },
+  {
+    "HS4": "2932",
+    "HS4 Short Name": "Oxygen Heterocyclic Compounds",
+    "HS4 Description": "Heterocyclic compounds with oxygen hetero-atom(s) only."
+  },
+  {
+    "HS4": "2933",
+    "HS4 Short Name": "Nitrogen Heterocyclic Compounds",
+    "HS4 Description": "Heterocyclic compounds with nitrogen hetero-atom(s) only."
+  },
+  {
+    "HS4": "2934",
+    "HS4 Short Name": "Nucleic Acids",
+    "HS4 Description": "Nucleic acids and their salts, whether or not chemically defined; other heterocyclic compounds."
+  },
+  {
+    "HS4": "2935",
+    "HS4 Short Name": "Sulfonamides",
+    "HS4 Description": "Sulphonamides."
+  },
+  {
+    "HS4": "2936",
+    "HS4 Short Name": "Vitamins",
+    "HS4 Description": "Provitamins and vitamins, natural or reproduced by synthesis (including natural concentrates), derivatives thereof used primarily as vitamins, and intermixtures of the foregoing, whether or not in any solvent."
+  },
+  {
+    "HS4": "2937",
+    "HS4 Short Name": "Hormones",
+    "HS4 Description": "Hormones, prostaglandins, thromboxanes and leukotrienes, natural or reproduced by synthesis; derivatives and structural analogues thereof, including chain modified polypeptides, used primarily as hormones."
+  },
+  {
+    "HS4": "2938",
+    "HS4 Short Name": "Glycosides",
+    "HS4 Description": "Glycosides, natural or reproduced by synthesis, and their salts, ethers, esters and other derivatives."
+  },
+  {
+    "HS4": "2939",
+    "HS4 Short Name": "Vegetable Alkaloids",
+    "HS4 Description": "Vegetable alkaloids, natural or reproduced by synthesis, and their salts, ethers, esters and other derivatives."
+  },
+  {
+    "HS4": "2940",
+    "HS4 Short Name": "Chemically Pure Sugars",
+    "HS4 Description": "Sugars, chemically pure, other than sucrose, lactose, maltose, glucose and fructose; sugar ethers, sugar acetals and sugar esters, and their salts, other than products of heading 29.37, 29.38 or 29.39."
+  },
+  {
+    "HS4": "2941",
+    "HS4 Short Name": "Antibiotics",
+    "HS4 Description": "Antibiotics."
+  },
+  {
+    "HS4": "2942",
+    "HS4 Short Name": "Other Organic Compounds",
+    "HS4 Description": "Other organic compounds."
+  },
+  {
+    "HS4": "3001",
+    "HS4 Short Name": "Glands and Other Organs",
+    "HS4 Description": "Glands and other organs for organo-therapeutic uses, dried, whether or not powdered; extracts of glands or other organs or of their secretions for organo-therapeutic uses; heparin and its salts; other human or animal substances prepared for therapeutic or"
+  },
+  {
+    "HS4": "3002",
+    "HS4 Short Name": "Human or Animal Blood",
+    "HS4 Description": "Human blood; animal blood prepared for therapeutic, prophylactic or diagnostic uses; antisera, other blood fractions and immunological products, whether or not modified or obtained by means of biotechnological processes; vaccines, toxins, cultures of micr"
+  },
+  {
+    "HS4": "3003",
+    "HS4 Short Name": "Unpackaged Medicaments",
+    "HS4 Description": "Medicaments (excluding goods of heading 30.02, 30.05 or 30.06) consisting of two or more constituents which have been mixed together for therapeutic or prophylactic uses, not put up in measured doses or in forms or packings for retail sale."
+  },
+  {
+    "HS4": "3004",
+    "HS4 Short Name": "Packaged Medicaments",
+    "HS4 Description": "Medicaments (excluding goods of heading 30.02, 30.05 or 30.06) consisting of mixed or unmixed products for therapeutic or prophylactic uses, put up in measured doses (including those in the form of transdermal administration systems) or in forms or packin"
+  },
+  {
+    "HS4": "3005",
+    "HS4 Short Name": "Bandages",
+    "HS4 Description": "Wadding, gauze, bandages and similar articles (for example, dressings, adhesive plasters, poultices), impregnated or coated with pharmaceutical substances or put up in forms or packings for retail sale for medical, surgical, dental or veterinary purposes."
+  },
+  {
+    "HS4": "3006",
+    "HS4 Short Name": "Special Pharmaceuticals",
+    "HS4 Description": "Pharmaceutical goods specified in Note 4 to this Chapter."
+  },
+  {
+    "HS4": "3101",
+    "HS4 Short Name": "Animal or Vegetable Fertilizers",
+    "HS4 Description": "Animal or vegetable fertilisers, whether or not mixed together or chemically treated; fertilisers produced by the mixing or chemical treatment of animal or vegetable products."
+  },
+  {
+    "HS4": "3102",
+    "HS4 Short Name": "Nitrogenous Fertilizers",
+    "HS4 Description": "Mineral or chemical fertilisers, nitrogenous."
+  },
+  {
+    "HS4": "3103",
+    "HS4 Short Name": "Phosphatic Fertilizers",
+    "HS4 Description": "Mineral or chemical fertilisers, phosphatic."
+  },
+  {
+    "HS4": "3104",
+    "HS4 Short Name": "Potassic Fertilizers",
+    "HS4 Description": "Mineral or chemical fertilisers, potassic."
+  },
+  {
+    "HS4": "3105",
+    "HS4 Short Name": "Mixed Mineral or Chemical Fertilizers",
+    "HS4 Description": "Mineral or chemical fertilisers containing two or three of the fertilising elements nitrogen, phosphorus and potassium; other fertilisers; goods of this Chapter in tablets or similar forms or in packages of a gross weight not exceeding 10 kg."
+  },
+  {
+    "HS4": "3201",
+    "HS4 Short Name": "Vegetable Tanning Extracts",
+    "HS4 Description": "Tanning extracts of vegetable origin; tannins and their salts, ethers, esters and other derivatives."
+  },
+  {
+    "HS4": "3202",
+    "HS4 Short Name": "Synthetic Tanning Extracts",
+    "HS4 Description": "Synthetic organic tanning substances; inorganic tanning substances; tanning preparations, whether or not containing natural tanning substances; enzymatic preparations for pretanning."
+  },
+  {
+    "HS4": "3203",
+    "HS4 Short Name": "Vegetable or Animal Dyes",
+    "HS4 Description": "Colouring matter of vegetable or animal origin (including dyeing extracts but excluding animal black), whether or not chemically defined; preparations as specified in Note 3 to this Chapter based on colouring matter of vegetable or animal origin."
+  },
+  {
+    "HS4": "3204",
+    "HS4 Short Name": "Synthetic Coloring Matter",
+    "HS4 Description": "Synthetic organic colouring matter, whether or not chemically defined; preparations as specified in Note 3 to this Chapter based on synthetic organic colouring matter; synthetic organic products of a kind used as fluorescent brightening agents or as lumin"
+  },
+  {
+    "HS4": "3205",
+    "HS4 Short Name": "Lake Pigments",
+    "HS4 Description": "Colour lakes; preparations as specified in Note 3 to this Chapter based on colour lakes."
+  },
+  {
+    "HS4": "3206",
+    "HS4 Short Name": "Other Coloring Matter",
+    "HS4 Description": "Other colouring matter; preparations as specified in Note 3 to this Chapter, other than those of heading 32.03, 32.04 or 32.05; inorganic products of a kind used as luminophores, whether or not chemically defined."
+  },
+  {
+    "HS4": "3207",
+    "HS4 Short Name": "Prepared Pigments",
+    "HS4 Description": "Prepared pigments, prepared opacifiers and prepared colours, vitrifiable enamels and glazes, engobes (slips), liquid lustres and similar preparations, of a kind used in the ceramic, enamelling or glass industry; glass frit and other glass, in the form of"
+  },
+  {
+    "HS4": "3208",
+    "HS4 Short Name": "Nonaqueous Paints",
+    "HS4 Description": "Paints and varnishes (including enamels and lacquers) based on synthetic polymers or chemically modified natural polymers, dispersed or dissolved in a non-aqueous medium; solutions as defined in Note 4 to this Chapter."
+  },
+  {
+    "HS4": "3209",
+    "HS4 Short Name": "Aqueous Paints",
+    "HS4 Description": "Paints and varnishes (including enamels and lacquers) based on synthetic polymers or chemically modified natural polymers, dispersed or dissolved in an aqueous medium."
+  },
+  {
+    "HS4": "3210",
+    "HS4 Short Name": "Other Paints",
+    "HS4 Description": "Other paints and varnishes (including enamels, lacquers and distempers); prepared water pigments of a kind used for finishing leather."
+  },
+  {
+    "HS4": "3211",
+    "HS4 Short Name": "Prepared Paint Driers",
+    "HS4 Description": "Prepared driers."
+  },
+  {
+    "HS4": "3212",
+    "HS4 Short Name": "Nonaqueous Pigments",
+    "HS4 Description": "Pigments (including metallic powders and flakes) dispersed in non-aqueous media, in liquid or paste form, of a kind used in the manufacture of paints (including enamels); stamping foils; dyes and other colouring matter put up in forms or packings for reta"
+  },
+  {
+    "HS4": "3213",
+    "HS4 Short Name": "Artistry Paints",
+    "HS4 Description": "Artists', students' or signboard painters' colours, modifying tints, amusement colours and the like, in tablets, tubes, jars, bottles, pans or in similar forms or packings."
+  },
+  {
+    "HS4": "3214",
+    "HS4 Short Name": "Glaziers Putty",
+    "HS4 Description": "Glaziers' putty, grafting putty, resin cements, caulking compounds and other mastics; painters' fillings; non-refractory surfacing preparations for façades, indoor walls, floors, ceilings or the like."
+  },
+  {
+    "HS4": "3215",
+    "HS4 Short Name": "Ink",
+    "HS4 Description": "Printing ink, writing or drawing ink and other inks, whether or not concentrated or solid."
+  },
+  {
+    "HS4": "3301",
+    "HS4 Short Name": "Essential Oils",
+    "HS4 Description": "Essential oils (terpeneless or not), including concretes and absolutes; resinoids; extracted oleoresins; concentrates of essential oils in fats, in fixed oils, in waxes or the like, obtained by enfleurage or maceration; terpenic by-products of the deterpe"
+  },
+  {
+    "HS4": "3302",
+    "HS4 Short Name": "Scented Mixtures",
+    "HS4 Description": "Mixtures of odoriferous substances and mixtures (including alcoholic solutions) with a basis of one or more of these substances, of a kind used as raw materials in industry; other preparations based on odoriferous substances, of a kind used for the manufa"
+  },
+  {
+    "HS4": "3303",
+    "HS4 Short Name": "Perfumes",
+    "HS4 Description": "Perfumes and toilet waters."
+  },
+  {
+    "HS4": "3304",
+    "HS4 Short Name": "Beauty Products",
+    "HS4 Description": "Beauty or make-up preparations and preparations for the care of the skin (other than medicaments), including sunscreen or sun tan preparations; manicure or pedicure preparations."
+  },
+  {
+    "HS4": "3305",
+    "HS4 Short Name": "Hair Products",
+    "HS4 Description": "Preparations for use on the hair."
+  },
+  {
+    "HS4": "3306",
+    "HS4 Short Name": "Dental Products",
+    "HS4 Description": "Preparations for oral or dental hygiene, including denture fixative pastes and powders; yarn used to clean between the teeth (dental floss), in individual retail packages."
+  },
+  {
+    "HS4": "3307",
+    "HS4 Short Name": "Shaving Products",
+    "HS4 Description": "Pre-shave, shaving or after-shave preparations, personal deodorants, bath preparations, depilatories and other perfumery, cosmetic or toilet preparations, not elsewhere specified or included; prepared room deodorisers, whether or not perfumed or having di"
+  },
+  {
+    "HS4": "3401",
+    "HS4 Short Name": "Soap",
+    "HS4 Description": "Soap; organic surface-active products and preparations for use as soap, in the form of bars, cakes, moulded pieces or shapes, whether or not containing soap; organic surface-active products and preparations for washing the skin, in the form of liquid or c"
+  },
+  {
+    "HS4": "3402",
+    "HS4 Short Name": "Cleaning Products",
+    "HS4 Description": "Organic surface-active agents (other than soap); surface-active preparations, washing preparations (including auxiliary washing preparations) and cleaning preparations, whether or not containing soap, other than those of heading 34.01."
+  },
+  {
+    "HS4": "3403",
+    "HS4 Short Name": "Lubricating Products",
+    "HS4 Description": "Lubricating preparations (including cutting-oil preparations, bolt or nut release preparations, anti-rust or anti-corrosion preparations and mould release preparations, based on lubricants) and preparations of a kind used for the oil or grease treatment o"
+  },
+  {
+    "HS4": "3404",
+    "HS4 Short Name": "Waxes",
+    "HS4 Description": "Artificial waxes and prepared waxes."
+  },
+  {
+    "HS4": "3405",
+    "HS4 Short Name": "Polishes and Creams",
+    "HS4 Description": "Polishes and creams, for footwear, furniture, floors, coachwork, glass or metal, scouring pastes and powders and similar preparations (whether or not in the form of paper, wadding, felt, nonwovens, cellular plastics or cellular rubber, impregnated, coated"
+  },
+  {
+    "HS4": "3406",
+    "HS4 Short Name": "Candles",
+    "HS4 Description": "Candles, tapers and the like."
+  },
+  {
+    "HS4": "3407",
+    "HS4 Short Name": "Pastes and Waxes",
+    "HS4 Description": "Modelling pastes, including those put up for children's amusement; preparations known as “dental wax” or as “dental impression compounds”, put up in sets, in packings for retail sale or in plates, horseshoe shapes, sticks or similar forms; other preparati"
+  },
+  {
+    "HS4": "3501",
+    "HS4 Short Name": "Casein",
+    "HS4 Description": "Casein, caseinates and other casein derivatives; casein glues."
+  },
+  {
+    "HS4": "3502",
+    "HS4 Short Name": "Water Soluble Proteins",
+    "HS4 Description": "Albumins (including concentrates of two or more whey proteins, containing by weight more than 80 % whey proteins, calculated on the dry matter), albuminates and other albumin derivatives."
+  },
+  {
+    "HS4": "3503",
+    "HS4 Short Name": "Gelatin",
+    "HS4 Description": "Gelatin (including gelatin in rectangular (including square) sheets, whether or not surface-worked or coloured) and gelatin derivatives; isinglass; other glues of animal origin, excluding casein glues of heading 35.01."
+  },
+  {
+    "HS4": "3504",
+    "HS4 Short Name": "Peptones",
+    "HS4 Description": "Peptones and their derivatives; other protein substances and their derivatives, not elsewhere specified or included; hide powder, whether or not chromed."
+  },
+  {
+    "HS4": "3505",
+    "HS4 Short Name": "Dextrins",
+    "HS4 Description": "Dextrins and other modified starches (for example, pregelatinised or esterified starches); glues based on starches, or on dextrins or other modified starches."
+  },
+  {
+    "HS4": "3506",
+    "HS4 Short Name": "Glues",
+    "HS4 Description": "Prepared glues and other prepared adhesives, not elsewhere specified or included; products suitable for use as glues or adhesives, put up for retail sale as glues or adhesives, not exceeding a net weight of 1 kg."
+  },
+  {
+    "HS4": "3507",
+    "HS4 Short Name": "Enzymes",
+    "HS4 Description": "Enzymes; prepared enzymes not elsewhere specified or included."
+  },
+  {
+    "HS4": "3601",
+    "HS4 Short Name": "Propellant Powders",
+    "HS4 Description": "Propellent powders."
+  },
+  {
+    "HS4": "3602",
+    "HS4 Short Name": "Prepared Explosives",
+    "HS4 Description": "Prepared explosives, other than propellent powders."
+  },
+  {
+    "HS4": "3603",
+    "HS4 Short Name": "Detonating Fuses",
+    "HS4 Description": "Safety fuses; detonating fuses; percussion or detonating caps; igniters; electric detonators."
+  },
+  {
+    "HS4": "3604",
+    "HS4 Short Name": "Fireworks",
+    "HS4 Description": "Fireworks, signalling flares, rain rockets, fog signals and other pyrotechnic articles."
+  },
+  {
+    "HS4": "3605",
+    "HS4 Short Name": "Matches",
+    "HS4 Description": "Matches, other than pyrotechnic articles of heading 36.04."
+  },
+  {
+    "HS4": "3606",
+    "HS4 Short Name": "Pyrophoric Alloys",
+    "HS4 Description": "Ferro-cerium and other pyrophoric alloys in all forms; articles of combustible materials as specified in Note 2 to this Chapter."
+  },
+  {
+    "HS4": "3701",
+    "HS4 Short Name": "Photographic Plates",
+    "HS4 Description": "Photographic plates and film in the flat, sensitised, unexposed, of any material other than paper, paperboard or textiles; instant print film in the flat, sensitised, unexposed, whether or not in packs."
+  },
+  {
+    "HS4": "3702",
+    "HS4 Short Name": "Photographic Film",
+    "HS4 Description": "Photographic film in rolls, sensitised, unexposed, of any material other than paper, paperboard or textiles; instant print film in rolls, sensitised, unexposed."
+  },
+  {
+    "HS4": "3703",
+    "HS4 Short Name": "Photographic Paper",
+    "HS4 Description": "Photographic paper, paperboard and textiles, sensitised, unexposed."
+  },
+  {
+    "HS4": "3704",
+    "HS4 Short Name": "Undeveloped Exposed Photographic Material",
+    "HS4 Description": "Photographic plates, film, paper, paperboard and textiles, exposed but not developed."
+  },
+  {
+    "HS4": "3705",
+    "HS4 Short Name": "Developed Exposed Photographic Material",
+    "HS4 Description": "Photographic plates and film; exposed and developed, other than cinematographic film"
+  },
+  {
+    "HS4": "3706",
+    "HS4 Short Name": "Motion-picture film, exposed and developed",
+    "HS4 Description": "Cinematographic film, exposed and developed, whether or not incorporating sound track or consisting only of sound track."
+  },
+  {
+    "HS4": "3707",
+    "HS4 Short Name": "Photographic Chemicals",
+    "HS4 Description": "Chemical preparations for photographic uses (other than varnishes, glues, adhesives and similar preparations); unmixed products for photographic uses, put up in measured portions or put up for retail sale in a form ready for use."
+  },
+  {
+    "HS4": "3801",
+    "HS4 Short Name": "Artificial Graphite",
+    "HS4 Description": "Artificial graphite; colloidal or semi-colloidal graphite; preparations based on graphite or other carbon in the form of pastes, blocks, plates or other semi-manufactures."
+  },
+  {
+    "HS4": "3802",
+    "HS4 Short Name": "Activated Carbon",
+    "HS4 Description": "Activated carbon; activated natural mineral products; animal black, including spent animal black."
+  },
+  {
+    "HS4": "3803",
+    "HS4 Short Name": "Tall Oil",
+    "HS4 Description": "Tall oil, whether or not refined."
+  },
+  {
+    "HS4": "3804",
+    "HS4 Short Name": "Wood Pulp Lyes",
+    "HS4 Description": "Residual lyes from the manufacture of wood pulp, whether or not concentrated, desugared or chemically treated, including lignin sulphonates, but excluding tall oil of heading 38.03."
+  },
+  {
+    "HS4": "3805",
+    "HS4 Short Name": "Turpentine",
+    "HS4 Description": "Gum, wood or sulphate turpentine and other terpenic oils produced by the distillation or other treatment of coniferous woods; crude dipentene; sulphite turpentine and other crude para-cymene; pine oil containing alpha-terpineol as the main constituent."
+  },
+  {
+    "HS4": "3806",
+    "HS4 Short Name": "Rosin",
+    "HS4 Description": "Rosin and resin acids, and derivatives thereof; rosin spirit and rosin oils; run gums."
+  },
+  {
+    "HS4": "3807",
+    "HS4 Short Name": "Wood Tar, Oils and Pitch",
+    "HS4 Description": "Wood tar; wood tar oils; wood creosote; wood naphtha; vegetable pitch; brewers' pitch and similar preparations based on rosin, resin acids or on vegetable pitch."
+  },
+  {
+    "HS4": "3808",
+    "HS4 Short Name": "Pesticides",
+    "HS4 Description": "Insecticides, rodenticides, fungicides, herbicides, anti-sprouting products and plant-growth regulators, disinfectants and similar products, put up in forms or packings for retail sale or as preparations or articles (for example, sulphur-treated bands, wi"
+  },
+  {
+    "HS4": "3809",
+    "HS4 Short Name": "Dyeing Finishing Agents",
+    "HS4 Description": "Finishing agents, dye carriers to accelerate the dyeing or fixing of dyestuffs and other products and preparations (for example, dressings and mordants), of a kind used in the textile, paper, leather or like industries, not elsewhere specified or included"
+  },
+  {
+    "HS4": "3810",
+    "HS4 Short Name": "Metal Pickling Preparations",
+    "HS4 Description": "Pickling preparations for metal surfaces; fluxes and other auxiliary preparations for soldering, brazing or welding; soldering, brazing or welding powders and pastes consisting of metal and other materials; preparations of a kind used as cores or coatings"
+  },
+  {
+    "HS4": "3811",
+    "HS4 Short Name": "Antiknock",
+    "HS4 Description": "Anti-knock preparations, oxidation inhibitors, gum inhibitors, viscosity improvers, anti-corrosive preparations and other prepared additives, for mineral oils (including gasoline) or for other liquids used for the same purposes as mineral oils."
+  },
+  {
+    "HS4": "3812",
+    "HS4 Short Name": "Prepared Rubber Accelerators",
+    "HS4 Description": "Prepared rubber accelerators; compound plasticisers for rubber or plastics, not elsewhere specified or included; anti-oxidising preparations and other compound stabilisers for rubber or plastics."
+  },
+  {
+    "HS4": "3813",
+    "HS4 Short Name": "Fire Extinguishers Preparations",
+    "HS4 Description": "Preparations and charges for fire-extinguishers; charged fireextinguishing grenades."
+  },
+  {
+    "HS4": "3814",
+    "HS4 Short Name": "Organic Composite Solvents",
+    "HS4 Description": "Organic composite solvents and thinners, not elsewhere specified or included; prepared paint or varnish removers."
+  },
+  {
+    "HS4": "3815",
+    "HS4 Short Name": "Reaction and Catalytic Products",
+    "HS4 Description": "Reaction initiators, reaction accelerators and catalytic preparations, not elsewhere specified or included."
+  },
+  {
+    "HS4": "3816",
+    "HS4 Short Name": "Refractory Cements",
+    "HS4 Description": "Refractory cements, mortars, concretes and similar compositions, other than products of heading 38.01."
+  },
+  {
+    "HS4": "3817",
+    "HS4 Short Name": "Alkylbenzenes and Alkylnaphthalenes",
+    "HS4 Description": "Mixed alkylbenzenes and mixed alkylnaphthalenes, other than those of heading 27.07 or 29.02."
+  },
+  {
+    "HS4": "3818",
+    "HS4 Short Name": "Disc Chemicals for Electronics",
+    "HS4 Description": "Chemical elements doped for use in electronics, in the form of discs, wafers or similar forms; chemical compounds doped for use in electronics."
+  },
+  {
+    "HS4": "3819",
+    "HS4 Short Name": "Hydraulic Brake Fluid",
+    "HS4 Description": "Hydraulic brake fluids and other prepared liquids for hydraulic transmission, not containing or containing less than 70 % by weight of petroleum oils or oils obtained from bituminous minerals."
+  },
+  {
+    "HS4": "3820",
+    "HS4 Short Name": "Antifreeze",
+    "HS4 Description": "Anti-freezing preparations and prepared de-icing fluids."
+  },
+  {
+    "HS4": "3821",
+    "HS4 Short Name": "Micro-Organism Culture Preparations",
+    "HS4 Description": "Prepared culture media for the development or maintenance of micro-organisms (including viruses and the like) or of plant, human or animal cells."
+  },
+  {
+    "HS4": "3822",
+    "HS4 Short Name": "Laboratory Reagents",
+    "HS4 Description": "Diagnostic or laboratory reagents on a backing, prepared diagnostic or laboratory reagents whether or not on a backing, other than those of heading 30.02 or 30.06; certified reference materials."
+  },
+  {
+    "HS4": "3823",
+    "HS4 Short Name": "Industrial Fatty Acids, Oils and Alcohols",
+    "HS4 Description": "Industrial monocarboxylic fatty acids; acid oils from refining; industrial fatty alcohols."
+  },
+  {
+    "HS4": "3824",
+    "HS4 Short Name": "Prepared binders for foundry moulds or cores",
+    "HS4 Description": "Prepared binders for foundry moulds or cores; chemical products and preparations of the chemical or allied industries (including those consisting of mixtures of natural products), not elsewhere specified or included."
+  },
+  {
+    "HS4": "3825",
+    "HS4 Short Name": "Residual products of the chemical or allied industries",
+    "HS4 Description": "Residual products of the chemical or allied industries, not elsewhere specified or included; municipal waste; sewage sludge; other wastes specified in Note 6 to this Chapter."
+  },
+  {
+    "HS4": "3826",
+    "HS4 Short Name": "Biodiesel and mixtures",
+    "HS4 Description": "Biodiesel and mixtures thereof, not containing or containing less than 70 % by weight of petroleum oils or oils obtained from bituminous minerals."
+  },
+  {
+    "HS4": "3827",
+    "HS4 Short Name": "Mixtures containing halogenated derivatives of methane, ethane or propane",
+    "HS4 Description": "Mixtures containing halogenated derivatives of methane, ethane or propane, not elsewhere specified or included"
+  },
+  {
+    "HS4": "3901",
+    "HS4 Short Name": "Ethylene Polymers",
+    "HS4 Description": "Polymers of ethylene, in primary forms."
+  },
+  {
+    "HS4": "3902",
+    "HS4 Short Name": "Propylene Polymers",
+    "HS4 Description": "Polymers of propylene or of other olefins, in primary forms."
+  },
+  {
+    "HS4": "3903",
+    "HS4 Short Name": "Styrene Polymers",
+    "HS4 Description": "Polymers of styrene, in primary forms."
+  },
+  {
+    "HS4": "3904",
+    "HS4 Short Name": "Vinyl Chloride Polymers",
+    "HS4 Description": "Polymers of vinyl chloride or of other halogenated olefins, in primary forms."
+  },
+  {
+    "HS4": "3905",
+    "HS4 Short Name": "Other Vinyl Polymers",
+    "HS4 Description": "Polymers of vinyl acetate or of other vinyl esters, in primary forms; other vinyl polymers in primary forms."
+  },
+  {
+    "HS4": "3906",
+    "HS4 Short Name": "Acrylic Polymers",
+    "HS4 Description": "Acrylic polymers in primary forms."
+  },
+  {
+    "HS4": "3907",
+    "HS4 Short Name": "Polyacetals",
+    "HS4 Description": "Polyacetals, other polyethers and epoxide resins, in primary forms; polycarbonates, alkyd resins, polyallyl esters and other polyesters, in primary forms."
+  },
+  {
+    "HS4": "3908",
+    "HS4 Short Name": "Polyamides",
+    "HS4 Description": "Polyamides in primary forms."
+  },
+  {
+    "HS4": "3909",
+    "HS4 Short Name": "Amino-resins",
+    "HS4 Description": "Amino-resins, phenolic resins and polyurethanes, in primary forms."
+  },
+  {
+    "HS4": "3910",
+    "HS4 Short Name": "Silicone",
+    "HS4 Description": "Silicones in primary forms."
+  },
+  {
+    "HS4": "3911",
+    "HS4 Short Name": "Petroleum Resins",
+    "HS4 Description": "Petroleum resins, coumarone-indene resins, polyterpenes, polysulphides, polysulphones and other products specified in Note 3 to this Chapter, not elsewhere specified or included, in primary forms."
+  },
+  {
+    "HS4": "3912",
+    "HS4 Short Name": "Cellulose",
+    "HS4 Description": "Cellulose and its chemical derivatives, not elsewhere specified or included, in primary forms."
+  },
+  {
+    "HS4": "3913",
+    "HS4 Short Name": "Natural Polymers",
+    "HS4 Description": "Natural polymers (for example, alginic acid) and modified natural polymers (for example, hardened proteins, chemical derivatives of natural rubber), not elsewhere specified or included, in primary forms."
+  },
+  {
+    "HS4": "3914",
+    "HS4 Short Name": "Polymer Ion-Exchangers",
+    "HS4 Description": "Ion-exchangers based on polymers of headings 39.01 to 39.13, in primary forms."
+  },
+  {
+    "HS4": "3915",
+    "HS4 Short Name": "Scrap Plastic",
+    "HS4 Description": "Waste, parings and scrap, of plastics."
+  },
+  {
+    "HS4": "3916",
+    "HS4 Short Name": "Monofilament",
+    "HS4 Description": "Monofilament of which any cross-sectional dimension exceeds 1 mm, rods, sticks and profile shapes, whether or not surfaceworked but not otherwise worked, of plastics."
+  },
+  {
+    "HS4": "3917",
+    "HS4 Short Name": "Plastic Pipes",
+    "HS4 Description": "Tubes, pipes and hoses, and fittings therefor (for example, joints, elbows, flanges), of plastics."
+  },
+  {
+    "HS4": "3918",
+    "HS4 Short Name": "Plastic Floor Coverings",
+    "HS4 Description": "Floor coverings of plastics, whether or not self-adhesive, in rolls or in the form of tiles; wall or ceiling coverings of plastics, as defined in Note 9 to this Chapter."
+  },
+  {
+    "HS4": "3919",
+    "HS4 Short Name": "Self-adhesive Plastics",
+    "HS4 Description": "Self-adhesive plates, sheets, film, foil, tape, strip and other flat shapes, of plastics, whether or not in rolls."
+  },
+  {
+    "HS4": "3920",
+    "HS4 Short Name": "Raw Plastic Sheeting",
+    "HS4 Description": "Other plates, sheets, film, foil and strip, of plastics, non-cellular and not reinforced, laminated, supported or similarly combined with other materials."
+  },
+  {
+    "HS4": "3921",
+    "HS4 Short Name": "Other Plastic Sheetings",
+    "HS4 Description": "Other plates, sheets, film, foil and strip, of plastics."
+  },
+  {
+    "HS4": "3922",
+    "HS4 Short Name": "Plastic Wash Basins",
+    "HS4 Description": "Baths, shower-baths, sinks, wash-basins, bidets, lavatory pans, seats and covers, flushing cisterns and similar sanitary ware, of plastics."
+  },
+  {
+    "HS4": "3923",
+    "HS4 Short Name": "Plastic Lids",
+    "HS4 Description": "Articles for the conveyance or packing of goods, of plastics; stoppers, lids, caps and other closures, of plastics."
+  },
+  {
+    "HS4": "3924",
+    "HS4 Short Name": "Plastic Housewares",
+    "HS4 Description": "Tableware, kitchenware, other household articles and hygienic or toilet articles, of plastics."
+  },
+  {
+    "HS4": "3925",
+    "HS4 Short Name": "Plastic Building Materials",
+    "HS4 Description": "Builders' ware of plastics, not elsewhere specified or included."
+  },
+  {
+    "HS4": "3926",
+    "HS4 Short Name": "Other Plastic Products",
+    "HS4 Description": "Other articles of plastics and articles of other materials of headings 39.01 to 39.14."
+  },
+  {
+    "HS4": "4001",
+    "HS4 Short Name": "Rubber",
+    "HS4 Description": "Natural rubber, balata, gutta-percha, guayule, chicle and similar natural gums, in primary forms or in plates, sheets or strip."
+  },
+  {
+    "HS4": "4002",
+    "HS4 Short Name": "Synthetic Rubber",
+    "HS4 Description": "Synthetic rubber and factice derived from oils, in primary forms or in plates, sheets or strip; mixtures of any product of heading 40.01 with any product of this heading, in primary forms or in plates, sheets or strip."
+  },
+  {
+    "HS4": "4003",
+    "HS4 Short Name": "Reclaimed Rubber",
+    "HS4 Description": "Reclaimed rubber in primary forms or in plates, sheets or strip."
+  },
+  {
+    "HS4": "4004",
+    "HS4 Short Name": "Scrap Rubber",
+    "HS4 Description": "Waste, parings and scrap of rubber (other than hard rubber) and powders and granules obtained therefrom."
+  },
+  {
+    "HS4": "4005",
+    "HS4 Short Name": "Compounded Unvulcanised Rubber",
+    "HS4 Description": "Compounded rubber, unvulcanised, in primary forms or in plates, sheets or strip."
+  },
+  {
+    "HS4": "4006",
+    "HS4 Short Name": "Unvulcanised Rubber Products",
+    "HS4 Description": "Other forms (for example, rods, tubes and profile shapes) and articles (for example, discs and rings), of unvulcanised rubber."
+  },
+  {
+    "HS4": "4007",
+    "HS4 Short Name": "Rubber Thread",
+    "HS4 Description": "Vulcanised rubber thread and cord."
+  },
+  {
+    "HS4": "4008",
+    "HS4 Short Name": "Rubber Sheets",
+    "HS4 Description": "Plates, sheets, strip, rods and profile shapes, of vulcanised rubber other than hard rubber."
+  },
+  {
+    "HS4": "4009",
+    "HS4 Short Name": "Rubber Pipes",
+    "HS4 Description": "Tubes, pipes and hoses, of vulcanised rubber other than hard rubber, with or without their fittings (for example, joints, elbows, flanges)."
+  },
+  {
+    "HS4": "4010",
+    "HS4 Short Name": "Rubber Belting",
+    "HS4 Description": "Conveyor or transmission belts or belting, of vulcanised rubber."
+  },
+  {
+    "HS4": "4011",
+    "HS4 Short Name": "Rubber Tires",
+    "HS4 Description": "New pneumatic tyres, of rubber."
+  },
+  {
+    "HS4": "4012",
+    "HS4 Short Name": "Used Rubber Tires",
+    "HS4 Description": "Retreaded or used pneumatic tyres of rubber; solid or cushion tyres, tyre treads and tyre flaps, of rubber."
+  },
+  {
+    "HS4": "4013",
+    "HS4 Short Name": "Rubber Inner Tubes",
+    "HS4 Description": "Inner tubes, of rubber."
+  },
+  {
+    "HS4": "4014",
+    "HS4 Short Name": "Pharmaceutical Rubber Products",
+    "HS4 Description": "Hygienic or pharmaceutical articles (including teats), of vulcanised rubber other than hard rubber, with or without fittings of hard rubber."
+  },
+  {
+    "HS4": "4015",
+    "HS4 Short Name": "Rubber Apparel",
+    "HS4 Description": "Articles of apparel and clothing accessories (including gloves, mittens and mitts), for all purposes, of vulcanised rubber other than hard rubber."
+  },
+  {
+    "HS4": "4016",
+    "HS4 Short Name": "Other Rubber Products",
+    "HS4 Description": "Other articles of vulcanised rubber other than hard rubber."
+  },
+  {
+    "HS4": "4017",
+    "HS4 Short Name": "Hard Rubber",
+    "HS4 Description": "Hard rubber (for example, ebonite) in all forms, including waste and scrap; articles of hard rubber."
+  },
+  {
+    "HS4": "4101",
+    "HS4 Short Name": "Equine and Bovine Hides",
+    "HS4 Description": "Raw hides and skins of bovine (including buffalo) or equine animals (fresh, or salted, dried, limed, pickled or otherwise preserved, but not tanned, parchment-dressed or further prepared), whether or not dehaired or split."
+  },
+  {
+    "HS4": "4102",
+    "HS4 Short Name": "Sheep Hides",
+    "HS4 Description": "Raw skins of sheep or lambs (fresh, or salted, dried, limed, pickled or otherwise preserved, but not tanned, parchmentdressed or further prepared), whether or not with wool on or split, other than those excluded by Note 1 (c) to this Chapter."
+  },
+  {
+    "HS4": "4103",
+    "HS4 Short Name": "Other Hides and Skins",
+    "HS4 Description": "Other raw hides and skins (fresh, or salted, dried, limed, pickled or otherwise preserved, but not tanned, parchment-dressed or further prepared), whether or not dehaired or split, other than those excluded by Note 1 (b) or 1 (c) to this Chapter."
+  },
+  {
+    "HS4": "4104",
+    "HS4 Short Name": "Tanned Equine and Bovine Hides",
+    "HS4 Description": "Tanned or crust hides and skins of bovine (including buffalo) or equine animals, without hair on, whether or not split, but not further prepared."
+  },
+  {
+    "HS4": "4105",
+    "HS4 Short Name": "Tanned Sheep Hides",
+    "HS4 Description": "Tanned or crust skins of sheep or lambs, without wool on, whether or not split, but not further prepared."
+  },
+  {
+    "HS4": "4106",
+    "HS4 Short Name": "Tanned Goat Hides",
+    "HS4 Description": "Tanned or crust hides and skins of other animals, without wool or hair on, whether or not split, but not further prepared."
+  },
+  {
+    "HS4": "4107",
+    "HS4 Short Name": "Leather of Other Animals",
+    "HS4 Description": "Leather further prepared after tanning or crusting, including parchment-dressed leather, of bovine (including buffalo) or equine animals, without hair on, whether or not split, other than leather of heading 41.14."
+  },
+  {
+    "HS4": "4108",
+    "HS4 Short Name": "Chamois Leather",
+    "HS4 Description": "(-2001) Chamois leather, incl. combination chamois leather (excl. glacé-tanned leather subsequently treated with formaldehyde and leather stuffed with oil only after tanning)"
+  },
+  {
+    "HS4": "4109",
+    "HS4 Short Name": "Patent Leather",
+    "HS4 Description": "(-2001) Patent leather and patent laminated leather; metallized leather (excl. lacquered or metallized reconstituted leather)"
+  },
+  {
+    "HS4": "4110",
+    "HS4 Short Name": "Leather Waste",
+    "HS4 Description": "(-2001) Parings and other waste of leather, parchment-dressed leather or composition leather, not suitable for the manufacture of leather articles; leather dust, powder and flour"
+  },
+  {
+    "HS4": "4111",
+    "HS4 Short Name": "Leather Sheets",
+    "HS4 Description": "(-2001) Composition leather based on leather or leather fibre, in slabs, sheets or strip, whether or not in rolls"
+  },
+  {
+    "HS4": "4112",
+    "HS4 Short Name": "Leather further prepared after tanning or crusting",
+    "HS4 Description": "Leather further prepared after tanning or crusting, including parchment-dressed leather, of sheep or lamb, without wool on, whether or not split, other than leather of heading 41.14."
+  },
+  {
+    "HS4": "4113",
+    "HS4 Short Name": "Leather further prepared after tanning or crusting",
+    "HS4 Description": "Leather further prepared after tanning or crusting, including parchment-dressed leather, of other animals, without wool or hair on, whether or not split, other than leather of heading 41.14."
+  },
+  {
+    "HS4": "4114",
+    "HS4 Short Name": "Chamois",
+    "HS4 Description": "Chamois (including combination chamois) leather; patent leather and patent laminated leather; metallised leather."
+  },
+  {
+    "HS4": "4115",
+    "HS4 Short Name": "Composition leather with a basis of leather or leather fibre",
+    "HS4 Description": "Composition leather with a basis of leather or leather fibre, in slabs, sheets or strip, whether or not in rolls; parings and other waste of leather or of composition leather, not suitable for the manufacture of leather articles; leather dust, powder and"
+  },
+  {
+    "HS4": "4201",
+    "HS4 Short Name": "Saddlery",
+    "HS4 Description": "Saddlery and harness for any animal (including traces, leads, knee pads, muzzles, saddle cloths, saddle bags, dog coats and the like), of any material."
+  },
+  {
+    "HS4": "4202",
+    "HS4 Short Name": "Trunks and Cases",
+    "HS4 Description": "Trunks, suit-cases, vanity-cases, executive-cases, brief-cases, school satchels, spectacle cases, binocular cases, camera cases, musical instrument cases, gun cases, holsters and similar containers; travelling-bags, insulated food or beverages bags, toile"
+  },
+  {
+    "HS4": "4203",
+    "HS4 Short Name": "Leather Apparel",
+    "HS4 Description": "Articles of apparel and clothing accessories, of leather or of composition leather."
+  },
+  {
+    "HS4": "4204",
+    "HS4 Short Name": "Leather Used in Machinery",
+    "HS4 Description": "(-20016) Articles for technical use, of leather or composition leather"
+  },
+  {
+    "HS4": "4205",
+    "HS4 Short Name": "Other Leather Articles",
+    "HS4 Description": "Other articles of leather or of composition leather."
+  },
+  {
+    "HS4": "4206",
+    "HS4 Short Name": "Articles of Gut",
+    "HS4 Description": "Articles of gut (other than silk-worm gut), of goldbeater's skin, of bladders or of tendons."
+  },
+  {
+    "HS4": "4301",
+    "HS4 Short Name": "Raw Furskins",
+    "HS4 Description": "Raw furskins (including heads, tails, paws and other pieces or cuttings, suitable for furriers' use), other than raw hides and skins of heading 41.01, 41.02 or 41.03."
+  },
+  {
+    "HS4": "4302",
+    "HS4 Short Name": "Tanned Furskins",
+    "HS4 Description": "Tanned or dressed furskins (including heads, tails, paws and other pieces or cuttings), unassembled, or assembled (without the addition of other materials) other than those of heading 43.03."
+  },
+  {
+    "HS4": "4303",
+    "HS4 Short Name": "Furskin Apparel",
+    "HS4 Description": "Articles of apparel, clothing accessories and other articles of furskin."
+  },
+  {
+    "HS4": "4304",
+    "HS4 Short Name": "Artificial Fur",
+    "HS4 Description": "Artificial fur and articles thereof."
+  },
+  {
+    "HS4": "4401",
+    "HS4 Short Name": "Fuel Wood",
+    "HS4 Description": "Fuel wood, in logs, in billets, in twigs, in faggots or in similar forms; wood in chips or particles; sawdust and wood waste and scrap, whether or not agglomerated in logs, briquettes, pellets or similar forms."
+  },
+  {
+    "HS4": "4402",
+    "HS4 Short Name": "Wood Charcoal",
+    "HS4 Description": "Wood charcoal (including shell or nut charcoal), whether or not agglomerated."
+  },
+  {
+    "HS4": "4403",
+    "HS4 Short Name": "Rough Wood",
+    "HS4 Description": "Wood in the rough, whether or not stripped of bark or sapwood, or roughly squared."
+  },
+  {
+    "HS4": "4404",
+    "HS4 Short Name": "Wood Stakes",
+    "HS4 Description": "Hoopwood; split poles; piles, pickets and stakes of wood, pointed but not sawn lengthwise; wooden sticks, roughly trimmed but not turned, bent or otherwise worked, suitable for the manufacture of walking-sticks, umbrellas, tool handles or the like; chipwo"
+  },
+  {
+    "HS4": "4405",
+    "HS4 Short Name": "Wood Wool",
+    "HS4 Description": "Wood wool; wood flour."
+  },
+  {
+    "HS4": "4406",
+    "HS4 Short Name": "Railroad Ties",
+    "HS4 Description": "Railway or tramway sleepers (cross-ties) of wood."
+  },
+  {
+    "HS4": "4407",
+    "HS4 Short Name": "Sawn Wood",
+    "HS4 Description": "Wood sawn or chipped lengthwise, sliced or peeled, whether or not planed, sanded or end-jointed, of a thickness exceeding 6 mm."
+  },
+  {
+    "HS4": "4408",
+    "HS4 Short Name": "Veneer Sheets",
+    "HS4 Description": "Sheets for veneering (including those obtained by slicing laminated wood), for plywood or for similar laminated wood and other wood, sawn lengthwise, sliced or peeled, whether or not planed, sanded, spliced or end-jointed, of a thickness not exceeding 6 m"
+  },
+  {
+    "HS4": "4409",
+    "HS4 Short Name": "Shaped Wood",
+    "HS4 Description": "Wood (including strips and friezes for parquet flooring, not assembled) continuously shaped (tongued, grooved, rebated, chamfered, V-jointed, beaded, moulded, rounded or the like) along any of its edges, ends or faces, whether or not planed, sanded or end"
+  },
+  {
+    "HS4": "4410",
+    "HS4 Short Name": "Particle Board",
+    "HS4 Description": "Particle board, oriented strand board (OSB) and similar board (for example, waferboard) of wood or other ligneous materials, whether or not agglomerated with resins or other organic binding substances."
+  },
+  {
+    "HS4": "4411",
+    "HS4 Short Name": "Wood Fiberboard",
+    "HS4 Description": "Fibreboard of wood or other ligneous materials, whether or not bonded with resins or other organic substances."
+  },
+  {
+    "HS4": "4412",
+    "HS4 Short Name": "Plywood",
+    "HS4 Description": "Plywood, veneered panels and similar laminated wood."
+  },
+  {
+    "HS4": "4413",
+    "HS4 Short Name": "Densified Wood",
+    "HS4 Description": "Densified wood, in blocks, plates, strips or profile shapes."
+  },
+  {
+    "HS4": "4414",
+    "HS4 Short Name": "Wood Frames",
+    "HS4 Description": "Wooden frames for paintings, photographs, mirrors or similar objects."
+  },
+  {
+    "HS4": "4415",
+    "HS4 Short Name": "Wood Crates",
+    "HS4 Description": "Packing cases, boxes, crates, drums and similar packings, of wood; cable-drums of wood; pallets, box pallets and other load boards, of wood; pallet collars of wood."
+  },
+  {
+    "HS4": "4416",
+    "HS4 Short Name": "Wood Barrels",
+    "HS4 Description": "Casks, barrels, vats, tubs and other coopers' products and parts thereof, of wood, including staves."
+  },
+  {
+    "HS4": "4417",
+    "HS4 Short Name": "Wooden Tool Handles",
+    "HS4 Description": "Tools, tool bodies, tool handles, broom or brush bodies and handles, of wood; boot or shoe lasts and trees, of wood."
+  },
+  {
+    "HS4": "4418",
+    "HS4 Short Name": "Wood Carpentry",
+    "HS4 Description": "Builders' joinery and carpentry of wood, including cellular wood panels, assembled flooring panels, shingles and shakes."
+  },
+  {
+    "HS4": "4419",
+    "HS4 Short Name": "Wood Kitchenware",
+    "HS4 Description": "Tableware and kitchenware, of wood."
+  },
+  {
+    "HS4": "4420",
+    "HS4 Short Name": "Wood Ornaments",
+    "HS4 Description": "Wood marquetry and inlaid wood; caskets and cases for jewellery or cutlery, and similar articles, of wood; statuettes and other ornaments, of wood; wooden articles of furniture not falling in Chapter 94."
+  },
+  {
+    "HS4": "4421",
+    "HS4 Short Name": "Other Wood Articles",
+    "HS4 Description": "Other articles of wood."
+  },
+  {
+    "HS4": "4501",
+    "HS4 Short Name": "Raw Cork",
+    "HS4 Description": "Natural cork, raw or simply prepared; waste cork; crushed, granulated or ground cork."
+  },
+  {
+    "HS4": "4502",
+    "HS4 Short Name": "Debacked Cork",
+    "HS4 Description": "Natural cork, debacked or roughly squared, or in rectangular (including square) blocks, plates, sheets or strip (including sharp-edged blanks for corks or stoppers)."
+  },
+  {
+    "HS4": "4503",
+    "HS4 Short Name": "Natural Cork Articles",
+    "HS4 Description": "Articles of natural cork."
+  },
+  {
+    "HS4": "4504",
+    "HS4 Short Name": "Agglomerated Cork",
+    "HS4 Description": "Agglomerated cork (with or without a binding substance) and articles of agglomerated cork."
+  },
+  {
+    "HS4": "4601",
+    "HS4 Short Name": "Plaiting Products",
+    "HS4 Description": "Plaits and similar products of plaiting materials, whether or not assembled into strips; plaiting materials, plaits and similar products of plaiting materials, bound together in parallel strands or woven, in sheet form, whether or not being finished artic"
+  },
+  {
+    "HS4": "4602",
+    "HS4 Short Name": "Basketwork",
+    "HS4 Description": "Basketwork, wickerwork and other articles, made directly to shape from plaiting materials or made up from goods of heading 46.01; articles of loofah."
+  },
+  {
+    "HS4": "4701",
+    "HS4 Short Name": "Mechanical Wood Pulp",
+    "HS4 Description": "Mechanical wood pulp."
+  },
+  {
+    "HS4": "4702",
+    "HS4 Short Name": "Dissolving Grades Chemical Woodpulp",
+    "HS4 Description": "Chemical wood pulp, dissolving grades."
+  },
+  {
+    "HS4": "4703",
+    "HS4 Short Name": "Sulfate Chemical Woodpulp",
+    "HS4 Description": "Chemical wood pulp, soda or sulphate, other than dissolving grades."
+  },
+  {
+    "HS4": "4704",
+    "HS4 Short Name": "Sulfite Chemical Woodpulp",
+    "HS4 Description": "Chemical wood pulp, sulphite, other than dissolving grades."
+  },
+  {
+    "HS4": "4705",
+    "HS4 Short Name": "Semi chemical Woodpulp",
+    "HS4 Description": "Wood pulp obtained by a combination of mechanical and chemical pulping processes."
+  },
+  {
+    "HS4": "4706",
+    "HS4 Short Name": "Recovered Paper Pulp",
+    "HS4 Description": "Pulps of fibres derived from recovered (waste and scrap) paper or paperboard or of other fibrous cellulosic material."
+  },
+  {
+    "HS4": "4707",
+    "HS4 Short Name": "Recovered Paper",
+    "HS4 Description": "Recovered (waste and scrap) paper or paperboard."
+  },
+  {
+    "HS4": "4801",
+    "HS4 Short Name": "Newsprint",
+    "HS4 Description": "Newsprint, in rolls or sheets."
+  },
+  {
+    "HS4": "4802",
+    "HS4 Short Name": "Uncoated Paper",
+    "HS4 Description": "Uncoated paper and paperboard, of a kind used for writing, printing or other graphic purposes, and non perforated punchcards and punch tape paper, in rolls or rectangular (including square) sheets, of any size, other than paper of heading 48.01 or 48.03"
+  },
+  {
+    "HS4": "4803",
+    "HS4 Short Name": "Facial Tissue",
+    "HS4 Description": "Toilet or facial tissue stock, towel or napkin stock and similar paper of a kind used for household or sanitary purposes, cellulose wadding and webs of cellulose fibres, whether or not creped, crinkled, embossed, perforated, surface-coloured, surfacedec"
+  },
+  {
+    "HS4": "4804",
+    "HS4 Short Name": "Uncoated Kraft Paper",
+    "HS4 Description": "Uncoated kraft paper and paperboard, in rolls or sheets, other than that of heading 48.02 or 48.03."
+  },
+  {
+    "HS4": "4805",
+    "HS4 Short Name": "Other Uncoated Paper",
+    "HS4 Description": "Other uncoated paper and paperboard, in rolls or sheets, not further worked or processed than as specified in Note 3 to this Chapter."
+  },
+  {
+    "HS4": "4806",
+    "HS4 Short Name": "Vegetable Parchment",
+    "HS4 Description": "Vegetable parchment, greaseproof papers, tracing papers and glassine and other glazed transparent or translucent papers, in rolls or sheets."
+  },
+  {
+    "HS4": "4807",
+    "HS4 Short Name": "Composite Paper",
+    "HS4 Description": "Composite paper and paperboard (made by sticking flat layers of paper or paperboard together with an adhesive), not surfacecoated or impregnated, whether or not internally reinforced, in rolls or sheets."
+  },
+  {
+    "HS4": "4808",
+    "HS4 Short Name": "Corrugated Paper",
+    "HS4 Description": "Paper and paperboard, corrugated (with or without glued flat surface sheets), creped, crinkled, embossed or perforated, in rolls or sheets, other than paper of the kind described in heading 48.03."
+  },
+  {
+    "HS4": "4809",
+    "HS4 Short Name": "Carbon Paper",
+    "HS4 Description": "Carbon paper, self-copy paper and other copying or transfer papers (including coated or impregnated paper for duplicator stencils or offset plates), whether or not printed, in rolls or sheets."
+  },
+  {
+    "HS4": "4810",
+    "HS4 Short Name": "Kaolin Coated Paper",
+    "HS4 Description": "Paper and paperboard, coated on one or both sides with kaolin (China clay) or other inorganic substances, with or without a binder, and with no other coating, whether or not surfacecoloured, surface-decorated or printed, in rolls or rectangular (includi"
+  },
+  {
+    "HS4": "4811",
+    "HS4 Short Name": "Cellulose Fibers Paper",
+    "HS4 Description": "Paper, paperboard, cellulose wadding and webs of cellulose fibres, coated, impregnated, covered, surface-coloured, surfacedecorated or printed, in rolls or rectangular (including square) sheets, of any size, other than goods of the kind described in hea"
+  },
+  {
+    "HS4": "4812",
+    "HS4 Short Name": "Paper Pulp Filter Blocks",
+    "HS4 Description": "Filter blocks, slabs and plates, of paper pulp."
+  },
+  {
+    "HS4": "4813",
+    "HS4 Short Name": "Cigarette Paper",
+    "HS4 Description": "Cigarette paper, whether or not cut to size or in the form of booklets or tubes."
+  },
+  {
+    "HS4": "4814",
+    "HS4 Short Name": "Wallpaper",
+    "HS4 Description": "Wallpaper and similar wall coverings; window transparencies of paper."
+  },
+  {
+    "HS4": "4815",
+    "HS4 Short Name": "Paper Floor Coverings",
+    "HS4 Description": "(-2006) Floor coverings on a base of paper or paperboard, whether or not cut to size (excl. similar floor coverings with textile backings, and floor coverings without backings)"
+  },
+  {
+    "HS4": "4816",
+    "HS4 Short Name": "Other Carbon Paper",
+    "HS4 Description": "Carbon paper, self-copy paper and other copying or transfer papers (other than those of heading 48.09), duplicator stencils and offset plates, of paper, whether or not put up in boxes."
+  },
+  {
+    "HS4": "4817",
+    "HS4 Short Name": "Letter Stock",
+    "HS4 Description": "Envelopes, letter cards, plain postcards and correspondence cards, of paper or paperboard; boxes, pouches, wallets and writing compendiums, of paper or paperboard, containing an assortment of paper stationery."
+  },
+  {
+    "HS4": "4818",
+    "HS4 Short Name": "Toilet Paper",
+    "HS4 Description": "Toilet paper and similar paper, cellulose wadding or webs of cellulose fibres, of a kind used for household or sanitary purposes, in rolls of a width not exceeding 36 cm, or cut to size or shape; handkerchiefs, cleansing tissues, towels, tablecloths, serv"
+  },
+  {
+    "HS4": "4819",
+    "HS4 Short Name": "Paper Containers",
+    "HS4 Description": "Cartons, boxes, cases, bags and other packing containers, of paper, paperboard, cellulose wadding or webs of cellulose fibres; box files, letter trays, and similar articles, of paper or paperboard of a kind used in offices, shops or the like."
+  },
+  {
+    "HS4": "4820",
+    "HS4 Short Name": "Paper Notebooks",
+    "HS4 Description": "Registers, account books, note books, order books, receipt books, letter pads, memorandum pads, diaries and similar articles, exercise books, blotting-pads, binders (loose-leaf or other), folders, file covers, manifold business forms, interleaved carbon s"
+  },
+  {
+    "HS4": "4821",
+    "HS4 Short Name": "Paper Labels",
+    "HS4 Description": "Paper or paperboard labels of all kinds, whether or not printed."
+  },
+  {
+    "HS4": "4822",
+    "HS4 Short Name": "Paper Spools",
+    "HS4 Description": "Bobbins, spools, cops and similar supports of paper pulp, paper or paperboard (whether or not perforated or hardened)."
+  },
+  {
+    "HS4": "4823",
+    "HS4 Short Name": "Shaped Paper",
+    "HS4 Description": "Other paper, paperboard, cellulose wadding and webs of cellulose fibres, cut to size or shape; other articles of paper pulp, paper, paperboard, cellulose wadding or webs of cellulose fibres."
+  },
+  {
+    "HS4": "4901",
+    "HS4 Short Name": "Brochures",
+    "HS4 Description": "Printed books, brochures, leaflets and similar printed matter, whether or not in single sheets."
+  },
+  {
+    "HS4": "4902",
+    "HS4 Short Name": "Newspapers",
+    "HS4 Description": "Newspapers, journals and periodicals, whether or not illustrated or containing advertising material."
+  },
+  {
+    "HS4": "4903",
+    "HS4 Short Name": "Children's Picture Books",
+    "HS4 Description": "Children's picture, drawing or colouring books."
+  },
+  {
+    "HS4": "4904",
+    "HS4 Short Name": "Sheet Music",
+    "HS4 Description": "Music, printed or in manuscript, whether or not bound or illustrated."
+  },
+  {
+    "HS4": "4905",
+    "HS4 Short Name": "Maps",
+    "HS4 Description": "Maps and hydrographic or similar charts of all kinds, including atlases, wall maps, topographical plans and globes, printed."
+  },
+  {
+    "HS4": "4906",
+    "HS4 Short Name": "Architectural Plans",
+    "HS4 Description": "Plans and drawings for architectural, engineering, industrial, commercial, topographical or similar purposes, being originals drawn by hand; hand-written texts; photographic reproductions on sensitised paper and carbon copies of the foregoing."
+  },
+  {
+    "HS4": "4907",
+    "HS4 Short Name": "Postage Stamps",
+    "HS4 Description": "Unused postage, revenue or similar stamps of current or new issue in the country in which they have, or will have, a recognised face value; stamp-impressed paper; banknotes; cheque forms; stock, share or bond certificates and similar documents of title."
+  },
+  {
+    "HS4": "4908",
+    "HS4 Short Name": "Decals",
+    "HS4 Description": "Transfers (decalcomanias)."
+  },
+  {
+    "HS4": "4909",
+    "HS4 Short Name": "Postcards",
+    "HS4 Description": "Printed or illustrated postcards; printed cards bearing personal greetings, messages or announcements, whether or not illustrated, with or without envelopes or trimmings."
+  },
+  {
+    "HS4": "4910",
+    "HS4 Short Name": "Calendars",
+    "HS4 Description": "Calendars of any kind, printed, including calendar blocks."
+  },
+  {
+    "HS4": "4911",
+    "HS4 Short Name": "Other Printed Material",
+    "HS4 Description": "Other printed matter, including printed pictures and photographs."
+  },
+  {
+    "HS4": "5001",
+    "HS4 Short Name": "Silkworm Cocoons",
+    "HS4 Description": "Silk-worm cocoons suitable for reeling."
+  },
+  {
+    "HS4": "5002",
+    "HS4 Short Name": "Raw Silk",
+    "HS4 Description": "Raw silk (not thrown)."
+  },
+  {
+    "HS4": "5003",
+    "HS4 Short Name": "Silk Waste",
+    "HS4 Description": "Silk waste (including cocoons unsuitable for reeling, yarn waste and garnetted stock)."
+  },
+  {
+    "HS4": "5004",
+    "HS4 Short Name": "Non-Retail Silk Yarn",
+    "HS4 Description": "Silk yarn (other than yarn spun from silk waste) not put up for retail sale."
+  },
+  {
+    "HS4": "5005",
+    "HS4 Short Name": "Silk Waste Yarn",
+    "HS4 Description": "Yarn spun from silk waste, not put up for retail sale."
+  },
+  {
+    "HS4": "5006",
+    "HS4 Short Name": "Retail Silk Yarn",
+    "HS4 Description": "Silk yarn and yarn spun from silk waste, put up for retail sale; silk-worm gut."
+  },
+  {
+    "HS4": "5007",
+    "HS4 Short Name": "Silk Fabrics",
+    "HS4 Description": "Woven fabrics of silk or of silk waste."
+  },
+  {
+    "HS4": "5101",
+    "HS4 Short Name": "Wool",
+    "HS4 Description": "Wool, not carded or combed."
+  },
+  {
+    "HS4": "5102",
+    "HS4 Short Name": "Animal Hair",
+    "HS4 Description": "Fine or coarse animal hair, not carded or combed."
+  },
+  {
+    "HS4": "5103",
+    "HS4 Short Name": "Wool or Animal Hair Waste",
+    "HS4 Description": "Waste of wool or of fine or coarse animal hair, including yarn waste but excluding garnetted stock."
+  },
+  {
+    "HS4": "5104",
+    "HS4 Short Name": "Garnetted Wool or Animal Hair",
+    "HS4 Description": "Garnetted stock of wool or of fine or coarse animal hair."
+  },
+  {
+    "HS4": "5105",
+    "HS4 Short Name": "Prepared Wool or Animal Hair",
+    "HS4 Description": "Wool and fine or coarse animal hair, carded or combed (including combed wool in fragments)."
+  },
+  {
+    "HS4": "5106",
+    "HS4 Short Name": "Non-Retail Carded Wool Yarn",
+    "HS4 Description": "Yarn of carded wool, not put up for retail sale."
+  },
+  {
+    "HS4": "5107",
+    "HS4 Short Name": "Non-Retail Combed Wool Yarn",
+    "HS4 Description": "Yarn of combed wool, not put up for retail sale."
+  },
+  {
+    "HS4": "5108",
+    "HS4 Short Name": "Non-Retail Animal Hair Yarn",
+    "HS4 Description": "Yarn of fine animal hair (carded or combed), not put up for retail sale."
+  },
+  {
+    "HS4": "5109",
+    "HS4 Short Name": "Retail Wool or Animal Hair Yarn",
+    "HS4 Description": "Yarn of wool or of fine animal hair, put up for retail sale."
+  },
+  {
+    "HS4": "5110",
+    "HS4 Short Name": "Horsehair Yarn",
+    "HS4 Description": "Yarn of coarse animal hair or of horsehair (including gimped horsehair yarn), whether or not put up for retail sale."
+  },
+  {
+    "HS4": "5111",
+    "HS4 Short Name": "Carded Wool or Animal Hair Fabric",
+    "HS4 Description": "Woven fabrics of carded wool or of carded fine animal hair."
+  },
+  {
+    "HS4": "5112",
+    "HS4 Short Name": "Combed Wool or Animal Hair Fabric",
+    "HS4 Description": "Woven fabrics of combed wool or of combed fine animal hair."
+  },
+  {
+    "HS4": "5113",
+    "HS4 Short Name": "Horsehair Fabric",
+    "HS4 Description": "Woven fabrics of coarse animal hair or of horsehair."
+  },
+  {
+    "HS4": "5201",
+    "HS4 Short Name": "Raw Cotton",
+    "HS4 Description": "Cotton, not carded or combed."
+  },
+  {
+    "HS4": "5202",
+    "HS4 Short Name": "Cotton Waste",
+    "HS4 Description": "Cotton waste (including yarn waste and garnetted stock)."
+  },
+  {
+    "HS4": "5203",
+    "HS4 Short Name": "Prepared Cotton",
+    "HS4 Description": "Cotton, carded or combed."
+  },
+  {
+    "HS4": "5204",
+    "HS4 Short Name": "Cotton Sewing Thread",
+    "HS4 Description": "Cotton sewing thread, whether or not put up for retail sale."
+  },
+  {
+    "HS4": "5205",
+    "HS4 Short Name": "Non-Retail Pure Cotton Yarn",
+    "HS4 Description": "Cotton yarn (other than sewing thread), containing 85 % or more by weight of cotton, not put up for retail sale."
+  },
+  {
+    "HS4": "5206",
+    "HS4 Short Name": "Non-Retail Mixed Cotton Yarn",
+    "HS4 Description": "Cotton yarn (other than sewing thread), containing less than 85 % by weight of cotton, not put up for retail sale."
+  },
+  {
+    "HS4": "5207",
+    "HS4 Short Name": "Retail Cotton Yarn",
+    "HS4 Description": "Cotton yarn (other than sewing thread) put up for retail sale."
+  },
+  {
+    "HS4": "5208",
+    "HS4 Short Name": "Light Pure Woven Cotton",
+    "HS4 Description": "Woven fabrics of cotton, containing 85 % or more by weight of cotton, weighing not more than 200 g/m2."
+  },
+  {
+    "HS4": "5209",
+    "HS4 Short Name": "Heavy Pure Woven Cotton",
+    "HS4 Description": "Woven fabrics of cotton, containing 85 % or more by weight of cotton, weighing more than 200 g/m2."
+  },
+  {
+    "HS4": "5210",
+    "HS4 Short Name": "Light Mixed Woven Cotton",
+    "HS4 Description": "Woven fabrics of cotton, containing less than 85 % by weight of cotton, mixed mainly or solely with man-made fibres, weighing not more than 200 g/m2."
+  },
+  {
+    "HS4": "5211",
+    "HS4 Short Name": "Heavy Mixed Woven Cotton",
+    "HS4 Description": "Woven fabrics of cotton, containing less than 85 % by weight of cotton, mixed mainly or solely with man-made fibres, weighing more than 200 g/m2."
+  },
+  {
+    "HS4": "5212",
+    "HS4 Short Name": "Other Cotton Fabrics",
+    "HS4 Description": "Other woven fabrics of cotton."
+  },
+  {
+    "HS4": "5301",
+    "HS4 Short Name": "Flax Fibers",
+    "HS4 Description": "Flax, raw or processed but not spun; flax tow and waste (including yarn waste and garnetted stock)."
+  },
+  {
+    "HS4": "5302",
+    "HS4 Short Name": "Hemp Fibers",
+    "HS4 Description": "True hemp (Cannabis sativa L.), raw or processed but not spun; tow and waste of true hemp (including yarn waste and garnetted stock)."
+  },
+  {
+    "HS4": "5303",
+    "HS4 Short Name": "Jute and Other Textile Fibers",
+    "HS4 Description": "Jute and other textile bast fibres (excluding flax, true hemp and ramie), raw or processed but not spun; tow and waste of these fibres (including yarn waste and garnetted stock)."
+  },
+  {
+    "HS4": "5304",
+    "HS4 Short Name": "Agave",
+    "HS4 Description": "(-2006) Sisal and other textile fibres of the genus Agave, raw or processed, but not spun; tow and waste of such fibres, incl. yarn waste and garnetted stock"
+  },
+  {
+    "HS4": "5305",
+    "HS4 Short Name": "Coconut and Other Vegetable Fibers",
+    "HS4 Description": "Coconut, abaca (Manila hemp or Musa textilis Nee), ramie and other vegetable textile fibres, not elsewhere specified or included, raw or processed but not spun; tow, noils and waste of these fibres (including yarn waste and garnetted stock)."
+  },
+  {
+    "HS4": "5306",
+    "HS4 Short Name": "Flax Yarn",
+    "HS4 Description": "Flax yarn."
+  },
+  {
+    "HS4": "5307",
+    "HS4 Short Name": "Jute Yarn",
+    "HS4 Description": "Yarn of jute or of other textile bast fibres of heading 53.03."
+  },
+  {
+    "HS4": "5308",
+    "HS4 Short Name": "Other Vegetable Fibers Yarn",
+    "HS4 Description": "Yarn of other vegetable textile fibres; paper yarn."
+  },
+  {
+    "HS4": "5309",
+    "HS4 Short Name": "Flax Woven Fabric",
+    "HS4 Description": "Woven fabrics of flax."
+  },
+  {
+    "HS4": "5310",
+    "HS4 Short Name": "Jute Woven Fabric",
+    "HS4 Description": "Woven fabrics of jute or of other textile bast fibres of heading 53.03."
+  },
+  {
+    "HS4": "5311",
+    "HS4 Short Name": "Other Vegetable Fibers Fabric",
+    "HS4 Description": "Woven fabrics of other vegetable textile fibres; woven fabrics of paper yarn."
+  },
+  {
+    "HS4": "5401",
+    "HS4 Short Name": "Artificial Filament Sewing Thread",
+    "HS4 Description": "Sewing thread of man-made filaments, whether or not put up for retail sale."
+  },
+  {
+    "HS4": "5402",
+    "HS4 Short Name": "Non-Retail Synthetic Filament Yarn",
+    "HS4 Description": "Synthetic filament yarn (other than sewing thread), not put up for retail sale, including synthetic monofilament of less than 67 decitex."
+  },
+  {
+    "HS4": "5403",
+    "HS4 Short Name": "Non-Retail Artificial Filament Yarn",
+    "HS4 Description": "Artificial filament yarn (other than sewing thread), not put up for retail sale, including artificial monofilament of less than 67 decitex."
+  },
+  {
+    "HS4": "5404",
+    "HS4 Short Name": "Synthetic Monofilament",
+    "HS4 Description": "Synthetic monofilament of 67 decitex or more and of which no cross-sectional dimension exceeds 1 mm; strip and the like (for example, artificial straw) of synthetic textile materials of an apparent width not exceeding 5 mm."
+  },
+  {
+    "HS4": "5405",
+    "HS4 Short Name": "Artificial Monofilament",
+    "HS4 Description": "Artificial monofilament of 67 decitex or more and of which no cross-sectional dimension exceeds 1 mm; strip and the like (for example, artificial straw) of artificial textile materials of an apparent width not exceeding 5 mm."
+  },
+  {
+    "HS4": "5406",
+    "HS4 Short Name": "Retail Artificial Filament Yarn",
+    "HS4 Description": "Man-made filament yarn (other than sewing thread), put up for retail sale."
+  },
+  {
+    "HS4": "5407",
+    "HS4 Short Name": "Synthetic Filament Yarn Woven Fabric",
+    "HS4 Description": "Woven fabrics of synthetic filament yarn, including woven fabrics obtained from materials of heading 54.04."
+  },
+  {
+    "HS4": "5408",
+    "HS4 Short Name": "Artificial Filament Yarn Woven Fabric",
+    "HS4 Description": "Woven fabrics of artificial filament yarn, including woven fabrics obtained from materials of heading 54.05."
+  },
+  {
+    "HS4": "5501",
+    "HS4 Short Name": "Synthetic Filament Tow",
+    "HS4 Description": "Synthetic filament tow."
+  },
+  {
+    "HS4": "5502",
+    "HS4 Short Name": "Artificial Filament Tow",
+    "HS4 Description": "Artificial filament tow."
+  },
+  {
+    "HS4": "5503",
+    "HS4 Short Name": "Unprocessed Synthetic Staple Fibers",
+    "HS4 Description": "Synthetic staple fibres, not carded, combed or otherwise processed for spinning."
+  },
+  {
+    "HS4": "5504",
+    "HS4 Short Name": "Unprocessed Artificial Staple Fibers",
+    "HS4 Description": "Artificial staple fibres, not carded, combed or otherwise processed for spinning."
+  },
+  {
+    "HS4": "5505",
+    "HS4 Short Name": "Artificial Fibers Waste",
+    "HS4 Description": "Waste (including noils, yarn waste and garnetted stock) of manmade fibres."
+  },
+  {
+    "HS4": "5506",
+    "HS4 Short Name": "Processed Synthetic Staple Fibers",
+    "HS4 Description": "Synthetic staple fibres, carded, combed or otherwise processed for spinning."
+  },
+  {
+    "HS4": "5507",
+    "HS4 Short Name": "Processed Artificial Staple Fibers",
+    "HS4 Description": "Artificial staple fibres, carded, combed or otherwise processed for spinning."
+  },
+  {
+    "HS4": "5508",
+    "HS4 Short Name": "Non-Retail Artificial Staple Fibers Sewing Thread",
+    "HS4 Description": "Sewing thread of man-made staple fibres, whether or not put up for retail sale."
+  },
+  {
+    "HS4": "5509",
+    "HS4 Short Name": "Non-Retail Synthetic Staple Fibers Yarn",
+    "HS4 Description": "Yarn (other than sewing thread) of synthetic staple fibres, not put up for retail sale."
+  },
+  {
+    "HS4": "5510",
+    "HS4 Short Name": "Non-Retail Artificial Staple Fibers Yarn",
+    "HS4 Description": "Yarn (other than sewing thread) of artificial staple fibres, not put up for retail sale."
+  },
+  {
+    "HS4": "5511",
+    "HS4 Short Name": "Retail Artificial Staple Fibers Yarn",
+    "HS4 Description": "Yarn (other than sewing thread) of man-made staple fibres, put up for retail sale."
+  },
+  {
+    "HS4": "5512",
+    "HS4 Short Name": "Synthetic Fabrics",
+    "HS4 Description": "Woven fabrics of synthetic staple fibres, containing 85 % or more by weight of synthetic staple fibres."
+  },
+  {
+    "HS4": "5513",
+    "HS4 Short Name": "Light Synthetic Cotton Fabrics",
+    "HS4 Description": "Woven fabrics of synthetic staple fibres, containing less than 85 % by weight of such fibres, mixed mainly or solely with cotton, of a weight not exceeding 170 g/m²."
+  },
+  {
+    "HS4": "5514",
+    "HS4 Short Name": "Heavy Synthetic Cotton Fabrics",
+    "HS4 Description": "Woven fabrics of synthetic staple fibres, containing less than 85 % by weight of such fibres, mixed mainly or solely with cotton, of a weight exceeding 170 g/m²."
+  },
+  {
+    "HS4": "5515",
+    "HS4 Short Name": "Other Synthetic Fabrics",
+    "HS4 Description": "Other woven fabrics of synthetic staple fibres."
+  },
+  {
+    "HS4": "5516",
+    "HS4 Short Name": "Woven Fabric of Synthetic Staple Fibers",
+    "HS4 Description": "Woven fabrics of artificial staple fibres."
+  },
+  {
+    "HS4": "5601",
+    "HS4 Short Name": "Wadding",
+    "HS4 Description": "Wadding of textile materials and articles thereof; textile fibres, not exceeding 5 mm in length (flock), textile dust and mill neps."
+  },
+  {
+    "HS4": "5602",
+    "HS4 Short Name": "Felt",
+    "HS4 Description": "Felt, whether or not impregnated, coated, covered or laminated."
+  },
+  {
+    "HS4": "5603",
+    "HS4 Short Name": "Non-woven Textiles",
+    "HS4 Description": "Nonwovens, whether or not impregnated, coated, covered or laminated."
+  },
+  {
+    "HS4": "5604",
+    "HS4 Short Name": "Rubber Textiles",
+    "HS4 Description": "Rubber thread and cord, textile covered; textile yarn, and strip and the like of heading 54.04 or 54.05, impregnated, coated, covered or sheathed with rubber or plastics."
+  },
+  {
+    "HS4": "5605",
+    "HS4 Short Name": "Metallic Yarn",
+    "HS4 Description": "Metallised yarn, whether or not gimped, being textile yarn, or strip or the like of heading 54.04 or 54.05, combined with metal in the form of thread, strip or powder or covered with metal."
+  },
+  {
+    "HS4": "5606",
+    "HS4 Short Name": "Gimp Yarn",
+    "HS4 Description": "Gimped yarn, and strip and the like of heading 54.04 or 54.05, gimped (other than those of heading 56.05 and gimped horsehair yarn); chenille yarn (including flock chenille yarn); loop waleyarn."
+  },
+  {
+    "HS4": "5607",
+    "HS4 Short Name": "Twine and Rope",
+    "HS4 Description": "Twine, cordage, ropes and cables, whether or not plaited or braided and whether or not impregnated, coated, covered or sheathed with rubber or plastics."
+  },
+  {
+    "HS4": "5608",
+    "HS4 Short Name": "Netting",
+    "HS4 Description": "Knotted netting of twine, cordage or rope; made up fishing nets and other made up nets, of textile materials."
+  },
+  {
+    "HS4": "5609",
+    "HS4 Short Name": "Other Articles of Twine and Rope",
+    "HS4 Description": "Articles of yarn, strip or the like of heading 54.04 or 54.05, twine, cordage, rope or cables, not elsewhere specified or included."
+  },
+  {
+    "HS4": "5701",
+    "HS4 Short Name": "Knotted Carpets",
+    "HS4 Description": "Carpets and other textile floor coverings, knotted, whether or not made up."
+  },
+  {
+    "HS4": "5702",
+    "HS4 Short Name": "Hand-Woven Rugs",
+    "HS4 Description": "Carpets and other textile floor coverings, woven, not tufted or flocked, whether or not made up, including “Kelem”, “Schumacks”, “Karamanie” and similar hand-woven rugs."
+  },
+  {
+    "HS4": "5703",
+    "HS4 Short Name": "Tufted Carpets",
+    "HS4 Description": "Carpets and other textile floor coverings, tufted, whether or not made up."
+  },
+  {
+    "HS4": "5704",
+    "HS4 Short Name": "Felt Carpets",
+    "HS4 Description": "Carpets and other textile floor coverings, of felt, not tufted or flocked, whether or not made up."
+  },
+  {
+    "HS4": "5705",
+    "HS4 Short Name": "Other Carpets",
+    "HS4 Description": "Other carpets and other textile floor coverings, whether or not made up."
+  },
+  {
+    "HS4": "5801",
+    "HS4 Short Name": "Woven Fabrics",
+    "HS4 Description": "Woven pile fabrics and chenille fabrics, other than fabrics of heading 58.02 or 58.06."
+  },
+  {
+    "HS4": "5802",
+    "HS4 Short Name": "Terry Fabric",
+    "HS4 Description": "Terry towelling and similar woven terry fabrics, other than narrow fabrics of heading 58.06; tufted textile fabrics, other than products of heading 57.03."
+  },
+  {
+    "HS4": "5803",
+    "HS4 Short Name": "Gauze",
+    "HS4 Description": "Gauze, other than narrow fabrics of heading 58.06."
+  },
+  {
+    "HS4": "5804",
+    "HS4 Short Name": "Tulles and Net Fabric",
+    "HS4 Description": "Tulles and other net fabrics, not including woven, knitted or crocheted fabrics; lace in the piece, in strips or in motifs, other than fabrics of headings 60.02 to 60.06."
+  },
+  {
+    "HS4": "5805",
+    "HS4 Short Name": "Hand-Woven Tapestries",
+    "HS4 Description": "Hand-woven tapestries of the type Gobelins, Flanders, Aubusson, Beauvais and the like, and needle-worked tapestries (for example, petit point, cross stitch), whether or not made up."
+  },
+  {
+    "HS4": "5806",
+    "HS4 Short Name": "Narrow Woven Fabric",
+    "HS4 Description": "Narrow woven fabrics, other than goods of heading 58.07; narrow fabrics consisting of warp without weft assembled by means of an adhesive (bolducs)."
+  },
+  {
+    "HS4": "5807",
+    "HS4 Short Name": "Labels",
+    "HS4 Description": "Labels, badges and similar articles of textile materials, in the piece, in strips or cut to shape or size, not embroidered."
+  },
+  {
+    "HS4": "5808",
+    "HS4 Short Name": "Ornamental Trimmings",
+    "HS4 Description": "Braids in the piece; ornamental trimmings in the piece, without embroidery, other than knitted or crocheted; tassels, pompons and similar articles."
+  },
+  {
+    "HS4": "5809",
+    "HS4 Short Name": "Metallic Fabric",
+    "HS4 Description": "Woven fabrics of metal thread and woven fabrics of metallised yarn of heading 56.05, of a kind used in apparel, as furnishing fabrics or for similar purposes, not elsewhere specified or included."
+  },
+  {
+    "HS4": "5810",
+    "HS4 Short Name": "Embroidery",
+    "HS4 Description": "Embroidery in the piece, in strips or in motifs."
+  },
+  {
+    "HS4": "5811",
+    "HS4 Short Name": "Quilted Textiles",
+    "HS4 Description": "Quilted textile products in the piece, composed of one or more layers of textile materials assembled with padding by stitching or otherwise, other than embroidery of heading 58.10."
+  },
+  {
+    "HS4": "5901",
+    "HS4 Short Name": "Gum Coated Textile Fabric",
+    "HS4 Description": "Textile fabrics coated with gum or amylaceous substances, of a kind used for the outer covers of books or the like; tracing cloth; prepared painting canvas; buckram and similar stiffened textile fabrics of a kind used for hat foundations."
+  },
+  {
+    "HS4": "5902",
+    "HS4 Short Name": "Polyamide Fabric",
+    "HS4 Description": "Tyre cord fabric of high tenacity yarn of nylon or other polyamides, polyesters or viscose rayon."
+  },
+  {
+    "HS4": "5903",
+    "HS4 Short Name": "Plastic Coated Textile Fabric",
+    "HS4 Description": "Textile fabrics impregnated, coated, covered or laminated with plastics, other than those of heading 59.02."
+  },
+  {
+    "HS4": "5904",
+    "HS4 Short Name": "Linoleum",
+    "HS4 Description": "Linoleum, whether or not cut to shape; floor coverings consisting of a coating or covering applied on a textile backing, whether or not cut to shape."
+  },
+  {
+    "HS4": "5905",
+    "HS4 Short Name": "Textile Wall Coverings",
+    "HS4 Description": "Textile wall coverings."
+  },
+  {
+    "HS4": "5906",
+    "HS4 Short Name": "Rubber Textile Fabric",
+    "HS4 Description": "Rubberised textile fabrics, other than those of heading 59.02."
+  },
+  {
+    "HS4": "5907",
+    "HS4 Short Name": "Coated Textile Fabric",
+    "HS4 Description": "Textile fabrics otherwise impregnated, coated or covered; painted canvas being theatrical scenery, studio back-cloths or the like."
+  },
+  {
+    "HS4": "5908",
+    "HS4 Short Name": "Textile Wicks",
+    "HS4 Description": "Textile wicks, woven, plaited or knitted , for lamps, stoves, lighters, candles or the like; incandescent gas mantles and tubular knitted gas mantle fabric therefor, whether or not impregnated."
+  },
+  {
+    "HS4": "5909",
+    "HS4 Short Name": "Hose Piping Textiles",
+    "HS4 Description": "Textile hosepiping and similar textile tubing, with or without lining, armour or accessories of other materials."
+  },
+  {
+    "HS4": "5910",
+    "HS4 Short Name": "Conveyor Belt Textiles",
+    "HS4 Description": "Transmission or conveyor belts or belting, of textile material, whether or not impregnated, coated, covered or laminated with plastics, or reinforced with metal or other material."
+  },
+  {
+    "HS4": "5911",
+    "HS4 Short Name": "Technical Use Textiles",
+    "HS4 Description": "Textile products and articles, for technical uses, specified in Note 7 to this Chapter."
+  },
+  {
+    "HS4": "6001",
+    "HS4 Short Name": "Pile Fabric",
+    "HS4 Description": "Pile fabrics, including “long pile” fabrics and terry fabrics, knitted or crocheted."
+  },
+  {
+    "HS4": "6002",
+    "HS4 Short Name": "Light Rubberized Knitted Fabric",
+    "HS4 Description": "Knitted or crocheted fabrics of a width not exceeding 30 cm, containing by weight 5 % or more of elastomeric yarn or rubber thread, other than those of heading 60.01."
+  },
+  {
+    "HS4": "6003",
+    "HS4 Short Name": "Knitted or crocheted fabrics",
+    "HS4 Description": "Knitted or crocheted fabrics of a width not exceeding 30 cm, other than those of heading 60.01 or 60.02."
+  },
+  {
+    "HS4": "6004",
+    "HS4 Short Name": "Knitted or crocheted fabrics",
+    "HS4 Description": "Knitted or crocheted fabrics of a width exceeding 30 cm, containing by weight 5 % or more of elastomeric yarn or rubber thread, other than those of heading 60.01."
+  },
+  {
+    "HS4": "6005",
+    "HS4 Short Name": "Warp knit fabrics ",
+    "HS4 Description": "Warp knit fabrics (including those made on galloon knitting machines), other than those of headings 60.01 to 60.04."
+  },
+  {
+    "HS4": "6006",
+    "HS4 Short Name": "Other knitted or crocheted fabrics.",
+    "HS4 Description": "Other knitted or crocheted fabrics."
+  },
+  {
+    "HS4": "6101",
+    "HS4 Short Name": "Knit Men's Coats",
+    "HS4 Description": "Men's or boys' overcoats, car-coats, capes, cloaks, anoraks (including ski-jackets), wind-cheaters, wind-jackets and similar articles, knitted or crocheted, other than those of heading 61.03."
+  },
+  {
+    "HS4": "6102",
+    "HS4 Short Name": "Knit Women's Coats",
+    "HS4 Description": "Women's or girls' overcoats, car-coats, capes, cloaks, anoraks (including ski-jackets), wind-cheaters, windjackets and similar articles, knitted or crocheted, other than those of heading 61.04."
+  },
+  {
+    "HS4": "6103",
+    "HS4 Short Name": "Knit Men's Suits",
+    "HS4 Description": "Men's or boys' suits, ensembles, jackets, blazers, trousers, bib and brace overalls, breeches and shorts (other than swimwear), knitted or crocheted."
+  },
+  {
+    "HS4": "6104",
+    "HS4 Short Name": "Knit Women's Suits",
+    "HS4 Description": "Women's or girls' suits, ensembles, jackets, blazers, dresses, skirts, divided skirts, trousers, bib and brace overalls, breeches and shorts (other than swimwear), knitted or crocheted."
+  },
+  {
+    "HS4": "6105",
+    "HS4 Short Name": "Knit Men's Shirts",
+    "HS4 Description": "Men's or boys' shirts, knitted or crocheted."
+  },
+  {
+    "HS4": "6106",
+    "HS4 Short Name": "Knit Women's Shirts",
+    "HS4 Description": "Women's or girls' blouses, shirts and shirt-blouses, knitted or crocheted."
+  },
+  {
+    "HS4": "6107",
+    "HS4 Short Name": "Knit Men's Undergarments",
+    "HS4 Description": "Men's or boys' underpants, briefs, nightshirts, pyjamas, bathrobes, dressing gowns and similar articles, knitted or crocheted."
+  },
+  {
+    "HS4": "6108",
+    "HS4 Short Name": "Knit Women's Undergarments",
+    "HS4 Description": "Women's or girls' slips, petticoats, briefs, panties, nightdresses, pyjamas, negligees, bathrobes, dressing gowns and similar articles, knitted or crocheted."
+  },
+  {
+    "HS4": "6109",
+    "HS4 Short Name": "Knit T-shirts",
+    "HS4 Description": "T-shirts, singlets and other vests, knitted or crocheted."
+  },
+  {
+    "HS4": "6110",
+    "HS4 Short Name": "Knit Sweaters",
+    "HS4 Description": "Jerseys, pullovers, cardigans, waistcoats and similar articles, knitted or crocheted."
+  },
+  {
+    "HS4": "6111",
+    "HS4 Short Name": "Knit Babies' Garments",
+    "HS4 Description": "Babies' garments and clothing accessories, knitted or crocheted."
+  },
+  {
+    "HS4": "6112",
+    "HS4 Short Name": "Knit Active Wear",
+    "HS4 Description": "Track suits, ski suits and swimwear, knitted or crocheted."
+  },
+  {
+    "HS4": "6113",
+    "HS4 Short Name": "Garments of Impregnated Fabric",
+    "HS4 Description": "Garments, made up of knitted or crocheted fabrics of heading 59.03, 59.06 or 59.07."
+  },
+  {
+    "HS4": "6114",
+    "HS4 Short Name": "Other Knit Garments",
+    "HS4 Description": "Other garments, knitted or crocheted."
+  },
+  {
+    "HS4": "6115",
+    "HS4 Short Name": "Knit Socks and Hosiery",
+    "HS4 Description": "Panty hose, tights, stockings, socks and other hosiery, including graduated compression hosiery (for example, stockings for varicose veins) and footwear without applied soles, knitted or crocheted."
+  },
+  {
+    "HS4": "6116",
+    "HS4 Short Name": "Knit Gloves",
+    "HS4 Description": "Gloves, mittens and mitts, knitted or crocheted."
+  },
+  {
+    "HS4": "6117",
+    "HS4 Short Name": "Other Knit Clothing Accessories",
+    "HS4 Description": "Other made up clothing accessories, knitted or crocheted; knitted or crocheted parts of garments or of clothing accessories."
+  },
+  {
+    "HS4": "6201",
+    "HS4 Short Name": "Non-Knit Men's Coats",
+    "HS4 Description": "Men's or boys' overcoats, car-coats, capes, cloaks, anoraks (including ski-jackets), wind-cheaters, wind-jackets and similar articles, other than those of heading 62.03."
+  },
+  {
+    "HS4": "6202",
+    "HS4 Short Name": "Non-Knit Women's Coats",
+    "HS4 Description": "Women's or girls' overcoats, car-coats, capes, cloaks, anoraks (including ski-jackets), wind-cheaters, wind-jackets and similar articles, other than those of heading 62.04."
+  },
+  {
+    "HS4": "6203",
+    "HS4 Short Name": "Non-Knit Men's Suits",
+    "HS4 Description": "Men's or boys' suits, ensembles, jackets, blazers, trousers, bib and brace overalls, breeches and shorts (other than swimwear)."
+  },
+  {
+    "HS4": "6204",
+    "HS4 Short Name": "Non-Knit Women's Suits",
+    "HS4 Description": "Women's or girls' suits, ensembles, jackets, blazers, dresses, skirts, divided skirts, trousers, bib and brace overalls, breeches and shorts (other than swimwear)."
+  },
+  {
+    "HS4": "6205",
+    "HS4 Short Name": "Non-Knit Men's Shirts",
+    "HS4 Description": "Men's or boys' shirts."
+  },
+  {
+    "HS4": "6206",
+    "HS4 Short Name": "Non-Knit Women's Shirts",
+    "HS4 Description": "Women's or girls' blouses, shirts and shirt-blouses."
+  },
+  {
+    "HS4": "6207",
+    "HS4 Short Name": "Non-Knit Men's Undergarments",
+    "HS4 Description": "Men's or boys' singlets and other vests, underpants, briefs, nightshirts, pyjamas, bathrobes, dressing gowns and similar articles."
+  },
+  {
+    "HS4": "6208",
+    "HS4 Short Name": "Non-Knit Women's Undergarments",
+    "HS4 Description": "Women's or girls' singlets and other vests, slips, petticoats, briefs, panties, nightdresses, pyjamas, negligees, bathrobes, dressing gowns and similar articles."
+  },
+  {
+    "HS4": "6209",
+    "HS4 Short Name": "Non-Knit Babies' Garments",
+    "HS4 Description": "Babies' garments and clothing accessories."
+  },
+  {
+    "HS4": "6210",
+    "HS4 Short Name": "Felt or Coated Fabric Garments",
+    "HS4 Description": "Garments, made up of fabrics of heading 56.02, 56.03, 59.03, 59.06 or 59.07."
+  },
+  {
+    "HS4": "6211",
+    "HS4 Short Name": "Non-Knit Active Wear",
+    "HS4 Description": "Track suits, ski suits and swimwear; other garments."
+  },
+  {
+    "HS4": "6212",
+    "HS4 Short Name": "Other Women's Undergarments",
+    "HS4 Description": "Brassieres, girdles, corsets, braces, suspenders, garters and similar articles and parts thereof, whether or not knitted or crocheted."
+  },
+  {
+    "HS4": "6213",
+    "HS4 Short Name": "Handkerchiefs",
+    "HS4 Description": "Handkerchiefs."
+  },
+  {
+    "HS4": "6214",
+    "HS4 Short Name": "Scarves",
+    "HS4 Description": "Shawls, scarves, mufflers, mantillas, veils and the like."
+  },
+  {
+    "HS4": "6215",
+    "HS4 Short Name": "Neck Ties",
+    "HS4 Description": "Ties, bow ties and cravats."
+  },
+  {
+    "HS4": "6216",
+    "HS4 Short Name": "Non-Knit Gloves",
+    "HS4 Description": "Gloves, mittens and mitts."
+  },
+  {
+    "HS4": "6217",
+    "HS4 Short Name": "Other Non-Knit Clothing Accessories",
+    "HS4 Description": "Other made up clothing accessories; parts of garments or of clothing accessories, other than those of heading 62.12."
+  },
+  {
+    "HS4": "6301",
+    "HS4 Short Name": "Blankets",
+    "HS4 Description": "Blankets and travelling rugs."
+  },
+  {
+    "HS4": "6302",
+    "HS4 Short Name": "House Linens",
+    "HS4 Description": "Bed linen, table linen, toilet linen and kitchen linen."
+  },
+  {
+    "HS4": "6303",
+    "HS4 Short Name": "Window Dressings",
+    "HS4 Description": "Curtains (including drapes) and interior blinds; curtain or bed valances."
+  },
+  {
+    "HS4": "6304",
+    "HS4 Short Name": "Bedspreads",
+    "HS4 Description": "Other furnishing articles, excluding those of heading 94.04."
+  },
+  {
+    "HS4": "6305",
+    "HS4 Short Name": "Packing Bags",
+    "HS4 Description": "Sacks and bags, of a kind used for the packing of goods."
+  },
+  {
+    "HS4": "6306",
+    "HS4 Short Name": "Awnings, Tents, and Sails",
+    "HS4 Description": "Tarpaulins, awnings and sunblinds; tents; sails for boats, sailboards or landcraft; camping goods."
+  },
+  {
+    "HS4": "6307",
+    "HS4 Short Name": "Other Cloth Articles",
+    "HS4 Description": "Other made up articles, including dress patterns."
+  },
+  {
+    "HS4": "6308",
+    "HS4 Short Name": "Packaged Sewing Sets",
+    "HS4 Description": "Sets consisting of woven fabric and yarn, whether or not with accessories, for making up into rugs, tapestries, embroidered table cloths or serviettes, or similar textile articles, put up in packings for retail sale."
+  },
+  {
+    "HS4": "6309",
+    "HS4 Short Name": "Used Clothing",
+    "HS4 Description": "Worn clothing and other worn articles."
+  },
+  {
+    "HS4": "6310",
+    "HS4 Short Name": "Textile Scraps",
+    "HS4 Description": "Used or new rags, scrap twine, cordage, rope and cables and worn out articles of twine, cordage, rope or cables, of textile materials."
+  },
+  {
+    "HS4": "6401",
+    "HS4 Short Name": "Waterproof Footwear",
+    "HS4 Description": "Waterproof footwear with outer soles and uppers of rubber or of plastics, the uppers of which are neither fixed to the sole nor assembled by stitching, riveting, nailing, screwing, plugging or similar processes."
+  },
+  {
+    "HS4": "6402",
+    "HS4 Short Name": "Rubber Footwear",
+    "HS4 Description": "Other footwear with outer soles and uppers of rubber or plastics."
+  },
+  {
+    "HS4": "6403",
+    "HS4 Short Name": "Leather Footwear",
+    "HS4 Description": "Footwear with outer soles of rubber, plastics, leather or composition leather and uppers of leather."
+  },
+  {
+    "HS4": "6404",
+    "HS4 Short Name": "Textile Footwear",
+    "HS4 Description": "Footwear with outer soles of rubber, plastics, leather or composition leather and uppers of textile materials."
+  },
+  {
+    "HS4": "6405",
+    "HS4 Short Name": "Other Footwear",
+    "HS4 Description": "Other footwear."
+  },
+  {
+    "HS4": "6406",
+    "HS4 Short Name": "Footwear Parts",
+    "HS4 Description": "Parts of footwear (including uppers whether or not attached to soles other than outer soles); removable in-soles, heel cushions and similar articles; gaiters, leggings and similar articles, and parts thereof."
+  },
+  {
+    "HS4": "6501",
+    "HS4 Short Name": "Hat Forms",
+    "HS4 Description": "Hat-forms, hat bodies and hoods of felt, neither blocked to shape nor with made brims; plateaux and manchons (including slit manchons), of felt."
+  },
+  {
+    "HS4": "6502",
+    "HS4 Short Name": "Hat Shapes",
+    "HS4 Description": "Hat-shapes, plaited or made by assembling strips of any material, neither blocked to shape, nor with made brims, nor lined, nor trimmed."
+  },
+  {
+    "HS4": "6503",
+    "HS4 Short Name": "Felt Hats",
+    "HS4 Description": "(-2006) Felt hats and other felt headgear, made from the hat bodies, hoods or plateaux of heading 6501, whether or not lined or trimmed (excl. made by assembling strips or pieces of felt, and toy and carnival headgear)"
+  },
+  {
+    "HS4": "6504",
+    "HS4 Short Name": "Hats",
+    "HS4 Description": "Hats and other headgear, plaited or made by assembling strips of any material, whether or not lined or trimmed."
+  },
+  {
+    "HS4": "6505",
+    "HS4 Short Name": "Knitted Hats",
+    "HS4 Description": "Hats and other headgear, knitted or crocheted, or made up from lace, felt or other textile fabric, in the piece (but not in strips), whether or not lined or trimmed; hair-nets of any material, whether or not lined or trimmed."
+  },
+  {
+    "HS4": "6506",
+    "HS4 Short Name": "Other Headwear",
+    "HS4 Description": "Other headgear, whether or not lined or trimmed."
+  },
+  {
+    "HS4": "6507",
+    "HS4 Short Name": "Headbands and Linings",
+    "HS4 Description": "Head-bands, linings, covers, hat foundations, hat frames, peaks and chinstraps, for headgear."
+  },
+  {
+    "HS4": "6601",
+    "HS4 Short Name": "Umbrellas",
+    "HS4 Description": "Umbrellas and sun umbrellas (including walking-stick umbrellas, garden umbrellas and similar umbrellas)."
+  },
+  {
+    "HS4": "6602",
+    "HS4 Short Name": "Walking Sticks",
+    "HS4 Description": "Walking-sticks, seat-sticks, whips, riding-crops and the like."
+  },
+  {
+    "HS4": "6603",
+    "HS4 Short Name": "Umbrella and Walking Stick Accessories",
+    "HS4 Description": "Parts, trimmings and accessories of articles of heading 66.01 or 66.02."
+  },
+  {
+    "HS4": "6701",
+    "HS4 Short Name": "Bird Skins and Feathers",
+    "HS4 Description": "Skins and other parts of birds with their feathers or down, feathers, parts of feathers, down and articles thereof (other than goods of heading 05.05 and worked quills and scapes)."
+  },
+  {
+    "HS4": "6702",
+    "HS4 Short Name": "Artificial Vegetation",
+    "HS4 Description": "Artificial flowers, foliage and fruit and parts thereof; articles made of artificial flowers, foliage or fruit."
+  },
+  {
+    "HS4": "6703",
+    "HS4 Short Name": "Processed Hair",
+    "HS4 Description": "Human hair, dressed, thinned, bleached or otherwise worked; wool or other animal hair or other textile materials, prepared for use in making wigs or the like."
+  },
+  {
+    "HS4": "6704",
+    "HS4 Short Name": "Fake Hair",
+    "HS4 Description": "Wigs, false beards, eyebrows and eyelashes, switches and the like, of human or animal hair or of textile materials; articles of human hair not elsewhere specified or included."
+  },
+  {
+    "HS4": "6801",
+    "HS4 Short Name": "Curbstones",
+    "HS4 Description": "Setts, curbstones and flagstones, of natural stone (except slate)."
+  },
+  {
+    "HS4": "6802",
+    "HS4 Short Name": "Building Stone",
+    "HS4 Description": "Worked monumental or building stone (except slate) and articles thereof, other than goods of heading 68.01; mosaic cubes and the like, of natural stone (including slate), whether or not on a backing; artificially coloured granules, chippings and powder, o"
+  },
+  {
+    "HS4": "6803",
+    "HS4 Short Name": "Slate",
+    "HS4 Description": "Worked slate and articles of slate or of agglomerated slate."
+  },
+  {
+    "HS4": "6804",
+    "HS4 Short Name": "Milling Stones",
+    "HS4 Description": "Millstones, grindstones, grinding wheels and the like, without frameworks, for grinding, sharpening, polishing, trueing or cutting, hand sharpening or polishing stones, and parts thereof, of natural stone, of agglomerated natural or artificial abrasives,"
+  },
+  {
+    "HS4": "6805",
+    "HS4 Short Name": "Abrasive Powder",
+    "HS4 Description": "Natural or artificial abrasive powder or grain, on a base of textile material, of paper, of paperboard or of other materials, whether or not cut to shape or sewn or otherwise made up."
+  },
+  {
+    "HS4": "6806",
+    "HS4 Short Name": "Rock Wool",
+    "HS4 Description": "Slag wool, rock wool and similar mineral wools; exfoliated vermiculite, expanded clays, foamed slag and similar expanded mineral materials; mixtures and articles of heat-insulating, sound-insulating or sound-absorbing mineral materials, other than those o"
+  },
+  {
+    "HS4": "6807",
+    "HS4 Short Name": "Asphalt",
+    "HS4 Description": "Articles of asphalt or of similar material (for example, petroleum bitumen or coal tar pitch)."
+  },
+  {
+    "HS4": "6808",
+    "HS4 Short Name": "Vegetable Fiber",
+    "HS4 Description": "Panels, boards, tiles, blocks and similar articles of vegetable fibre, of straw or of shavings, chips, particles, sawdust or other waste, of wood, agglomerated with cement, plaster or other mineral binders."
+  },
+  {
+    "HS4": "6809",
+    "HS4 Short Name": "Plaster Articles",
+    "HS4 Description": "Articles of plaster or of compositions based on plaster."
+  },
+  {
+    "HS4": "6810",
+    "HS4 Short Name": "Cement Articles",
+    "HS4 Description": "Articles of cement, of concrete or of artificial stone, whether or not reinforced."
+  },
+  {
+    "HS4": "6811",
+    "HS4 Short Name": "Asbestos Cement Articles",
+    "HS4 Description": "Articles of asbestos-cement, of cellulose fibre-cement or the like."
+  },
+  {
+    "HS4": "6812",
+    "HS4 Short Name": "Asbestos Fibres",
+    "HS4 Description": "Fabricated asbestos fibres; mixtures with a basis of asbestos or with a basis of asbestos and magnesium carbonate; articles of such mixtures or of asbestos (for example, thread, woven fabric, clothing, headgear, footwear, gaskets), whether or not reinforc"
+  },
+  {
+    "HS4": "6813",
+    "HS4 Short Name": "Friction Material",
+    "HS4 Description": "Friction material and articles thereof (for example, sheets, rolls, strips, segments, discs, washers, pads), not mounted, for brakes, for clutches or the like, with a basis of asbestos, of other mineral substances or of cellulose, whether or not combined"
+  },
+  {
+    "HS4": "6814",
+    "HS4 Short Name": "Mica",
+    "HS4 Description": "Worked mica and articles of mica, including agglomerated or reconstituted mica, whether or not on a support of paper, paperboard or other materials."
+  },
+  {
+    "HS4": "6815",
+    "HS4 Short Name": "Other Stone Articles",
+    "HS4 Description": "Articles of stone or of other mineral substances (including carbon fibres, articles of carbon fibres and articles of peat), not elsewhere specified or included."
+  },
+  {
+    "HS4": "6901",
+    "HS4 Short Name": "Bricks",
+    "HS4 Description": "Bricks, blocks, tiles and other ceramic goods of siliceous fossil meals (for example, kieselguhr, tripolite or diatomite) or of similar siliceous earths."
+  },
+  {
+    "HS4": "6902",
+    "HS4 Short Name": "Refractory Bricks",
+    "HS4 Description": "Refractory bricks, blocks, tiles and similar refractory ceramic constructional goods, other than those of siliceous fossil meals or similar siliceous earths."
+  },
+  {
+    "HS4": "6903",
+    "HS4 Short Name": "Refractory Ceramics",
+    "HS4 Description": "Other refractory ceramic goods (for example, retorts, crucibles, muffles, nozzles, plugs, supports, cupels, tubes, pipes, sheaths and rods), other than those of siliceous fossil meals or of similar siliceous earths."
+  },
+  {
+    "HS4": "6904",
+    "HS4 Short Name": "Ceramic Bricks",
+    "HS4 Description": "Ceramic building bricks, flooring blocks, support or filler tiles and the like."
+  },
+  {
+    "HS4": "6905",
+    "HS4 Short Name": "Roofing Tiles",
+    "HS4 Description": "Roofing tiles, chimney-pots, cowls, chimney liners, architectural ornaments and other ceramic constructional goods."
+  },
+  {
+    "HS4": "6906",
+    "HS4 Short Name": "Ceramic Pipes",
+    "HS4 Description": "Ceramic pipes, conduits, guttering and pipe fittings."
+  },
+  {
+    "HS4": "6907",
+    "HS4 Short Name": "Unglazed Ceramics",
+    "HS4 Description": "Unglazed ceramic flags and paving, hearth or wall tiles; unglazed ceramic mosaic cubes and the like, whether or not on a backing."
+  },
+  {
+    "HS4": "6908",
+    "HS4 Short Name": "Glazed Ceramics",
+    "HS4 Description": "Glazed ceramic flags and paving, hearth or wall tiles; glazed ceramic mosaic cubes and the like, whether or not on a backing."
+  },
+  {
+    "HS4": "6909",
+    "HS4 Short Name": "Laboratory Ceramic Ware",
+    "HS4 Description": "Ceramic wares for laboratory, chemical or other technical uses; ceramic troughs, tubs and similar receptacles of a kind used in agriculture; ceramic pots, jars and similar articles of a kind used for the conveyance or packing of goods."
+  },
+  {
+    "HS4": "6910",
+    "HS4 Short Name": "Bathroom Ceramics",
+    "HS4 Description": "Ceramic sinks, wash basins, wash basin pedestals, baths, bidets, water closet pans, flushing cisterns, urinals and similar sanitary fixtures."
+  },
+  {
+    "HS4": "6911",
+    "HS4 Short Name": "Porcelain Tableware",
+    "HS4 Description": "Tableware, kitchenware, other household articles and toilet articles, of porcelain or china."
+  },
+  {
+    "HS4": "6912",
+    "HS4 Short Name": "Ceramic Tableware",
+    "HS4 Description": "Ceramic tableware, kitchenware, other household articles and toilet articles, other than of porcelain or china."
+  },
+  {
+    "HS4": "6913",
+    "HS4 Short Name": "Ornamental Ceramics",
+    "HS4 Description": "Statuettes and other ornamental ceramic articles."
+  },
+  {
+    "HS4": "6914",
+    "HS4 Short Name": "Other Ceramic Articles",
+    "HS4 Description": "Other ceramic articles."
+  },
+  {
+    "HS4": "7001",
+    "HS4 Short Name": "Glass Scraps",
+    "HS4 Description": "Cullet and other waste and scrap of glass; glass in the mass."
+  },
+  {
+    "HS4": "7002",
+    "HS4 Short Name": "Glass Balls",
+    "HS4 Description": "Glass in balls (other than microspheres of heading 70.18), rods or tubes, unworked."
+  },
+  {
+    "HS4": "7003",
+    "HS4 Short Name": "Cast or Rolled Glass",
+    "HS4 Description": "Cast glass and rolled glass, in sheets or profiles, whether or not having an absorbent, reflecting or non-reflecting layer, but not otherwise worked."
+  },
+  {
+    "HS4": "7004",
+    "HS4 Short Name": "Blown Glass",
+    "HS4 Description": "Drawn glass and blown glass, in sheets, whether or not having an absorbent, reflecting or non-reflecting layer, but not otherwise worked."
+  },
+  {
+    "HS4": "7005",
+    "HS4 Short Name": "Float Glass",
+    "HS4 Description": "Float glass and surface ground or polished glass, in sheets, whether or not having an absorbent, reflecting or non-reflecting layer, but not otherwise worked."
+  },
+  {
+    "HS4": "7006",
+    "HS4 Short Name": "Glass with Edge Workings",
+    "HS4 Description": "Glass of heading 70.03, 70.04 or 70.05, bent, edge-worked, engraved, drilled, enamelled or otherwise worked, but not framed or fitted with other materials."
+  },
+  {
+    "HS4": "7007",
+    "HS4 Short Name": "Safety Glass",
+    "HS4 Description": "Safety glass, consisting of toughened (tempered) or laminated glass."
+  },
+  {
+    "HS4": "7008",
+    "HS4 Short Name": "Insulating Glass",
+    "HS4 Description": "Multiple-walled insulating units of glass."
+  },
+  {
+    "HS4": "7009",
+    "HS4 Short Name": "Glass Mirrors",
+    "HS4 Description": "Glass mirrors, whether or not framed, including rear-view mirrors."
+  },
+  {
+    "HS4": "7010",
+    "HS4 Short Name": "Glass Bottles",
+    "HS4 Description": "Carboys, bottles, flasks, jars, pots, phials, ampoules and other containers, of glass, of a kind used for the conveyance or packing of goods; preserving jars of glass; stoppers, lids and other closures, of glass."
+  },
+  {
+    "HS4": "7011",
+    "HS4 Short Name": "Glass Bulbs",
+    "HS4 Description": "Glass envelopes (including bulbs and tubes), open, and glass parts thereof, without fittings, for electric lamps, cathode-ray tubes or the like."
+  },
+  {
+    "HS4": "7012",
+    "HS4 Short Name": "Vacuum Flasks Glass Inners",
+    "HS4 Description": "(-2006) Glass inners for vacuum flasks or for other vacuum vessels"
+  },
+  {
+    "HS4": "7013",
+    "HS4 Short Name": "Interior Decorative Glassware",
+    "HS4 Description": "Glassware of a kind used for table, kitchen, toilet, office, indoor decoration or similar purposes (other than that of heading 70.10 or 70.18)."
+  },
+  {
+    "HS4": "7014",
+    "HS4 Short Name": "Signaling Glassware",
+    "HS4 Description": "Signalling glassware and optical elements of glass (other than those of heading 70.15), not optically worked."
+  },
+  {
+    "HS4": "7015",
+    "HS4 Short Name": "Eyewear and Clock Glass",
+    "HS4 Description": "Clock or watch glasses and similar glasses, glasses for noncorrective or corrective spectacles, curved, bent, hollowed or the like, not optically worked; hollow glass spheres and their segments, for the manufacture of such glasses."
+  },
+  {
+    "HS4": "7016",
+    "HS4 Short Name": "Glass Bricks",
+    "HS4 Description": "Paving blocks, slabs, bricks, squares, tiles and other articles of pressed or moulded glass, whether or not wired, of a kind used for building or construction purposes; glass cubes and other glass smallwares, whether or not on a backing, for mosaics or si"
+  },
+  {
+    "HS4": "7017",
+    "HS4 Short Name": "Laboratory Glassware",
+    "HS4 Description": "Laboratory, hygienic or pharmaceutical glassware, whether or not graduated or calibrated."
+  },
+  {
+    "HS4": "7018",
+    "HS4 Short Name": "Glass Beads",
+    "HS4 Description": "Glass beads, imitation pearls, imitation precious or semi-precious stones and similar glass smallwares, and articles thereof other than imitation jewellery; glass eyes other than prosthetic articles; statuettes and other ornaments of lamp-worked glass, ot"
+  },
+  {
+    "HS4": "7019",
+    "HS4 Short Name": "Glass Fibers",
+    "HS4 Description": "Glass fibres (including glass wool) and articles thereof (for example, yarn, woven fabrics)."
+  },
+  {
+    "HS4": "7020",
+    "HS4 Short Name": "Other Glass Articles",
+    "HS4 Description": "Other articles of glass."
+  },
+  {
+    "HS4": "7101",
+    "HS4 Short Name": "Pearls",
+    "HS4 Description": "Pearls, natural or cultured, whether or not worked or graded but not strung, mounted or set; pearls, natural or cultured, temporarily strung for convenience of transport."
+  },
+  {
+    "HS4": "7102",
+    "HS4 Short Name": "Diamonds",
+    "HS4 Description": "Diamonds, whether or not worked, but not mounted or set."
+  },
+  {
+    "HS4": "7103",
+    "HS4 Short Name": "Precious Stones",
+    "HS4 Description": "Precious stones (other than diamonds) and semi-precious stones, whether or not worked or graded but not strung, mounted or set; ungraded precious stones (other than diamonds) and semiprecious stones, temporarily strung for convenience of transport."
+  },
+  {
+    "HS4": "7104",
+    "HS4 Short Name": "Synthetic Reconstructed Jewellery Stones",
+    "HS4 Description": "Synthetic or reconstructed precious or semi-precious stones, whether or not worked or graded but not strung, mounted or set; ungraded synthetic or reconstructed precious or semi-precious stones, temporarily strung for convenience of transport."
+  },
+  {
+    "HS4": "7105",
+    "HS4 Short Name": "Precious Stone Dust",
+    "HS4 Description": "Dust and powder of natural or synthetic precious or semiprecious stones."
+  },
+  {
+    "HS4": "7106",
+    "HS4 Short Name": "Silver",
+    "HS4 Description": "Silver (including silver plated with gold or platinum), unwrought or in semi-manufactured forms, or in powder form."
+  },
+  {
+    "HS4": "7107",
+    "HS4 Short Name": "Silver Clad Metals",
+    "HS4 Description": "Base metals clad with silver, not further worked than semimanufactured."
+  },
+  {
+    "HS4": "7108",
+    "HS4 Short Name": "Gold",
+    "HS4 Description": "Gold (including gold plated with platinum) unwrought or in semi-manufactured forms, or in powder form."
+  },
+  {
+    "HS4": "7109",
+    "HS4 Short Name": "Gold Clad Metals",
+    "HS4 Description": "Base metals or silver, clad with gold, not further worked than semi-manufactured."
+  },
+  {
+    "HS4": "7110",
+    "HS4 Short Name": "Platinum",
+    "HS4 Description": "Platinum, unwrought or in semi-manufactured forms, or in powder form."
+  },
+  {
+    "HS4": "7111",
+    "HS4 Short Name": "Platinum Clad Metals",
+    "HS4 Description": "Base metals, silver or gold, clad with platinum, not further worked than semi-manufactured."
+  },
+  {
+    "HS4": "7112",
+    "HS4 Short Name": "Precious Metal Scraps",
+    "HS4 Description": "Waste and scrap of precious metal or of metal clad with precious metal; other waste and scrap containing precious metal or precious metal compounds, of a kind used principally for the recovery of precious metal."
+  },
+  {
+    "HS4": "7113",
+    "HS4 Short Name": "Jewellery",
+    "HS4 Description": "Articles of jewellery and parts thereof, of precious metal or of metal clad with precious metal."
+  },
+  {
+    "HS4": "7114",
+    "HS4 Short Name": "Metal-Clad Products",
+    "HS4 Description": "Articles of goldsmiths' or silversmiths' wares and parts thereof, of precious metal or of metal clad with precious metal."
+  },
+  {
+    "HS4": "7115",
+    "HS4 Short Name": "Other Precious Metal Products",
+    "HS4 Description": "Other articles of precious metal or of metal clad with precious metal."
+  },
+  {
+    "HS4": "7116",
+    "HS4 Short Name": "Pearl Products",
+    "HS4 Description": "Articles of natural or cultured pearls, precious or semi-precious stones (natural, synthetic or reconstructed)."
+  },
+  {
+    "HS4": "7117",
+    "HS4 Short Name": "Imitation Jewellery",
+    "HS4 Description": "Imitation jewellery."
+  },
+  {
+    "HS4": "7118",
+    "HS4 Short Name": "Coin",
+    "HS4 Description": "Coin."
+  },
+  {
+    "HS4": "7201",
+    "HS4 Short Name": "Pig Iron",
+    "HS4 Description": "Pig iron and spiegeleisen in pigs, blocks or other primary forms."
+  },
+  {
+    "HS4": "7202",
+    "HS4 Short Name": "Ferroalloys",
+    "HS4 Description": "Ferro-alloys."
+  },
+  {
+    "HS4": "7203",
+    "HS4 Short Name": "Iron Reductions",
+    "HS4 Description": "Ferrous products obtained by direct reduction of iron ore and other spongy ferrous products, in lumps, pellets or similar forms; iron having a minimum purity by weight of 99.94 %, in lumps, pellets or similar forms."
+  },
+  {
+    "HS4": "7204",
+    "HS4 Short Name": "Scrap Iron",
+    "HS4 Description": "Ferrous waste and scrap; remelting scrap ingots of iron or steel."
+  },
+  {
+    "HS4": "7205",
+    "HS4 Short Name": "Iron Powder",
+    "HS4 Description": "Granules and powders, of pig iron, spiegeleisen, iron or steel."
+  },
+  {
+    "HS4": "7206",
+    "HS4 Short Name": "Iron Ingots",
+    "HS4 Description": "Iron and non-alloy steel in ingots or other primary forms (excluding iron of heading 72.03)."
+  },
+  {
+    "HS4": "7207",
+    "HS4 Short Name": "Semi-Finished Iron",
+    "HS4 Description": "Semi-finished products of iron or non-alloy steel."
+  },
+  {
+    "HS4": "7208",
+    "HS4 Short Name": "Hot-Rolled Iron",
+    "HS4 Description": "Flat-rolled products of iron or non-alloy steel, of a width of 600 mm or more, hot-rolled, not clad, plated or coated."
+  },
+  {
+    "HS4": "7209",
+    "HS4 Short Name": "Cold-Rolled Iron",
+    "HS4 Description": "Flat-rolled products of iron or non-alloy steel, of a width of 600 mm or more, cold-rolled (cold-reduced), not clad, plated or coated."
+  },
+  {
+    "HS4": "7210",
+    "HS4 Short Name": "Coated Flat-Rolled Iron",
+    "HS4 Description": "Flat-rolled products of iron or non-alloy steel, of a width of 600 mm or more, clad, plated or coated."
+  },
+  {
+    "HS4": "7211",
+    "HS4 Short Name": "Large Flat-Rolled Iron",
+    "HS4 Description": "Flat-rolled products of iron or non-alloy steel, of a width of less than 600 mm, not clad, plated or coated."
+  },
+  {
+    "HS4": "7212",
+    "HS4 Short Name": "Large Coated Flat-Rolled Iron",
+    "HS4 Description": "Flat-rolled products of iron or non-alloy steel, of a width of less than 600 mm, clad, plated or coated."
+  },
+  {
+    "HS4": "7213",
+    "HS4 Short Name": "Hot-Rolled Iron Bars",
+    "HS4 Description": "Bars and rods, hot-rolled, in irregularly wound coils, of iron or non-alloy steel."
+  },
+  {
+    "HS4": "7214",
+    "HS4 Short Name": "Raw Iron Bars",
+    "HS4 Description": "Other bars and rods of iron or non-alloy steel, not further worked than forged, hot-rolled, hot-drawn or hot-extruded, but including those twisted after rolling."
+  },
+  {
+    "HS4": "7215",
+    "HS4 Short Name": "Other Iron Bars",
+    "HS4 Description": "Other bars and rods of iron or non-alloy steel."
+  },
+  {
+    "HS4": "7216",
+    "HS4 Short Name": "Iron Blocks",
+    "HS4 Description": "Angles, shapes and sections of iron or non-alloy steel."
+  },
+  {
+    "HS4": "7217",
+    "HS4 Short Name": "Iron Wire",
+    "HS4 Description": "Wire of iron or non-alloy steel."
+  },
+  {
+    "HS4": "7218",
+    "HS4 Short Name": "Stainless Steel Ingots",
+    "HS4 Description": "Stainless steel in ingots or other primary forms; semi-finished products of stainless steel."
+  },
+  {
+    "HS4": "7219",
+    "HS4 Short Name": "Large Flat-Rolled Stainless Steel",
+    "HS4 Description": "Flat-rolled products of stainless steel, of a width of 600 mm or more."
+  },
+  {
+    "HS4": "7220",
+    "HS4 Short Name": "Flat-Rolled Stainless Steel",
+    "HS4 Description": "Flat-rolled products of stainless steel, of a width of less than 600 mm."
+  },
+  {
+    "HS4": "7221",
+    "HS4 Short Name": "Hot-Rolled Stainless Steel Bars",
+    "HS4 Description": "Bars and rods, hot-rolled, in irregularly wound coils, of stainless steel."
+  },
+  {
+    "HS4": "7222",
+    "HS4 Short Name": "Other Stainless Steel Bars",
+    "HS4 Description": "Other bars and rods of stainless steel; angles, shapes and sections of stainless steel."
+  },
+  {
+    "HS4": "7223",
+    "HS4 Short Name": "Stainless Steel Wire",
+    "HS4 Description": "Wire of stainless steel."
+  },
+  {
+    "HS4": "7224",
+    "HS4 Short Name": "Steel Ingots",
+    "HS4 Description": "Other alloy steel in ingots or other primary forms; semi-finished products of other alloy steel."
+  },
+  {
+    "HS4": "7225",
+    "HS4 Short Name": "Flat Flat-Rolled Steel",
+    "HS4 Description": "Flat-rolled products of other alloy steel, of a width of 600 mm or more."
+  },
+  {
+    "HS4": "7226",
+    "HS4 Short Name": "Flat-Rolled Iron",
+    "HS4 Description": "Flat-rolled products of other alloy steel, of a width of less than 600 mm."
+  },
+  {
+    "HS4": "7227",
+    "HS4 Short Name": "Steel Bars",
+    "HS4 Description": "Bars and rods, hot-rolled, in irregularly wound coils, of other alloy steel."
+  },
+  {
+    "HS4": "7228",
+    "HS4 Short Name": "Other Steel Bars",
+    "HS4 Description": "Other bars and rods of other alloy steel; angles, shapes and sections, of other alloy steel; hollow drill bars and rods, of alloy or non-alloy steel."
+  },
+  {
+    "HS4": "7229",
+    "HS4 Short Name": "Steel Wire",
+    "HS4 Description": "Wire of other alloy steel."
+  },
+  {
+    "HS4": "7301",
+    "HS4 Short Name": "Iron Sheet Piling",
+    "HS4 Description": "Sheet piling of iron or steel, whether or not drilled, punched or made from assembled elements; welded angles, shapes and sections, of iron or steel."
+  },
+  {
+    "HS4": "7302",
+    "HS4 Short Name": "Iron Railway Products",
+    "HS4 Description": "Railway or tramway track construction material of iron or steel, the following : rails, check-rails and rack rails, switch blades, crossing frogs, point rods and other crossing pieces, sleepers (cross-ties), fish-plates, chairs, chair wedges, sole plates"
+  },
+  {
+    "HS4": "7303",
+    "HS4 Short Name": "Cast Iron Pipes",
+    "HS4 Description": "Tubes, pipes and hollow profiles, of cast iron."
+  },
+  {
+    "HS4": "7304",
+    "HS4 Short Name": "Iron Pipes",
+    "HS4 Description": "Tubes, pipes and hollow profiles, seamless, of iron (other than cast iron) or steel."
+  },
+  {
+    "HS4": "7305",
+    "HS4 Short Name": "Other Large Iron Pipes",
+    "HS4 Description": "Other tubes and pipes (for example, welded, riveted or similarly closed), having circular cross-sections, the external diameter of which exceeds 406.4 mm, of iron or steel."
+  },
+  {
+    "HS4": "7306",
+    "HS4 Short Name": "Other Small Iron Pipes",
+    "HS4 Description": "Other tubes, pipes and hollow profiles (for example, open seam or welded, riveted or similarly closed), of iron or steel."
+  },
+  {
+    "HS4": "7307",
+    "HS4 Short Name": "Iron Pipe Fittings",
+    "HS4 Description": "Tube or pipe fittings (for example, couplings, elbows, sleeves), of iron or steel."
+  },
+  {
+    "HS4": "7308",
+    "HS4 Short Name": "Iron Structures",
+    "HS4 Description": "Structures (excluding prefabricated buildings of heading 94.06) and parts of structures (for example, bridges and bridge-sections, lock-gates, towers, lattice masts, roofs, roofing frame-works, doors and windows and their frames and thresholds for doors,"
+  },
+  {
+    "HS4": "7309",
+    "HS4 Short Name": "Large Iron Containers",
+    "HS4 Description": "Reservoirs, tanks, vats and similar containers for any material (other than compressed or liquefied gas), of iron or steel, of a capacity exceeding 300 l, whether or not lined or heat-insulated, but not fitted with mechanical or thermal equipment."
+  },
+  {
+    "HS4": "7310",
+    "HS4 Short Name": "Small Iron Containers",
+    "HS4 Description": "Tanks, casks, drums, cans, boxes and similar containers, for any material (other than compressed or liquefied gas), of iron or steel, of a capacity not exceeding 300 l, whether or not lined or heatinsulated, but not fitted with mechanical or thermal equ"
+  },
+  {
+    "HS4": "7311",
+    "HS4 Short Name": "Iron Gas Containers",
+    "HS4 Description": "Containers for compressed or liquefied gas, of iron or steel."
+  },
+  {
+    "HS4": "7312",
+    "HS4 Short Name": "Stranded Iron Wire",
+    "HS4 Description": "Stranded wire, ropes, cables, plaited bands, slings and the like, of iron or steel, not electrically insulated."
+  },
+  {
+    "HS4": "7313",
+    "HS4 Short Name": "Barbed Wire",
+    "HS4 Description": "Barbed wire of iron or steel; twisted hoop or single flat wire, barbed or not, and loosely twisted double wire, of a kind used for fencing, of iron or steel."
+  },
+  {
+    "HS4": "7314",
+    "HS4 Short Name": "Iron Cloth",
+    "HS4 Description": "Cloth (including endless bands), grill, netting and fencing, of iron or steel wire; expanded metal of iron or steel."
+  },
+  {
+    "HS4": "7315",
+    "HS4 Short Name": "Iron Chains",
+    "HS4 Description": "Chain and parts thereof, of iron or steel."
+  },
+  {
+    "HS4": "7316",
+    "HS4 Short Name": "Iron Anchors",
+    "HS4 Description": "Anchors, grapnels and parts thereof, of iron or steel."
+  },
+  {
+    "HS4": "7317",
+    "HS4 Short Name": "Iron Nails",
+    "HS4 Description": "Nails, tacks, drawing pins, corrugated nails, staples (other than those of heading 83.05) and similar articles, of iron or steel, whether or not with heads of other material, but excluding such articles with heads of copper."
+  },
+  {
+    "HS4": "7318",
+    "HS4 Short Name": "Iron Fasteners",
+    "HS4 Description": "Screws, bolts, nuts, coach screws, screw hooks, rivets, cotters, cotter-pins, washers (including spring washers) and similar articles, of iron or steel."
+  },
+  {
+    "HS4": "7319",
+    "HS4 Short Name": "Iron Sewing Needles",
+    "HS4 Description": "Sewing needles, knitting needles, bodkins, crochet hooks, embroidery stilettos and similar articles, for use in the hand, of iron or steel; safety pins and other pins of iron or steel, not elsewhere specified or included."
+  },
+  {
+    "HS4": "7320",
+    "HS4 Short Name": "Iron Springs",
+    "HS4 Description": "Springs and leaves for springs, of iron or steel."
+  },
+  {
+    "HS4": "7321",
+    "HS4 Short Name": "Iron Stovetops",
+    "HS4 Description": "Stoves, ranges, grates, cookers (including those with subsidiary boilers for central heating), barbecues, braziers, gas-rings, plate warmers and similar non-electric domestic appliances, and parts thereof, of iron or steel."
+  },
+  {
+    "HS4": "7322",
+    "HS4 Short Name": "Iron Radiators",
+    "HS4 Description": "Radiators for central heating, not electrically heated, and parts thereof, of iron or steel; air heaters and hot air distributors (including distributors which can also distribute fresh or conditioned air), not electrically heated, incorporating a motor-"
+  },
+  {
+    "HS4": "7323",
+    "HS4 Short Name": "Iron Housewares",
+    "HS4 Description": "Table, kitchen or other household articles and parts thereof, of iron or steel; iron or steel wool; pot scourers and scouring or polishing pads, gloves and the like, of iron or steel."
+  },
+  {
+    "HS4": "7324",
+    "HS4 Short Name": "Iron Toiletry",
+    "HS4 Description": "Sanitary ware and parts thereof, of iron or steel."
+  },
+  {
+    "HS4": "7325",
+    "HS4 Short Name": "Other Cast Iron Products",
+    "HS4 Description": "Other cast articles of iron or steel."
+  },
+  {
+    "HS4": "7326",
+    "HS4 Short Name": "Other Iron Products",
+    "HS4 Description": "Other articles of iron or steel."
+  },
+  {
+    "HS4": "7401",
+    "HS4 Short Name": "Precipitated Copper",
+    "HS4 Description": "Copper mattes; cement copper (precipitated copper)."
+  },
+  {
+    "HS4": "7402",
+    "HS4 Short Name": "Raw Copper",
+    "HS4 Description": "Unrefined copper; copper anodes for electrolytic refining."
+  },
+  {
+    "HS4": "7403",
+    "HS4 Short Name": "Refined Copper",
+    "HS4 Description": "Refined copper and copper alloys, unwrought."
+  },
+  {
+    "HS4": "7404",
+    "HS4 Short Name": "Scrap Copper",
+    "HS4 Description": "Copper waste and scrap."
+  },
+  {
+    "HS4": "7405",
+    "HS4 Short Name": "Copper Alloys",
+    "HS4 Description": "Master alloys of copper."
+  },
+  {
+    "HS4": "7406",
+    "HS4 Short Name": "Copper Powder",
+    "HS4 Description": "Copper powders and flakes."
+  },
+  {
+    "HS4": "7407",
+    "HS4 Short Name": "Copper Bars",
+    "HS4 Description": "Copper bars, rods and profiles."
+  },
+  {
+    "HS4": "7408",
+    "HS4 Short Name": "Copper Wire",
+    "HS4 Description": "Copper wire."
+  },
+  {
+    "HS4": "7409",
+    "HS4 Short Name": "Copper Plating",
+    "HS4 Description": "Copper plates, sheets and strip, of a thickness exceeding 0.15 mm."
+  },
+  {
+    "HS4": "7410",
+    "HS4 Short Name": "Copper Foil",
+    "HS4 Description": "Copper foil (whether or not printed or backed with paper, paperboard, plastics or similar backing materials) of a thickness (excluding any backing) not exceeding 0.15 mm."
+  },
+  {
+    "HS4": "7411",
+    "HS4 Short Name": "Copper Pipes",
+    "HS4 Description": "Copper tubes and pipes."
+  },
+  {
+    "HS4": "7412",
+    "HS4 Short Name": "Copper Pipe Fittings",
+    "HS4 Description": "Copper tube or pipe fittings (for example, couplings, elbows, sleeves)."
+  },
+  {
+    "HS4": "7413",
+    "HS4 Short Name": "Stranded Copper Wire",
+    "HS4 Description": "Stranded wire, cables, plaited bands and the like, of copper, not electrically insulated."
+  },
+  {
+    "HS4": "7414",
+    "HS4 Short Name": "Endless Copper Wire Bands",
+    "HS4 Description": "(-2006) Cloth 'incl. endless bands', grill and netting, of copper wire, and expanded metal, of copper (excl. cloth of metal fibres for clothing, lining and similar uses, flux-coated copper fabric for brazing, cloth, grill and netting made into hand sieves or mach"
+  },
+  {
+    "HS4": "7415",
+    "HS4 Short Name": "Copper Fasteners",
+    "HS4 Description": "Nails, tacks, drawing pins, staples (other than those of heading 83.05) and similar articles, of copper or of iron or steel with heads of copper; screws, bolts, nuts, screw hooks, rivets, cotters, cotter-pins, washers (including spring washers) and simila"
+  },
+  {
+    "HS4": "7416",
+    "HS4 Short Name": "Copper Springs",
+    "HS4 Description": "(-2006) Copper springs (excl. clock and watch springs, spring washers and other lock washers)"
+  },
+  {
+    "HS4": "7417",
+    "HS4 Short Name": "Copper Stovetops",
+    "HS4 Description": "(-2006) Cooking or heating apparatus of a kind used for domestic purposes, non-electric, and parts thereof, of copper (excl. hot water heaters and geysers)"
+  },
+  {
+    "HS4": "7418",
+    "HS4 Short Name": "Copper Housewares",
+    "HS4 Description": "Table, kitchen or other household articles and parts thereof, of copper; pot scourers and scouring or polishing pads, gloves and the like, of copper; sanitary ware and parts thereof, of copper."
+  },
+  {
+    "HS4": "7419",
+    "HS4 Short Name": "Other Copper Products",
+    "HS4 Description": "Other articles of copper."
+  },
+  {
+    "HS4": "7501",
+    "HS4 Short Name": "Nickel Mattes",
+    "HS4 Description": "Nickel mattes, nickel oxide sinters and other intermediate products of nickel metallurgy."
+  },
+  {
+    "HS4": "7502",
+    "HS4 Short Name": "Raw Nickel",
+    "HS4 Description": "Unwrought nickel."
+  },
+  {
+    "HS4": "7503",
+    "HS4 Short Name": "Scrap Nickel",
+    "HS4 Description": "Nickel waste and scrap."
+  },
+  {
+    "HS4": "7504",
+    "HS4 Short Name": "Nickel Powder",
+    "HS4 Description": "Nickel powders and flakes."
+  },
+  {
+    "HS4": "7505",
+    "HS4 Short Name": "Nickel Bars",
+    "HS4 Description": "Nickel bars, rods, profiles and wire."
+  },
+  {
+    "HS4": "7506",
+    "HS4 Short Name": "Nickel Sheets",
+    "HS4 Description": "Nickel plates, sheets, strip and foil."
+  },
+  {
+    "HS4": "7507",
+    "HS4 Short Name": "Nickel Pipes",
+    "HS4 Description": "Nickel tubes, pipes and tube or pipe fittings (for example, couplings, elbows, sleeves)."
+  },
+  {
+    "HS4": "7508",
+    "HS4 Short Name": "Other Nickel Products",
+    "HS4 Description": "Other articles of nickel."
+  },
+  {
+    "HS4": "7601",
+    "HS4 Short Name": "Raw Aluminium",
+    "HS4 Description": "Unwrought aluminium."
+  },
+  {
+    "HS4": "7602",
+    "HS4 Short Name": "Scrap Aluminium",
+    "HS4 Description": "Aluminium waste and scrap."
+  },
+  {
+    "HS4": "7603",
+    "HS4 Short Name": "Aluminium Powder",
+    "HS4 Description": "Aluminium powders and flakes."
+  },
+  {
+    "HS4": "7604",
+    "HS4 Short Name": "Aluminium Bars",
+    "HS4 Description": "Aluminium bars, rods and profiles."
+  },
+  {
+    "HS4": "7605",
+    "HS4 Short Name": "Aluminium Wire",
+    "HS4 Description": "Aluminium wire."
+  },
+  {
+    "HS4": "7606",
+    "HS4 Short Name": "Aluminium Plating",
+    "HS4 Description": "Aluminium plates, sheets and strip, of a thickness exceeding 0.2 mm."
+  },
+  {
+    "HS4": "7607",
+    "HS4 Short Name": "Aluminium Foil",
+    "HS4 Description": "Aluminium foil (whether or not printed or backed with paper, paperboard, plastics or similar backing materials) of a thickness (excluding any backing) not exceeding 0.2 mm."
+  },
+  {
+    "HS4": "7608",
+    "HS4 Short Name": "Aluminium Pipes",
+    "HS4 Description": "Aluminium tubes and pipes."
+  },
+  {
+    "HS4": "7609",
+    "HS4 Short Name": "Aluminium Pipe Fittings",
+    "HS4 Description": "Aluminium tube or pipe fittings (for example, couplings, elbows, sleeves)."
+  },
+  {
+    "HS4": "7610",
+    "HS4 Short Name": "Aluminium Structures",
+    "HS4 Description": "Aluminium structures (excluding prefabricated buildings of heading 94.06) and parts of structures (for example, bridges and bridge-sections, towers, lattice masts, roofs, roofing frameworks, doors and windows and their frames and thresholds for doors, bal"
+  },
+  {
+    "HS4": "7611",
+    "HS4 Short Name": "Large Aluminium Containers",
+    "HS4 Description": "Aluminium reservoirs, tanks, vats and similar containers, for any material (other than compressed or liquefied gas), of a capacity exceeding 300 l, whether or not lined or heat-insulated, but not fitted with mechanical or thermal equipment."
+  },
+  {
+    "HS4": "7612",
+    "HS4 Short Name": "Aluminium Cans",
+    "HS4 Description": "Aluminium casks, drums, cans, boxes and similar containers (including rigid or collapsible tubular containers), for any material (other than compressed or liquefied gas), of a capacity not exceeding 300 l, whether or not lined or heat-insulated, but not f"
+  },
+  {
+    "HS4": "7613",
+    "HS4 Short Name": "Aluminium Gas Containers",
+    "HS4 Description": "Aluminium containers for compressed or liquefied gas."
+  },
+  {
+    "HS4": "7614",
+    "HS4 Short Name": "Stranded Aluminium Wire",
+    "HS4 Description": "Stranded wire, cables, plaited bands and the like, of aluminium, not electrically insulated."
+  },
+  {
+    "HS4": "7615",
+    "HS4 Short Name": "Aluminium Housewares",
+    "HS4 Description": "Table, kitchen or other household articles and parts thereof, of aluminium; pot scourers and scouring or polishing pads, gloves and the like, of aluminium; sanitary ware and parts thereof, of aluminium."
+  },
+  {
+    "HS4": "7616",
+    "HS4 Short Name": "Other Aluminium Products",
+    "HS4 Description": "Other articles of aluminium."
+  },
+  {
+    "HS4": "7801",
+    "HS4 Short Name": "Raw Lead",
+    "HS4 Description": "Unwrought lead."
+  },
+  {
+    "HS4": "7802",
+    "HS4 Short Name": "Scrap Lead",
+    "HS4 Description": "Lead waste and scrap."
+  },
+  {
+    "HS4": "7803",
+    "HS4 Short Name": "Lead Bars",
+    "HS4 Description": "(-2006) Lead bars, rods, profiles and wire, n.e.s."
+  },
+  {
+    "HS4": "7804",
+    "HS4 Short Name": "Lead Sheets",
+    "HS4 Description": "Lead plates, sheets, strip and foil; lead powders and flakes."
+  },
+  {
+    "HS4": "7805",
+    "HS4 Short Name": "Lead Pipes",
+    "HS4 Description": "(-2006) Lead tubes, pipes and tube or pipe fittings 'e.g., couplings, elbows, sleeves'"
+  },
+  {
+    "HS4": "7806",
+    "HS4 Short Name": "Other Lead Products",
+    "HS4 Description": "Other articles of lead."
+  },
+  {
+    "HS4": "7901",
+    "HS4 Short Name": "Raw Zinc",
+    "HS4 Description": "Unwrought zinc."
+  },
+  {
+    "HS4": "7902",
+    "HS4 Short Name": "Scrap Waste",
+    "HS4 Description": "Zinc waste and scrap."
+  },
+  {
+    "HS4": "7903",
+    "HS4 Short Name": "Zinc Powder",
+    "HS4 Description": "Zinc dust, powders and flakes."
+  },
+  {
+    "HS4": "7904",
+    "HS4 Short Name": "Zinc Bars",
+    "HS4 Description": "Zinc bars, rods, profiles and wire."
+  },
+  {
+    "HS4": "7905",
+    "HS4 Short Name": "Zinc Sheets",
+    "HS4 Description": "Zinc plates, sheets, strip and foil."
+  },
+  {
+    "HS4": "7906",
+    "HS4 Short Name": "Zinc Pipes",
+    "HS4 Description": "(-2006) Zinc tubes, pipes and tube or pipe fittings 'e.g., couplings, elbows, sleeves'"
+  },
+  {
+    "HS4": "7907",
+    "HS4 Short Name": "Other Zinc Products",
+    "HS4 Description": "Other articles of zinc."
+  },
+  {
+    "HS4": "8001",
+    "HS4 Short Name": "Raw Tin",
+    "HS4 Description": "Unwrought tin."
+  },
+  {
+    "HS4": "8002",
+    "HS4 Short Name": "Scrap Tin",
+    "HS4 Description": "Tin waste and scrap."
+  },
+  {
+    "HS4": "8003",
+    "HS4 Short Name": "Tin Bars",
+    "HS4 Description": "Tin bars, rods, profiles and wire."
+  },
+  {
+    "HS4": "8004",
+    "HS4 Short Name": "Tin Plating",
+    "HS4 Description": "(-2006) Tin plates, sheets and strip, of a thickness of > 0,2 mm"
+  },
+  {
+    "HS4": "8005",
+    "HS4 Short Name": "Tin Foil",
+    "HS4 Description": "(-2006) Tin foil of a thickness 'without any backing' <= 0,2 mm, whether or not printed or backed with paper, paperboard, plastics or similar backing materials; tin powders and flakes (excl. tin granules and spangles of heading 8308)"
+  },
+  {
+    "HS4": "8006",
+    "HS4 Short Name": "Tin Pipes",
+    "HS4 Description": "(-2006) Tin tubes, pipes and tube or pipe fittings 'e.g., couplings, elbows, sleeves'"
+  },
+  {
+    "HS4": "8007",
+    "HS4 Short Name": "Other Tin Products",
+    "HS4 Description": "Other articles of tin."
+  },
+  {
+    "HS4": "8101",
+    "HS4 Short Name": "Tungsten",
+    "HS4 Description": "Tungsten (wolfram) and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8102",
+    "HS4 Short Name": "Molybdenum",
+    "HS4 Description": "Molybdenum and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8103",
+    "HS4 Short Name": "Tantalum",
+    "HS4 Description": "Tantalum and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8104",
+    "HS4 Short Name": "Magnesium",
+    "HS4 Description": "Magnesium and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8105",
+    "HS4 Short Name": "Cobalt",
+    "HS4 Description": "Cobalt mattes and other intermediate products of cobalt metallurgy; cobalt and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8106",
+    "HS4 Short Name": "Bismuth",
+    "HS4 Description": "Bismuth and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8107",
+    "HS4 Short Name": "Cadmium",
+    "HS4 Description": "Cadmium and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8108",
+    "HS4 Short Name": "Titanium",
+    "HS4 Description": "Titanium and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8109",
+    "HS4 Short Name": "Zirconium",
+    "HS4 Description": "Zirconium and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8110",
+    "HS4 Short Name": "Antimony",
+    "HS4 Description": "Antimony and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8111",
+    "HS4 Short Name": "Manganese",
+    "HS4 Description": "Manganese and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8112",
+    "HS4 Short Name": "Other Metals",
+    "HS4 Description": "Beryllium, chromium, germanium, vanadium, gallium, hafnium, indium, niobium (columbium), rhenium and thallium, and articles of these metals, including waste and scrap."
+  },
+  {
+    "HS4": "8113",
+    "HS4 Short Name": "Cermets",
+    "HS4 Description": "Cermets and articles thereof, including waste and scrap."
+  },
+  {
+    "HS4": "8201",
+    "HS4 Short Name": "Garden Tools",
+    "HS4 Description": "Hand tools, the following : spades, shovels, mattocks, picks, hoes, forks and rakes; axes, bill hooks and similar hewing tools; secateurs and pruners of any kind; scythes, sickles, hay knives, hedge shears, timber wedges and other tools of a kind used in"
+  },
+  {
+    "HS4": "8202",
+    "HS4 Short Name": "Hand Saws",
+    "HS4 Description": "Hand saws; blades for saws of all kinds (including slitting, slotting or toothless saw blades)."
+  },
+  {
+    "HS4": "8203",
+    "HS4 Short Name": "Hand Tools",
+    "HS4 Description": "Files, rasps, pliers (including cutting pliers), pincers, tweezers, metal cutting shears, pipe-cutters, bolt croppers, perforating punches and similar hand tools."
+  },
+  {
+    "HS4": "8204",
+    "HS4 Short Name": "Wrenches",
+    "HS4 Description": "Hand-operated spanners and wrenches (including torque meter wrenches but not including tap wrenches); interchangeable spanner sockets, with or without handles."
+  },
+  {
+    "HS4": "8205",
+    "HS4 Short Name": "Other Hand Tools",
+    "HS4 Description": "Hand tools (including glaziers' diamonds), not elsewhere specified or included; blow lamps; vices, clamps and the like, other than accessories for and parts of, machine tools; anvils; portable forges; hand or pedal-operated grinding wheels with frameworks"
+  },
+  {
+    "HS4": "8206",
+    "HS4 Short Name": "Tool Sets",
+    "HS4 Description": "Tools of two or more of the headings 82.02 to 82.05, put up in sets for retail sale."
+  },
+  {
+    "HS4": "8207",
+    "HS4 Short Name": "Interchangeable Tool Parts",
+    "HS4 Description": "Interchangeable tools for hand tools, whether or not poweroperated, or for machine-tools (for example, for pressing, stamping, punching, tapping, threading, drilling, boring, broaching, milling, turning or screw driving), including dies for drawing or e"
+  },
+  {
+    "HS4": "8208",
+    "HS4 Short Name": "Cutting Blades",
+    "HS4 Description": "Knives and cutting blades, for machines or for mechanical appliances."
+  },
+  {
+    "HS4": "8209",
+    "HS4 Short Name": "Tool Plates",
+    "HS4 Description": "Plates, sticks, tips and the like for tools, unmounted, of cermets."
+  },
+  {
+    "HS4": "8210",
+    "HS4 Short Name": "Cooking Hand Tools",
+    "HS4 Description": "Hand-operated mechanical appliances, weighing 10 kg or less, used in the preparation, conditioning or serving of food or drink."
+  },
+  {
+    "HS4": "8211",
+    "HS4 Short Name": "Knives",
+    "HS4 Description": "Knives with cutting blades, serrated or not (including pruning knives), other than knives of heading 82.08, and blades therefor."
+  },
+  {
+    "HS4": "8212",
+    "HS4 Short Name": "Razor Blades",
+    "HS4 Description": "Razors and razor blades (including razor blade blanks in strips)."
+  },
+  {
+    "HS4": "8213",
+    "HS4 Short Name": "Scissors",
+    "HS4 Description": "Scissors, tailors' shears and similar shears, and blades therefor."
+  },
+  {
+    "HS4": "8214",
+    "HS4 Short Name": "Other Cutlery",
+    "HS4 Description": "Other articles of cutlery (for example, hair clippers, butchers' or kitchen cleavers, choppers and mincing knives, paper knives); manicure or pedicure sets and instruments (including nail files)."
+  },
+  {
+    "HS4": "8215",
+    "HS4 Short Name": "Cutlery Sets",
+    "HS4 Description": "Spoons, forks, ladles, skimmers, cake-servers, fish-knives, butterknives, sugar tongs and similar kitchen or tableware."
+  },
+  {
+    "HS4": "8301",
+    "HS4 Short Name": "Padlocks",
+    "HS4 Description": "Padlocks and locks (key, combination or electrically operated), of base metal; clasps and frames with clasps, incorporating locks, of base metal; keys for any of the foregoing articles, of base metal."
+  },
+  {
+    "HS4": "8302",
+    "HS4 Short Name": "Metal Mountings",
+    "HS4 Description": "Base metal mountings, fittings and similar articles suitable for furniture, doors, staircases, windows, blinds, coachwork, saddlery, trunks, chests, caskets or the like; base metal hat-racks, hat-pegs, brackets and similar fixtures; castors with mountings"
+  },
+  {
+    "HS4": "8303",
+    "HS4 Short Name": "Safes",
+    "HS4 Description": "Armoured or reinforced safes, strong-boxes and doors and safe deposit lockers for strong-rooms, cash or deed boxes and the like, of base metal."
+  },
+  {
+    "HS4": "8304",
+    "HS4 Short Name": "Filing Cabinets",
+    "HS4 Description": "Filing cabinets, card-index cabinets, paper trays, paper rests, pen trays, office-stamp stands and similar office or desk equipment, of base metal, other than office furniture of heading 94.03."
+  },
+  {
+    "HS4": "8305",
+    "HS4 Short Name": "Metal Office Supplies",
+    "HS4 Description": "Fittings for loose-leaf binders or files, letter clips, letter corners, paper clips, indexing tags and similar office articles, of base metal; staples in strips (for example, for offices, upholstery, packaging), of base metal."
+  },
+  {
+    "HS4": "8306",
+    "HS4 Short Name": "Bells and Other Metal Ornaments",
+    "HS4 Description": "Bells, gongs and the like, non-electric, of base metal; statuettes and other ornaments, of base metal; photograph, picture or similar frames, of base metal; mirrors of base metal."
+  },
+  {
+    "HS4": "8307",
+    "HS4 Short Name": "Flexible Metal Tubing",
+    "HS4 Description": "Flexible tubing of base metal, with or without fittings."
+  },
+  {
+    "HS4": "8308",
+    "HS4 Short Name": "Other Metal Fasteners",
+    "HS4 Description": "Clasps, frames with clasps, buckles, buckle-clasps, hooks, eyes, eyelets and the like, of base metal, of a kind used for clothing, footwear, awnings, handbags, travel goods or other made up articles; tubular or bifurcated rivets, of base metal; beads and"
+  },
+  {
+    "HS4": "8309",
+    "HS4 Short Name": "Metal Stoppers",
+    "HS4 Description": "Stoppers, caps and lids (including crown corks, screw caps and pouring stoppers), capsules for bottles, threaded bungs, bung covers, seals and other packing accessories, of base metal."
+  },
+  {
+    "HS4": "8310",
+    "HS4 Short Name": "Metal Signs",
+    "HS4 Description": "Sign-plates, name-plates, address-plates and similar plates, numbers, letters and other symbols, of base metal, excluding those of heading 94.05."
+  },
+  {
+    "HS4": "8311",
+    "HS4 Short Name": "Coated Metal Soldering Products",
+    "HS4 Description": "Wire, rods, tubes, plates, electrodes and similar products, of base metal or of metal carbides, coated or cored with flux material, of a kind used for soldering, brazing, welding or deposition of metal or of metal carbides; wire and rods, of agglomerated"
+  },
+  {
+    "HS4": "8401",
+    "HS4 Short Name": "Nuclear Reactors",
+    "HS4 Description": "Nuclear reactors; fuel elements (cartridges), non-irradiated, for nuclear reactors; machinery and apparatus for isotopic separation."
+  },
+  {
+    "HS4": "8402",
+    "HS4 Short Name": "Steam Boilers",
+    "HS4 Description": "Steam or other vapour generating boilers (other than central heating hot water boilers capable also of producing low pressure steam); super-heated water boilers."
+  },
+  {
+    "HS4": "8403",
+    "HS4 Short Name": "Central Heating Boilers",
+    "HS4 Description": "Central heating boilers other than those of heading 84.02."
+  },
+  {
+    "HS4": "8404",
+    "HS4 Short Name": "Boiler Plants",
+    "HS4 Description": "Auxiliary plant for use with boilers of heading 84.02 or 84.03 (for example, economisers, super-heaters, soot removers, gas recoverers); condensers for steam or other vapour power units."
+  },
+  {
+    "HS4": "8405",
+    "HS4 Short Name": "Water and Gas Generators",
+    "HS4 Description": "Producer gas or water gas generators, with or without their purifiers; acetylene gas generators and similar water process gas generators, with or without their purifiers."
+  },
+  {
+    "HS4": "8406",
+    "HS4 Short Name": "Steam Turbines",
+    "HS4 Description": "Steam turbines and other vapour turbines."
+  },
+  {
+    "HS4": "8407",
+    "HS4 Short Name": "Spark-Ignition Engines",
+    "HS4 Description": "Spark-ignition reciprocating or rotary internal combustion piston engines."
+  },
+  {
+    "HS4": "8408",
+    "HS4 Short Name": "Combustion Engines",
+    "HS4 Description": "Compression-ignition internal combustion piston engines (diesel or semi-diesel engines)."
+  },
+  {
+    "HS4": "8409",
+    "HS4 Short Name": "Engine Parts",
+    "HS4 Description": "Parts suitable for use solely or principally with the engines of heading 84.07 or 84.08."
+  },
+  {
+    "HS4": "8410",
+    "HS4 Short Name": "Hydraulic Turbines",
+    "HS4 Description": "Hydraulic turbines, water wheels, and regulators therefor."
+  },
+  {
+    "HS4": "8411",
+    "HS4 Short Name": "Gas Turbines",
+    "HS4 Description": "Turbo-jets, turbo-propellers and other gas turbines."
+  },
+  {
+    "HS4": "8412",
+    "HS4 Short Name": "Other Engines",
+    "HS4 Description": "Other engines and motors."
+  },
+  {
+    "HS4": "8413",
+    "HS4 Short Name": "Liquid Pumps",
+    "HS4 Description": "Pumps for liquids, whether or not fitted with a measuring device; liquid elevators."
+  },
+  {
+    "HS4": "8414",
+    "HS4 Short Name": "Air Pumps",
+    "HS4 Description": "Air or vacuum pumps, air or other gas compressors and fans; ventilating or recycling hoods incorporating a fan, whether or not fitted with filters."
+  },
+  {
+    "HS4": "8415",
+    "HS4 Short Name": "Air Conditioners",
+    "HS4 Description": "Air conditioning machines, comprising a motor-driven fan and elements for changing the temperature and humidity, including those machines in which the humidity cannot be separately regulated."
+  },
+  {
+    "HS4": "8416",
+    "HS4 Short Name": "Liquid Fuel Furnaces",
+    "HS4 Description": "Furnace burners for liquid fuel, for pulverised solid fuel or for gas; mechanical stokers, including their mechanical grates, mechanical ash dischargers and similar appliances."
+  },
+  {
+    "HS4": "8417",
+    "HS4 Short Name": "Industrial Furnaces",
+    "HS4 Description": "Industrial or laboratory furnaces and ovens, including incinerators, non-electric."
+  },
+  {
+    "HS4": "8418",
+    "HS4 Short Name": "Refrigerators",
+    "HS4 Description": "Refrigerators, freezers and other refrigerating or freezing equipment, electric or other; heat pumps other than air conditioning machines of heading 84.15."
+  },
+  {
+    "HS4": "8419",
+    "HS4 Short Name": "Other Heating Machinery",
+    "HS4 Description": "Machinery, plant or laboratory equipment, whether or not electrically heated (excluding furnaces, ovens and other equipment of heading 85.14), for the treatment of materials by a process involving a change of temperature such as heating, cooking, roasting"
+  },
+  {
+    "HS4": "8420",
+    "HS4 Short Name": "Rolling Machines",
+    "HS4 Description": "Calendering or other rolling machines, other than for metals or glass, and cylinders therefor."
+  },
+  {
+    "HS4": "8421",
+    "HS4 Short Name": "Centrifuges",
+    "HS4 Description": "Centrifuges, including centrifugal dryers; filtering or purifying machinery and apparatus, for liquids or gases."
+  },
+  {
+    "HS4": "8422",
+    "HS4 Short Name": "Washing and Bottling Machines",
+    "HS4 Description": "Dish washing machines; machinery for cleaning or drying bottles or other containers; machinery for filling, closing, sealing or labelling bottles, cans, boxes, bags or other containers; machinery for capsuling bottles, jars, tubes and similar containers;"
+  },
+  {
+    "HS4": "8423",
+    "HS4 Short Name": "Scales",
+    "HS4 Description": "Weighing machinery (excluding balances of a sensitivity of 5 cg or better), including weight operated counting or checking machines; weighing machine weights of all kinds."
+  },
+  {
+    "HS4": "8424",
+    "HS4 Short Name": "Liquid Dispersing Machines",
+    "HS4 Description": "Mechanical appliances (whether or not hand-operated) for projecting, dispersing or spraying liquids or powders; fire extinguishers, whether or not charged; spray guns and similar appliances; steam or sand blasting machines and similar jet projecting machi"
+  },
+  {
+    "HS4": "8425",
+    "HS4 Short Name": "Pulley Systems",
+    "HS4 Description": "Pulley tackle and hoists other than skip hoists; winches and capstans; jacks."
+  },
+  {
+    "HS4": "8426",
+    "HS4 Short Name": "Cranes",
+    "HS4 Description": "Ships' derricks; cranes, including cable cranes; mobile lifting frames, straddle carriers and works trucks fitted with a crane."
+  },
+  {
+    "HS4": "8427",
+    "HS4 Short Name": "Fork-Lifts",
+    "HS4 Description": "Fork-lift trucks; other works trucks fitted with lifting or handling equipment."
+  },
+  {
+    "HS4": "8428",
+    "HS4 Short Name": "Lifting Machinery",
+    "HS4 Description": "Other lifting, handling, loading or unloading machinery (for example, lifts, escalators, conveyors, teleferics)."
+  },
+  {
+    "HS4": "8429",
+    "HS4 Short Name": "Large Construction Vehicles",
+    "HS4 Description": "Self-propelled bulldozers, angledozers, graders, levellers, scrapers, mechanical shovels, excavators, shovel loaders, tamping machines and road rollers."
+  },
+  {
+    "HS4": "8430",
+    "HS4 Short Name": "Other Construction Vehicles",
+    "HS4 Description": "Other moving, grading, levelling, scraping, excavating, tamping, compacting, extracting or boring machinery, for earth, minerals or ores; pile-drivers and pile-extractors; snow-ploughs and snowblowers."
+  },
+  {
+    "HS4": "8431",
+    "HS4 Short Name": "Excavation Machinery",
+    "HS4 Description": "Parts suitable for use solely or principally with the machinery of headings 84.25 to 84.30."
+  },
+  {
+    "HS4": "8432",
+    "HS4 Short Name": "Soil Preparation Machinery",
+    "HS4 Description": "Agricultural, horticultural or forestry machinery for soil preparation or cultivation; lawn or sports-ground rollers."
+  },
+  {
+    "HS4": "8433",
+    "HS4 Short Name": "Harvesting Machinery",
+    "HS4 Description": "Harvesting or threshing machinery, including straw or fodder balers; grass or hay mowers; machines for cleaning, sorting or grading eggs, fruit or other agricultural produce, other than machinery of heading 84.37."
+  },
+  {
+    "HS4": "8434",
+    "HS4 Short Name": "Dairy Machinery",
+    "HS4 Description": "Milking machines and dairy machinery."
+  },
+  {
+    "HS4": "8435",
+    "HS4 Short Name": "Fruit Pressing Machinery",
+    "HS4 Description": "Presses, crushers and similar machinery used in the manufacture of wine, cider, fruit juices or similar beverages."
+  },
+  {
+    "HS4": "8436",
+    "HS4 Short Name": "Other Agricultural Machinery",
+    "HS4 Description": "Other agricultural, horticultural, forestry, poultry-keeping or bee-keeping machinery, including germination plant fitted with mechanical or thermal equipment; poultry incubators and brooders."
+  },
+  {
+    "HS4": "8437",
+    "HS4 Short Name": "Mill Machinery",
+    "HS4 Description": "Machines for cleaning, sorting or grading seed, grain or dried leguminous vegetables; machinery used in the milling industry or for the working of cereals or dried leguminous vegetables, other than farm-type machinery."
+  },
+  {
+    "HS4": "8438",
+    "HS4 Short Name": "Industrial Food Preperation Machinery",
+    "HS4 Description": "Machinery, not specified or included elsewhere in this Chapter, for the industrial preparation or manufacture of food or drink, other than machinery for the extraction or preparation of animal or fixed vegetable fats or oils."
+  },
+  {
+    "HS4": "8439",
+    "HS4 Short Name": "Papermaking Machines",
+    "HS4 Description": "Machinery for making pulp of fibrous cellulosic material or for making or finishing paper or paperboard."
+  },
+  {
+    "HS4": "8440",
+    "HS4 Short Name": "Book-binding Machines",
+    "HS4 Description": "Book-binding machinery, including book-sewing machines."
+  },
+  {
+    "HS4": "8441",
+    "HS4 Short Name": "Other Paper Machinery",
+    "HS4 Description": "Other machinery for making up paper pulp, paper or paperboard, including cutting machines of all kinds."
+  },
+  {
+    "HS4": "8442",
+    "HS4 Short Name": "Print Production Machinery",
+    "HS4 Description": "Machinery, apparatus and equipment (other than the machinetools of headings 84.56 to 84.65) for preparing or making plates, cylinders or other printing components; plates, cylinders and other printing components; plates, cylinders and lithographic stone"
+  },
+  {
+    "HS4": "8443",
+    "HS4 Short Name": "Industrial Printers",
+    "HS4 Description": "Printing machinery used for printing by means of plates, cylinders and other printing components of heading 84.42; other printers, copying machines and facsimile machines, whether or not combined; parts and accessories thereof."
+  },
+  {
+    "HS4": "8444",
+    "HS4 Short Name": "Artificial Textile Machinery",
+    "HS4 Description": "Machines for extruding, drawing, texturing or cutting manmade textile materials."
+  },
+  {
+    "HS4": "8445",
+    "HS4 Short Name": "Textile Fiber Machinery",
+    "HS4 Description": "Machines for preparing textile fibres; spinning, doubling or twisting machines and other machinery for producing textile yarns; textile reeling or winding (including weft-winding) machines and machines for preparing textile yarns for use on the machines o"
+  },
+  {
+    "HS4": "8446",
+    "HS4 Short Name": "Looms",
+    "HS4 Description": "Weaving machines (looms)."
+  },
+  {
+    "HS4": "8447",
+    "HS4 Short Name": "Knitting Machines",
+    "HS4 Description": "Knitting machines, stitch-bonding machines and machines for making gimped yarn, tulle, lace, embroidery, trimmings, braid or net and machines for tufting."
+  },
+  {
+    "HS4": "8448",
+    "HS4 Short Name": "Knitting Machine Accessories",
+    "HS4 Description": "Auxiliary machinery for use with machines of heading 84.44, 84.45, 84.46 or 84.47 (for example, dobbies, Jacquards, automatic stop motions, shuttle changing mechanisms); parts and accessories suitable for use solely or principally with the machines of thi"
+  },
+  {
+    "HS4": "8449",
+    "HS4 Short Name": "Felt Machinery",
+    "HS4 Description": "Machinery for the manufacture or finishing of felt or nonwovens in the piece or in shapes, including machinery for making felt hats; blocks for making hats."
+  },
+  {
+    "HS4": "8450",
+    "HS4 Short Name": "Household Washing Machines",
+    "HS4 Description": "Household or laundry-type washing machines, including machines which both wash and dry."
+  },
+  {
+    "HS4": "8451",
+    "HS4 Short Name": "Textile Processing Machines",
+    "HS4 Description": "Machinery (other than machines of heading 84.50) for washing, cleaning, wringing, drying, ironing, pressing (including fusing presses), bleaching, dyeing, dressing, finishing, coating or impregnating textile yarns, fabrics or made up textile articles and"
+  },
+  {
+    "HS4": "8452",
+    "HS4 Short Name": "Sewing Machines",
+    "HS4 Description": "Sewing machines, other than book-sewing machines of heading 84.40; furniture, bases and covers specially designed for sewing machines; sewing machine needles."
+  },
+  {
+    "HS4": "8453",
+    "HS4 Short Name": "Leather Machinery",
+    "HS4 Description": "Machinery for preparing, tanning or working hides, skins or leather or for making or repairing footwear or other articles of hides, skins or leather, other than sewing machines."
+  },
+  {
+    "HS4": "8454",
+    "HS4 Short Name": "Casting Machines",
+    "HS4 Description": "Converters, ladles, ingot moulds and casting machines, of a kind used in metallurgy or in metal foundries."
+  },
+  {
+    "HS4": "8455",
+    "HS4 Short Name": "Metal-Rolling Mills",
+    "HS4 Description": "Metal-rolling mills and rolls therefor."
+  },
+  {
+    "HS4": "8456",
+    "HS4 Short Name": "Non-Mechanical Removal Machinery",
+    "HS4 Description": "Machine-tools for working any material by removal of material, by laser or other light or photon beam, ultrasonic, electrodischarge, electro-chemical, electron beam, ionic-beam or plasma arc processes; water-jet cutting machines."
+  },
+  {
+    "HS4": "8457",
+    "HS4 Short Name": "Metalworking Transfer Machines",
+    "HS4 Description": "Machining centres, unit construction machines (single station) and multi-station transfer machines, for working metal."
+  },
+  {
+    "HS4": "8458",
+    "HS4 Short Name": "Metal Lathes",
+    "HS4 Description": "Lathes (including turning centres) for removing metal."
+  },
+  {
+    "HS4": "8459",
+    "HS4 Short Name": "Drilling Machines",
+    "HS4 Description": "Machine-tools (including way-type unit head machines) for drilling, boring, milling, threading or tapping by removing metal, other than lathes (including turning centres) of heading 84.58."
+  },
+  {
+    "HS4": "8460",
+    "HS4 Short Name": "Metal Finishing Machines",
+    "HS4 Description": "Machine-tools for deburring, sharpening, grinding, honing, lapping, polishing or otherwise finishing metal or cermets by means of grinding stones, abrasives or polishing products, other than gear cutting, gear grinding or gear finishing machines of headin"
+  },
+  {
+    "HS4": "8461",
+    "HS4 Short Name": "Metalworking Machines",
+    "HS4 Description": "Machine-tools for planing, shaping, slotting, broaching, gear cutting, gear grinding or gear finishing, sawing, cutting-off and other machine-tools working by removing metal or cermets, not elsewhere specified or included."
+  },
+  {
+    "HS4": "8462",
+    "HS4 Short Name": "Forging Machines",
+    "HS4 Description": "Machine-tools (including presses) for working metal by forging, hammering or die-stamping; machine-tools (including presses) for working metal by bending, folding, straightening, flattening, shearing, punching or notching; presses for working metal or met"
+  },
+  {
+    "HS4": "8463",
+    "HS4 Short Name": "Other Non-Metal Removal Machinery",
+    "HS4 Description": "Other machine-tools for working metal or cermets, without removing material."
+  },
+  {
+    "HS4": "8464",
+    "HS4 Short Name": "Stone Working Machines",
+    "HS4 Description": "Machine-tools for working stone, ceramics, concrete, asbestoscement or like mineral materials or for cold working glass."
+  },
+  {
+    "HS4": "8465",
+    "HS4 Short Name": "Woodworking machines",
+    "HS4 Description": "Machine-tools (including machines for nailing, stapling, glueing or otherwise assembling) for working wood, cork, bone, hard rubber, hard plastics or similar hard materials."
+  },
+  {
+    "HS4": "8466",
+    "HS4 Short Name": "Metalworking Machine Parts",
+    "HS4 Description": "Parts and accessories suitable for use solely or principally with the machines of headings 84.56 to 84.65, including work or tool holders, self-opening dieheads, dividing heads and other special attachments for machine-tools; tool holders for any type of"
+  },
+  {
+    "HS4": "8467",
+    "HS4 Short Name": "Motor-working Tools",
+    "HS4 Description": "Tools for working in the hand, pneumatic, hydraulic or with self-contained electric or non-electric motor."
+  },
+  {
+    "HS4": "8468",
+    "HS4 Short Name": "Soldering and Welding Machinery",
+    "HS4 Description": "Machinery and apparatus for soldering, brazing or welding, whether or not capable of cutting, other than those of heading 85.15; gas-operated surface tempering machines and appliances."
+  },
+  {
+    "HS4": "8469",
+    "HS4 Short Name": "Typewriters",
+    "HS4 Description": "Typewriters other than printers of heading 84.43; wordprocessing machines."
+  },
+  {
+    "HS4": "8470",
+    "HS4 Short Name": "Calculators",
+    "HS4 Description": "Calculating machines and pocket-size data recording, reproducing and displaying machines with calculating functions; accounting machines, postage-franking machines, ticket-issuing machines and similar machines, incorporating a calculating device; cash reg"
+  },
+  {
+    "HS4": "8471",
+    "HS4 Short Name": "Computers",
+    "HS4 Description": "Automatic data processing machines and units thereof; magnetic or optical readers, machines for transcribing data onto data media in coded form and machines for processing such data, not elsewhere specified or included."
+  },
+  {
+    "HS4": "8472",
+    "HS4 Short Name": "Other Office Machines",
+    "HS4 Description": "Other office machines (for example, hectograph or stencil duplicating machines, addressing machines, automatic banknote dispensers, coin-sorting machines, coin-counting or wrapping machines, pencil-sharpening machines, perforating or stapling machines)."
+  },
+  {
+    "HS4": "8473",
+    "HS4 Short Name": "Office Machine Parts",
+    "HS4 Description": "Parts and accessories (other than covers, carrying cases and the like) suitable for use solely or principally with machines of headings 84.69 to 84.72."
+  },
+  {
+    "HS4": "8474",
+    "HS4 Short Name": "Stone Processing Machines",
+    "HS4 Description": "Machinery for sorting, screening, separating, washing, crushing, grinding, mixing or kneading earth, stone, ores or other mineral substances, in solid (including powder or paste) form; machinery for agglomerating, shaping or moulding solid mineral fuels,"
+  },
+  {
+    "HS4": "8475",
+    "HS4 Short Name": "Glass Working Machines",
+    "HS4 Description": "Machines for assembling electric or electronic lamps, tubes or valves or flashbulbs, in glass envelopes; machines for manufacturing or hot working glass or glassware."
+  },
+  {
+    "HS4": "8476",
+    "HS4 Short Name": "Vending Machines",
+    "HS4 Description": "Automatic goods-vending machines (for example, postage stamp, cigarette, food or beverage machines), including moneychanging machines."
+  },
+  {
+    "HS4": "8477",
+    "HS4 Short Name": "Rubberworking Machinery",
+    "HS4 Description": "Machinery for working rubber or plastics or for the manufacture of products from these materials, not specified or included elsewhere in this Chapter."
+  },
+  {
+    "HS4": "8478",
+    "HS4 Short Name": "Tobacco Processing Machines",
+    "HS4 Description": "Machinery for preparing or making up tobacco, not specified or included elsewhere in this Chapter."
+  },
+  {
+    "HS4": "8479",
+    "HS4 Short Name": "Machinery Having Individual Functions",
+    "HS4 Description": "Machines and mechanical appliances having individual functions, not specified or included elsewhere in this Chapter."
+  },
+  {
+    "HS4": "8480",
+    "HS4 Short Name": "Metal Molds",
+    "HS4 Description": "Moulding boxes for metal foundry; mould bases; moulding patterns; moulds for metal (other than ingot moulds), metal carbides, glass, mineral materials, rubber or plastics."
+  },
+  {
+    "HS4": "8481",
+    "HS4 Short Name": "Valves",
+    "HS4 Description": "Taps, cocks, valves and similar appliances for pipes, boiler shells, tanks, vats or the like, including pressure-reducing valves and thermostatically controlled valves."
+  },
+  {
+    "HS4": "8482",
+    "HS4 Short Name": "Ball Bearings",
+    "HS4 Description": "Ball or roller bearings."
+  },
+  {
+    "HS4": "8483",
+    "HS4 Short Name": "Transmissions",
+    "HS4 Description": "Transmission shafts (including cam shafts and crank shafts) and cranks; bearing housings and plain shaft bearings; gears and gearing; ball or roller screws; gear boxes and other speed changers, including torque converters; flywheels and pulleys, including"
+  },
+  {
+    "HS4": "8484",
+    "HS4 Short Name": "Gaskets",
+    "HS4 Description": "Gaskets and similar joints of metal sheeting combined with other material or of two or more layers of metal; sets or assortments of gaskets and similar joints, dissimilar in composition, put up in pouches, envelopes or similar packings; mechanical seals."
+  },
+  {
+    "HS4": "8485",
+    "HS4 Short Name": "Boat Propellers",
+    "HS4 Description": "(-2006) Machinery parts not specified or included elsewhere in this chapter (excl. parts containing electrical connectors, insulators, coils, contacts or other electrical features)"
+  },
+  {
+    "HS4": "8486",
+    "HS4 Short Name": "Machines for the manufacture of semiconductors and integrated circuits",
+    "HS4 Description": "Machines and apparatus of a kind used solely or principally for the manufacture of semiconductor boules or wafers, semiconductor devices, electronic integrated circuits or flat panel displays; machines and apparatus specified in Note 9 (C) to this Chapter"
+  },
+  {
+    "HS4": "8487",
+    "HS4 Short Name": "Machinery parts, not containing other electrical features",
+    "HS4 Description": "Machinery parts, not containing electrical connectors, insulators, coils, contacts or other electrical features, not specified or included elsewhere in this Chapter."
+  },
+  {
+    "HS4": "8501",
+    "HS4 Short Name": "Electric Motors",
+    "HS4 Description": "Electric motors and generators (excluding generating sets)."
+  },
+  {
+    "HS4": "8502",
+    "HS4 Short Name": "Electric Generating Sets",
+    "HS4 Description": "Electric generating sets and rotary converters."
+  },
+  {
+    "HS4": "8503",
+    "HS4 Short Name": "Electric Motor Parts",
+    "HS4 Description": "Parts suitable for use solely or principally with the machines of heading 85.01 or 85.02."
+  },
+  {
+    "HS4": "8504",
+    "HS4 Short Name": "Electrical Transformers",
+    "HS4 Description": "Electrical transformers, static converters (for example, rectifiers) and inductors."
+  },
+  {
+    "HS4": "8505",
+    "HS4 Short Name": "Electromagnets",
+    "HS4 Description": "Electro-magnets; permanent magnets and articles intended to become permanent magnets after magnetisation; electromagnetic or permanent magnet chucks, clamps and similar holding devices; electro-magnetic couplings, clutches and brakes; electro-magnetic l"
+  },
+  {
+    "HS4": "8506",
+    "HS4 Short Name": "Batteries",
+    "HS4 Description": "Primary cells and primary batteries."
+  },
+  {
+    "HS4": "8507",
+    "HS4 Short Name": "Electric Batteries",
+    "HS4 Description": "Electric accumulators, including separators therefor, whether or not rectangular (including square)."
+  },
+  {
+    "HS4": "8508",
+    "HS4 Short Name": "Vacuum Cleaners",
+    "HS4 Description": "Vacuum cleaners."
+  },
+  {
+    "HS4": "8509",
+    "HS4 Short Name": "Other Domestic Electric Housewares",
+    "HS4 Description": "Electro-mechanical domestic appliances, with self-contained electric motor, other than vacuum cleaners of heading 85.08."
+  },
+  {
+    "HS4": "8510",
+    "HS4 Short Name": "Hair Trimmers",
+    "HS4 Description": "Shavers, hair clippers and hair-removing appliances, with selfcontained electric motor."
+  },
+  {
+    "HS4": "8511",
+    "HS4 Short Name": "Electrical Ignitions",
+    "HS4 Description": "Electrical ignition or starting equipment of a kind used for spark-ignition or compression-ignition internal combustion engines (for example, ignition magnetos, magneto-dynamos, ignition coils, sparking plugs and glow plugs, starter motors); generators (f"
+  },
+  {
+    "HS4": "8512",
+    "HS4 Short Name": "Electrical Lighting and Signalling Equipment",
+    "HS4 Description": "Electrical lighting or signalling equipment (excluding articles of heading 85.39), windscreen wipers, defrosters and demisters, of a kind used for cycles or motor vehicles."
+  },
+  {
+    "HS4": "8513",
+    "HS4 Short Name": "Portable Lighting",
+    "HS4 Description": "Portable electric lamps designed to function by their own source of energy (for example, dry batteries, accumulators, magnetos), other than lighting equipment of heading 85.12."
+  },
+  {
+    "HS4": "8514",
+    "HS4 Short Name": "Electric Furnaces",
+    "HS4 Description": "Industrial or laboratory electric furnaces and ovens (including those functioning by induction or dielectric loss); other industrial or laboratory equipment for the heat treatment of materials by induction or dielectric loss."
+  },
+  {
+    "HS4": "8515",
+    "HS4 Short Name": "Electric Soldering Equipment",
+    "HS4 Description": "Electric (including electrically heated gas), laser or other light or photon beam, ultrasonic, electron beam, magnetic pulse or plasma arc soldering, brazing or welding machines and apparatus, whether or not capable of cutting; electric machines and appar"
+  },
+  {
+    "HS4": "8516",
+    "HS4 Short Name": "Electric Heaters",
+    "HS4 Description": "Electric instantaneous or storage water heaters and immersion heaters; electric space heating apparatus and soil heating apparatus; electro-thermic hair-dressing apparatus (for example, hair dryers, hair curlers, curling tong heaters) and hand dryers; ele"
+  },
+  {
+    "HS4": "8517",
+    "HS4 Short Name": "Telephones",
+    "HS4 Description": "Telephone sets, including telephones for cellular networks or for other wireless networks; other apparatus for the transmission or reception of voice, images or other data, including apparatus for communication in a wired or wireless network (such as a lo"
+  },
+  {
+    "HS4": "8518",
+    "HS4 Short Name": "Microphones and Headphones",
+    "HS4 Description": "Microphones and stands therefor; loudspeakers, whether or not mounted in their enclosures; headphones and earphones, whether or not combined with a microphone, and sets consisting of a microphone and one or more loudspeakers; audiofrequency electric amp"
+  },
+  {
+    "HS4": "8519",
+    "HS4 Short Name": "Sound Recording Equipment",
+    "HS4 Description": "Sound recording or reproducing apparatus."
+  },
+  {
+    "HS4": "8520",
+    "HS4 Short Name": "Dictation Machines",
+    "HS4 Description": "(-2006) Magnetic tape recorders and other sound recording apparatus whether or not incorporating a sound-reproducing device"
+  },
+  {
+    "HS4": "8521",
+    "HS4 Short Name": "Video Recording Equipment",
+    "HS4 Description": "Video recording or reproducing apparatus, whether or not incorporating a video tuner."
+  },
+  {
+    "HS4": "8522",
+    "HS4 Short Name": "Audio and Video Recording Accessories",
+    "HS4 Description": "Parts and accessories suitable for use solely or principally with the apparatus of headings 85.19 or 85.21."
+  },
+  {
+    "HS4": "8523",
+    "HS4 Short Name": "Blank Audio Media",
+    "HS4 Description": "Discs, tapes, solid-state non-volatile storage devices, 'smart cards' and other media for the recording of sound or of other phenomena, whether or not recorded, including matrices and masters for the production of discs, but excluding products of Chapter"
+  },
+  {
+    "HS4": "8524",
+    "HS4 Short Name": "Sound Recordings",
+    "HS4 Description": "(-2006) Records, tapes and other recorded media for sound or other similarly recorded phenomena, incl. matrices and masters for the production of records (excl. products of chapter 37)"
+  },
+  {
+    "HS4": "8525",
+    "HS4 Short Name": "Broadcasting Equipment",
+    "HS4 Description": "Transmission apparatus for radio-broadcasting or television, whether or not incorporating reception apparatus or sound recording or reproducing apparatus; television cameras, digital cameras and video camera recorders."
+  },
+  {
+    "HS4": "8526",
+    "HS4 Short Name": "Navigation Equipment",
+    "HS4 Description": "Radar apparatus, radio navigational aid apparatus and radio remote control apparatus."
+  },
+  {
+    "HS4": "8527",
+    "HS4 Short Name": "Radio Receivers",
+    "HS4 Description": "Reception apparatus for radio-broadcasting, whether or not combined, in the same housing, with sound recording or reproducing apparatus or a clock."
+  },
+  {
+    "HS4": "8528",
+    "HS4 Short Name": "Video Displays",
+    "HS4 Description": "Monitors and projectors, not incorporating television reception apparatus; reception apparatus for television, whether or not incorporating radio-broadcast receivers or sound or video recording or reproducing apparatus."
+  },
+  {
+    "HS4": "8529",
+    "HS4 Short Name": "Broadcasting Accessories",
+    "HS4 Description": "Parts suitable for use solely or principally with the apparatus of headings 85.25 to 85.28."
+  },
+  {
+    "HS4": "8530",
+    "HS4 Short Name": "Traffic Signals",
+    "HS4 Description": "Electrical signalling, safety or traffic control equipment for railways, tramways, roads, inland waterways, parking facilities, port installations or airfields (other than those of heading 86.08)."
+  },
+  {
+    "HS4": "8531",
+    "HS4 Short Name": "Audio Alarms",
+    "HS4 Description": "Electric sound or visual signalling apparatus (for example, bells, sirens, indicator panels, burglar or fire alarms), other than those of heading 85.12 or 85.30."
+  },
+  {
+    "HS4": "8532",
+    "HS4 Short Name": "Electrical Capacitors",
+    "HS4 Description": "Electrical capacitors, fixed, variable or adjustable (pre-set)."
+  },
+  {
+    "HS4": "8533",
+    "HS4 Short Name": "Electrical Resistors",
+    "HS4 Description": "Electrical resistors (including rheostats and potentiometers), other than heating resistors."
+  },
+  {
+    "HS4": "8534",
+    "HS4 Short Name": "Printed Circuit Boards",
+    "HS4 Description": "Printed circuits."
+  },
+  {
+    "HS4": "8535",
+    "HS4 Short Name": "High-voltage Protection Equipment",
+    "HS4 Description": "Electrical apparatus for switching or protecting electrical circuits, or for making connections to or in electrical circuits (for example, switches, fuses, lightning arresters, voltage limiters, surge suppressors, plugs and other connectors, junction boxe"
+  },
+  {
+    "HS4": "8536",
+    "HS4 Short Name": "Low-voltage Protection Equipment",
+    "HS4 Description": "Electrical apparatus for switching or protecting electrical circuits, or for making connections to or in electrical circuits (for example, switches, relays, fuses, surge suppressors, plugs, sockets, lamp-holders and other connectors, junction boxes), for"
+  },
+  {
+    "HS4": "8537",
+    "HS4 Short Name": "Electrical Control Boards",
+    "HS4 Description": "Boards, panels, consoles, desks, cabinets and other bases, equipped with two or more apparatus of heading 85.35 or 85.36, for electric control or the distribution of electricity, including those incorporating instruments or apparatus of Chapter 90, and nu"
+  },
+  {
+    "HS4": "8538",
+    "HS4 Short Name": "Electrical Power Accessories",
+    "HS4 Description": "Parts suitable for use solely or principally with the apparatus of heading 85.35, 85.36 or 85.37."
+  },
+  {
+    "HS4": "8539",
+    "HS4 Short Name": "Electric Filament",
+    "HS4 Description": "Electric filament or discharge lamps, including sealed beam lamp units and ultra-violet or infra-red lamps; arc-lamps."
+  },
+  {
+    "HS4": "8540",
+    "HS4 Short Name": "Cathode Tubes",
+    "HS4 Description": "Thermionic, cold cathode or photo-cathode valves and tubes (for example, vacuum or vapour or gas filled valves and tubes, mercury arc rectifying valves and tubes, cathode-ray tubes, television camera tubes)."
+  },
+  {
+    "HS4": "8541",
+    "HS4 Short Name": "Semiconductor Devices",
+    "HS4 Description": "Diodes, transistors and similar semiconductor devices; photosensitive semiconductor devices, including photovoltaic cells whether or not assembled in modules or made up into panels; light emitting diodes; mounted piezo-electric crystals."
+  },
+  {
+    "HS4": "8542",
+    "HS4 Short Name": "Integrated Circuits",
+    "HS4 Description": "Electronic integrated circuits."
+  },
+  {
+    "HS4": "8543",
+    "HS4 Short Name": "Other Electrical Machinery",
+    "HS4 Description": "Electrical machines and apparatus, having individual functions, not specified or included elsewhere in this Chapter."
+  },
+  {
+    "HS4": "8544",
+    "HS4 Short Name": "Insulated Wire",
+    "HS4 Description": "Insulated (including enamelled or anodised) wire, cable (including co-axial cable) and other insulated electric conductors, whether or not fitted with connectors; optical fibre cables, made up of individually sheathed fibres, whether or not assembled with"
+  },
+  {
+    "HS4": "8545",
+    "HS4 Short Name": "Carbon-based Electronics",
+    "HS4 Description": "Carbon electrodes, carbon brushes, lamp carbons, battery carbons and other articles of graphite or other carbon, with or without metal, of a kind used for electrical purposes."
+  },
+  {
+    "HS4": "8546",
+    "HS4 Short Name": "Electrical Insulators",
+    "HS4 Description": "Electrical insulators of any material."
+  },
+  {
+    "HS4": "8547",
+    "HS4 Short Name": "Metal Insulating Fittings",
+    "HS4 Description": "Insulating fittings for electrical machines, appliances or equipment, being fittings wholly of insulating material apart from any minor components of metal (for example, threaded sockets) incorporated during moulding solely for purposes of assembly, other"
+  },
+  {
+    "HS4": "8548",
+    "HS4 Short Name": "Electrical Parts",
+    "HS4 Description": "Waste and scrap of primary cells, primary batteries and electric accumulators; spent primary cells, spent primary batteries and spent electric accumulators; electrical parts of machinery or apparatus, not specified or included elsewhere in this Chapter."
+  },
+  {
+    "HS4": "8549",
+    "HS4 Short Name": "Electrical and electronic waste and scrap",
+    "HS4 Description": "Electrical and electronic waste and scrap"
+  },
+  {
+    "HS4": "8601",
+    "HS4 Short Name": "Electric Locomotives",
+    "HS4 Description": "Rail locomotives powered from an external source of electricity or by electric accumulators."
+  },
+  {
+    "HS4": "8602",
+    "HS4 Short Name": "Other Locomotives",
+    "HS4 Description": "Other rail locomotives; locomotive tenders."
+  },
+  {
+    "HS4": "8603",
+    "HS4 Short Name": "Self-Propelled Rail Transport",
+    "HS4 Description": "Self-propelled railway or tramway coaches, vans and trucks, other than those of heading 86.04."
+  },
+  {
+    "HS4": "8604",
+    "HS4 Short Name": "Railway Maintenance Vehicles",
+    "HS4 Description": "Railway or tramway maintenance or service vehicles, whether or not self-propelled (for example, workshops, cranes, ballast tampers, trackliners, testing coaches and track inspection vehicles)."
+  },
+  {
+    "HS4": "8605",
+    "HS4 Short Name": "Railway Passenger Cars",
+    "HS4 Description": "Railway or tramway passenger coaches, not self-propelled; luggage vans, post office coaches and other special purpose railway or tramway coaches, not self-propelled (excluding those of heading 86.04)."
+  },
+  {
+    "HS4": "8606",
+    "HS4 Short Name": "Railway Freight Cars",
+    "HS4 Description": "Railway or tramway goods vans and wagons, not self-propelled."
+  },
+  {
+    "HS4": "8607",
+    "HS4 Short Name": "Locomotive Parts",
+    "HS4 Description": "Parts of railway or tramway locomotives or rolling-stock."
+  },
+  {
+    "HS4": "8608",
+    "HS4 Short Name": "Railway Track Fixtures",
+    "HS4 Description": "Railway or tramway track fixtures and fittings; mechanical (including electro-mechanical) signalling, safety or traffic control equipment for railways, tramways, roads, inland waterways, parking facilities, port installations or airfields; parts of the fo"
+  },
+  {
+    "HS4": "8609",
+    "HS4 Short Name": "Railway Cargo Containers",
+    "HS4 Description": "Containers (including containers for the transport of fluids) specially designed and equipped for carriage by one or more modes of transport."
+  },
+  {
+    "HS4": "8701",
+    "HS4 Short Name": "Tractors",
+    "HS4 Description": "Tractors (other than tractors of heading 87.09)."
+  },
+  {
+    "HS4": "8702",
+    "HS4 Short Name": "Buses",
+    "HS4 Description": "Motor vehicles for the transport of ten or more persons, including the driver."
+  },
+  {
+    "HS4": "8703",
+    "HS4 Short Name": "Cars",
+    "HS4 Description": "Motor cars and other motor vehicles principally designed for the transport of persons (other than those of heading 87.02), including station wagons and racing cars."
+  },
+  {
+    "HS4": "8704",
+    "HS4 Short Name": "Delivery Trucks",
+    "HS4 Description": "Motor vehicles for the transport of goods."
+  },
+  {
+    "HS4": "8705",
+    "HS4 Short Name": "Specialized Vehicles",
+    "HS4 Description": "Special purpose motor vehicles, other than those principally designed for the transport of persons or goods (for example, breakdown lorries, crane lorries, fire fighting vehicles, concretemixer lorries, road sweeper lorries, spraying lorries, mobile wor"
+  },
+  {
+    "HS4": "8706",
+    "HS4 Short Name": "Vehicle Chassis",
+    "HS4 Description": "Chassis fitted with engines, for the motor vehicles of headings 87.01 to 87.05."
+  },
+  {
+    "HS4": "8707",
+    "HS4 Short Name": "Vehicle Bodies",
+    "HS4 Description": "Bodies (including cabs), for the motor vehicles of headings 87.01 to 87.05."
+  },
+  {
+    "HS4": "8708",
+    "HS4 Short Name": "Vehicle Parts",
+    "HS4 Description": "Parts and accessories of the motor vehicles of headings 87.01 to 87.05."
+  },
+  {
+    "HS4": "8709",
+    "HS4 Short Name": "Work Trucks",
+    "HS4 Description": "Works trucks, self-propelled, not fitted with lifting or handling equipment, of the type used in factories, warehouses, dock areas or airports for short distance transport of goods; tractors of the type used on railway station platforms; parts of the fore"
+  },
+  {
+    "HS4": "8710",
+    "HS4 Short Name": "Armored vehicles",
+    "HS4 Description": "Tanks and other armoured fighting vehicles, motorised, whether or not fitted with weapons, and parts of such vehicles."
+  },
+  {
+    "HS4": "8711",
+    "HS4 Short Name": "Motorcycles",
+    "HS4 Description": "Motorcycles (including mopeds) and cycles fitted with an auxiliary motor, with or without side-cars; side-cars."
+  },
+  {
+    "HS4": "8712",
+    "HS4 Short Name": "Bicycles",
+    "HS4 Description": "Bicycles and other cycles (including delivery tricycles), not motorised."
+  },
+  {
+    "HS4": "8713",
+    "HS4 Short Name": "Wheelchairs",
+    "HS4 Description": "Carriages for disabled persons, whether or not motorised or otherwise mechanically propelled."
+  },
+  {
+    "HS4": "8714",
+    "HS4 Short Name": "Bi-Wheel Vehicle Parts",
+    "HS4 Description": "Parts and accessories of vehicles of headings 87.11 to 87.13."
+  },
+  {
+    "HS4": "8715",
+    "HS4 Short Name": "Baby Carriages",
+    "HS4 Description": "Baby carriages and parts thereof."
+  },
+  {
+    "HS4": "8716",
+    "HS4 Short Name": "Trailers",
+    "HS4 Description": "Trailers and semi-trailers; other vehicles, not mechanically propelled; parts thereof."
+  },
+  {
+    "HS4": "8801",
+    "HS4 Short Name": "Non-powered Aircraft",
+    "HS4 Description": "Balloons and dirigibles; gliders, hang gliders and other nonpowered aircraft."
+  },
+  {
+    "HS4": "8802",
+    "HS4 Short Name": "Planes, Helicopters, and/or Spacecraft",
+    "HS4 Description": "Other aircraft (for example, helicopters, aeroplanes); spacecraft (including satellites) and suborbital and spacecraft launch vehicles."
+  },
+  {
+    "HS4": "8803",
+    "HS4 Short Name": "Aircraft Parts",
+    "HS4 Description": "Parts of goods of heading 88.01 or 88.02."
+  },
+  {
+    "HS4": "8804",
+    "HS4 Short Name": "Parachutes",
+    "HS4 Description": "Parachutes (including dirigible parachutes and paragliders) and rotochutes; parts thereof and accessories thereto."
+  },
+  {
+    "HS4": "8805",
+    "HS4 Short Name": "Aircraft Launch Gear",
+    "HS4 Description": "Aircraft launching gear; deck-arrestor or similar gear; ground flying trainers; parts of the foregoing articles."
+  },
+  {
+    "HS4": "8806",
+    "HS4 Short Name": "Unmanned aircraft",
+    "HS4 Description": "Unmanned aircraft"
+  },
+  {
+    "HS4": "8807",
+    "HS4 Short Name": "Parts of aircraft",
+    "HS4 Description": "Parts of aircraft and spacecraft of heading 8801, 8802 or 8806, n.e.s."
+  },
+  {
+    "HS4": "8901",
+    "HS4 Short Name": "Passenger and Cargo Ships",
+    "HS4 Description": "Cruise ships, excursion boats, ferry-boats, cargo ships, barges and similar vessels for the transport of persons or goods."
+  },
+  {
+    "HS4": "8902",
+    "HS4 Short Name": "Fishing Ships",
+    "HS4 Description": "Fishing vessels; factory ships and other vessels for processing or preserving fishery products."
+  },
+  {
+    "HS4": "8903",
+    "HS4 Short Name": "Recreational Boats",
+    "HS4 Description": "Yachts and other vessels for pleasure or sports; rowing boats and canoes."
+  },
+  {
+    "HS4": "8904",
+    "HS4 Short Name": "Tug Boats",
+    "HS4 Description": "Tugs and pusher craft."
+  },
+  {
+    "HS4": "8905",
+    "HS4 Short Name": "Special Purpose Ships",
+    "HS4 Description": "Light-vessels, fire-floats, dredgers, floating cranes and other vessels the navigability of which is subsidiary to their main function; floating docks; floating or submersible drilling or production platforms."
+  },
+  {
+    "HS4": "8906",
+    "HS4 Short Name": "Other Sea Vessels",
+    "HS4 Description": "Other vessels, including warships and lifeboats other than rowing boats."
+  },
+  {
+    "HS4": "8907",
+    "HS4 Short Name": "Other Floating Structures",
+    "HS4 Description": "Other floating structures (for example, rafts, tanks, cofferdams, landing-stages, buoys and beacons)."
+  },
+  {
+    "HS4": "8908",
+    "HS4 Short Name": "Scrap Vessels",
+    "HS4 Description": "Vessels and other floating structures for breaking up."
+  },
+  {
+    "HS4": "9001",
+    "HS4 Short Name": "Optical Fibers",
+    "HS4 Description": "Optical fibres and optical fibre bundles; optical fibre cables other than those of heading 85.44; sheets and plates of polarising material; lenses (including contact lenses), prisms, mirrors and other optical elements, of any material, unmounted, other th"
+  },
+  {
+    "HS4": "9002",
+    "HS4 Short Name": "Mirrors and Lenses",
+    "HS4 Description": "Lenses, prisms, mirrors and other optical elements, of any material, mounted, being parts of or fittings for instruments or apparatus, other than such elements of glass not optically worked."
+  },
+  {
+    "HS4": "9003",
+    "HS4 Short Name": "Eyewear Frames",
+    "HS4 Description": "Frames and mountings for spectacles, goggles or the like, and parts thereof."
+  },
+  {
+    "HS4": "9004",
+    "HS4 Short Name": "Eyewear",
+    "HS4 Description": "Spectacles, goggles and the like, corrective, protective or other."
+  },
+  {
+    "HS4": "9005",
+    "HS4 Short Name": "Binoculars and Telescopes",
+    "HS4 Description": "Binoculars, monoculars, other optical telescopes, and mountings therefor; other astronomical instruments and mountings therefor, but not including instruments for radio-astronomy."
+  },
+  {
+    "HS4": "9006",
+    "HS4 Short Name": "Cameras",
+    "HS4 Description": "Photographic (other than cinematographic) cameras; photographic flashlight apparatus and flashbulbs other than discharge lamps of heading 85.39."
+  },
+  {
+    "HS4": "9007",
+    "HS4 Short Name": "Video Cameras",
+    "HS4 Description": "Cinematographic cameras and projectors, whether or not incorporating sound recording or reproducing apparatus."
+  },
+  {
+    "HS4": "9008",
+    "HS4 Short Name": "Image Projectors",
+    "HS4 Description": "Image projectors, other than cinematographic; photographic (other than cinematographic) enlargers and reducers."
+  },
+  {
+    "HS4": "9009",
+    "HS4 Short Name": "Photocopiers",
+    "HS4 Description": "(-2006) Photocopying apparatus incorporating an optical system or of the contact type and thermo-copying apparatus"
+  },
+  {
+    "HS4": "9010",
+    "HS4 Short Name": "Photo Lab Equipment",
+    "HS4 Description": "Apparatus and equipment for photographic (including cinematographic) laboratories, not specified or included elsewhere in this Chapter; negatoscopes; projection screens."
+  },
+  {
+    "HS4": "9011",
+    "HS4 Short Name": "Microscopes",
+    "HS4 Description": "Compound optical microscopes, including those for photomicrography, cinephotomicrography or microprojection."
+  },
+  {
+    "HS4": "9012",
+    "HS4 Short Name": "Non-optical Microscopes",
+    "HS4 Description": "Microscopes other than optical microscopes; diffraction apparatus."
+  },
+  {
+    "HS4": "9013",
+    "HS4 Short Name": "LCDs",
+    "HS4 Description": "Liquid crystal devices not constituting articles provided for more specifically in other headings; lasers, other than laser diodes; other optical appliances and instruments, not specified or included elsewhere in this Chapter."
+  },
+  {
+    "HS4": "9014",
+    "HS4 Short Name": "Compasses",
+    "HS4 Description": "Direction finding compasses; other navigational instruments and appliances."
+  },
+  {
+    "HS4": "9015",
+    "HS4 Short Name": "Surveying Equipment",
+    "HS4 Description": "Surveying (including photogrammetrical surveying), hydrographic, oceanographic, hydrological, meteorological or geophysical instruments and appliances, excluding compasses; rangefinders."
+  },
+  {
+    "HS4": "9016",
+    "HS4 Short Name": "Balances",
+    "HS4 Description": "Balances of a sensitivity of 5 cg or better, with or without weights."
+  },
+  {
+    "HS4": "9017",
+    "HS4 Short Name": "Drafting Tools",
+    "HS4 Description": "Drawing, marking-out or mathematical calculating instruments (for example, drafting machines, pantographs, protractors, drawing sets, slide rules, disc calculators); instruments for measuring length, for use in the hand (for example, measuring rods and ta"
+  },
+  {
+    "HS4": "9018",
+    "HS4 Short Name": "Medical Instruments",
+    "HS4 Description": "Instruments and appliances used in medical, surgical, dental or veterinary sciences, including scintigraphic apparatus, other electro-medical apparatus and sight-testing instruments."
+  },
+  {
+    "HS4": "9019",
+    "HS4 Short Name": "Therapeutic Appliances",
+    "HS4 Description": "Mechano-therapy appliances; massage apparatus; psychological aptitude-testing apparatus; ozone therapy, oxygen therapy, aerosol therapy, artificial respiration or other therapeutic respiration apparatus."
+  },
+  {
+    "HS4": "9020",
+    "HS4 Short Name": "Breathing Appliances",
+    "HS4 Description": "Other breathing appliances and gas masks, excluding protective masks having neither mechanical parts nor replaceable filters."
+  },
+  {
+    "HS4": "9021",
+    "HS4 Short Name": "Orthopedic Appliances",
+    "HS4 Description": "Orthopaedic appliances, including crutches, surgical belts and trusses; splints and other fracture appliances; artificial parts of the body; hearing aids and other appliances which are worn or carried, or implanted in the body, to compensate for a defect"
+  },
+  {
+    "HS4": "9022",
+    "HS4 Short Name": "X-Ray Equipment",
+    "HS4 Description": "Apparatus based on the use of X-rays or of alpha, beta or gamma radiations, whether or not for medical, surgical, dental or veterinary uses, including radiography or radiotherapy apparatus, X-ray tubes and other X-ray generators, high tension generators,"
+  },
+  {
+    "HS4": "9023",
+    "HS4 Short Name": "Instructional Models",
+    "HS4 Description": "Instruments, apparatus and models, designed for demonstrational purposes (for example, in education or exhibitions), unsuitable for other uses."
+  },
+  {
+    "HS4": "9024",
+    "HS4 Short Name": "Tensile Testing Machines",
+    "HS4 Description": "Machines and appliances for testing the hardness, strength, compressibility, elasticity or other mechanical properties of materials (for example, metals, wood, textiles, paper, plastics)."
+  },
+  {
+    "HS4": "9025",
+    "HS4 Short Name": "Hydrometers",
+    "HS4 Description": "Hydrometers and similar floating instruments, thermometers, pyrometers, barometers, hygrometers and psychrometers, recording or not, and any combination of these instruments."
+  },
+  {
+    "HS4": "9026",
+    "HS4 Short Name": "Gas and Liquid Flow Measuring Instruments",
+    "HS4 Description": "Instruments and apparatus for measuring or checking the flow, level, pressure or other variables of liquids or gases (for example, flow meters, level gauges, manometers, heat meters), excluding instruments and apparatus of heading 90.14, 90.15, 90.28 or 9"
+  },
+  {
+    "HS4": "9027",
+    "HS4 Short Name": "Chemical Analysis Instruments",
+    "HS4 Description": "Instruments and apparatus for physical or chemical analysis (for example, polarimeters, refractometers, spectrometers, gas or smoke analysis apparatus); instruments and apparatus for measuring or checking viscosity, porosity, expansion, surface tension or"
+  },
+  {
+    "HS4": "9028",
+    "HS4 Short Name": "Utility Meters",
+    "HS4 Description": "Gas, liquid or electricity supply or production meters, including calibrating meters therefor."
+  },
+  {
+    "HS4": "9029",
+    "HS4 Short Name": "Revolution Counters",
+    "HS4 Description": "Revolution counters, production counters, taximeters, mileometers, pedometers and the like; speed indicators and tachometers, other than those of heading 90.14 or 90.15; stroboscopes."
+  },
+  {
+    "HS4": "9030",
+    "HS4 Short Name": "Oscilloscopes",
+    "HS4 Description": "Oscilloscopes, spectrum analysers and other instruments and apparatus for measuring or checking electrical quantities, excluding meters of heading 90.28; instruments and apparatus for measuring or detecting alpha, beta, gamma, X-ray, cosmic or other ionis"
+  },
+  {
+    "HS4": "9031",
+    "HS4 Short Name": "Other Measuring Instruments",
+    "HS4 Description": "Measuring or checking instruments, appliances and machines, not specified or included elsewhere in this Chapter; profile projectors."
+  },
+  {
+    "HS4": "9032",
+    "HS4 Short Name": "Thermostats",
+    "HS4 Description": "Automatic regulating or controlling instruments and apparatus."
+  },
+  {
+    "HS4": "9033",
+    "HS4 Short Name": "Opto-Electric Instrument Parts",
+    "HS4 Description": "Parts and accessories (not specified or included elsewhere in this Chapter) for machines, appliances, instruments or apparatus of Chapter 90."
+  },
+  {
+    "HS4": "9101",
+    "HS4 Short Name": "Precious Metal Watches",
+    "HS4 Description": "Wrist-watches, pocket-watches and other watches, including stop-watches, with case of precious metal or of metal clad with precious metal."
+  },
+  {
+    "HS4": "9102",
+    "HS4 Short Name": "Base Metal Watches",
+    "HS4 Description": "Wrist-watches, pocket-watches and other watches, including stop-watches, other than those of heading 91.01."
+  },
+  {
+    "HS4": "9103",
+    "HS4 Short Name": "Clocks with Watch Movements",
+    "HS4 Description": "Clocks with watch movements, excluding clocks of heading 91.04."
+  },
+  {
+    "HS4": "9104",
+    "HS4 Short Name": "Dashboard Clocks",
+    "HS4 Description": "Instrument panel clocks and clocks of a similar type for vehicles, aircraft, spacecraft or vessels."
+  },
+  {
+    "HS4": "9105",
+    "HS4 Short Name": "Other Clocks",
+    "HS4 Description": "Other clocks."
+  },
+  {
+    "HS4": "9106",
+    "HS4 Short Name": "Time Recording Instruments",
+    "HS4 Description": "Time of day recording apparatus and apparatus for measuring, recording or otherwise indicating intervals of time, with clock or watch movement or with synchronous motor (for example, timeregisters, time-recorders)."
+  },
+  {
+    "HS4": "9107",
+    "HS4 Short Name": "Time Switches",
+    "HS4 Description": "Time switches with clock or watch movement or with synchronous motor."
+  },
+  {
+    "HS4": "9108",
+    "HS4 Short Name": "Watch Movements",
+    "HS4 Description": "Watch movements, complete and assembled."
+  },
+  {
+    "HS4": "9109",
+    "HS4 Short Name": "Clock Movements",
+    "HS4 Description": "Clock movements, complete and assembled."
+  },
+  {
+    "HS4": "9110",
+    "HS4 Short Name": "Incomplete Movement Sets",
+    "HS4 Description": "Complete watch or clock movements, unassembled or partly assembled (movement sets); incomplete watch or clock movements, assembled; rough watch or clock movements."
+  },
+  {
+    "HS4": "9111",
+    "HS4 Short Name": "Watch Cases and Parts",
+    "HS4 Description": "Watch cases and parts thereof."
+  },
+  {
+    "HS4": "9112",
+    "HS4 Short Name": "Clock Cases and Parts",
+    "HS4 Description": "Clock cases and cases of a similar type for other goods of this Chapter, and parts thereof."
+  },
+  {
+    "HS4": "9113",
+    "HS4 Short Name": "Watch Straps",
+    "HS4 Description": "Watch straps, watch bands and watch bracelets, and parts thereof."
+  },
+  {
+    "HS4": "9114",
+    "HS4 Short Name": "Other Clocks and Watches",
+    "HS4 Description": "Other clock or watch parts."
+  },
+  {
+    "HS4": "9201",
+    "HS4 Short Name": "Pianos",
+    "HS4 Description": "Pianos, including automatic pianos; harpsichords and other keyboard stringed instruments."
+  },
+  {
+    "HS4": "9202",
+    "HS4 Short Name": "String Instruments",
+    "HS4 Description": "Other string musical instruments (for example, guitars, violins, harps)."
+  },
+  {
+    "HS4": "9203",
+    "HS4 Short Name": "Pipe Organs",
+    "HS4 Description": "(-2006) Keyboard pipe organs; harmoniums and similar keyboard instruments with free metal reeds (excl. string musical instruments)"
+  },
+  {
+    "HS4": "9204",
+    "HS4 Short Name": "Accordions",
+    "HS4 Description": "(-2006) Accordions and similar instruments; mouth organs"
+  },
+  {
+    "HS4": "9205",
+    "HS4 Short Name": "Wind Instruments",
+    "HS4 Description": "Wind musical instruments (for example, keyboard pipe organs, accordions, clarinets, trumpets, bagpipes), other than fairground organs and mechanical street organs."
+  },
+  {
+    "HS4": "9206",
+    "HS4 Short Name": "Percussion",
+    "HS4 Description": "Percussion musical instruments (for example, drums, xylophones, cymbals, castanets, maracas)."
+  },
+  {
+    "HS4": "9207",
+    "HS4 Short Name": "Electric Musical Instruments",
+    "HS4 Description": "Musical instruments, the sound of which is produced, or must be amplified, electrically (for example, organs, guitars, accordions)."
+  },
+  {
+    "HS4": "9208",
+    "HS4 Short Name": "Other Musical Instruments",
+    "HS4 Description": "Musical boxes, fairground organs, mechanical street organs, mechanical singing birds, musical saws and other musical instruments not falling within any other heading of this Chapter; decoy calls of all kinds; whistles, call horns and other mouthblown so"
+  },
+  {
+    "HS4": "9209",
+    "HS4 Short Name": "Musical Instrument Parts",
+    "HS4 Description": "Parts (for example, mechanisms for musical boxes) and accessories (for example, cards, discs and rolls for mechanical instruments) of musical instruments; metronomes, tuning forks and pitch pipes of all kinds."
+  },
+  {
+    "HS4": "9301",
+    "HS4 Short Name": "Military Weapons",
+    "HS4 Description": "Military weapons, other than revolvers, pistols and the arms of heading 93.07."
+  },
+  {
+    "HS4": "9302",
+    "HS4 Short Name": "Handguns",
+    "HS4 Description": "Revolvers and pistols, other than those of heading 93.03 or 93.04."
+  },
+  {
+    "HS4": "9303",
+    "HS4 Short Name": "Other Firearms",
+    "HS4 Description": "Other firearms and similar devices which operate by the firing of an explosive charge (for example, sporting shotguns and rifles, muzzle-loading firearms, Very pistols and other devices designed to project only signal flares, pistols and revolvers for fir"
+  },
+  {
+    "HS4": "9304",
+    "HS4 Short Name": "Spring, Air, and Gas Guns",
+    "HS4 Description": "Other arms (for example, spring, air or gas guns and pistols, truncheons), excluding those of heading 93.07."
+  },
+  {
+    "HS4": "9305",
+    "HS4 Short Name": "Weapons Parts and Accessories",
+    "HS4 Description": "Parts and accessories of articles of headings 93.01 to 93.04."
+  },
+  {
+    "HS4": "9306",
+    "HS4 Short Name": "Explosive Ammunition",
+    "HS4 Description": "Bombs, grenades, torpedoes, mines, missiles and similar munitions of war and parts thereof; cartridges and other ammunition and projectiles and parts thereof, including shot and cartridge wads."
+  },
+  {
+    "HS4": "9307",
+    "HS4 Short Name": "Bladed Weapons and Accessories",
+    "HS4 Description": "Swords, cutlasses, bayonets, lances and similar arms and parts thereof and scabbards and sheaths therefor."
+  },
+  {
+    "HS4": "9401",
+    "HS4 Short Name": "Seats",
+    "HS4 Description": "Seats (other than those of heading 94.02), whether or not convertible into beds, and parts thereof."
+  },
+  {
+    "HS4": "9402",
+    "HS4 Short Name": "Medical Furniture",
+    "HS4 Description": "Medical, surgical, dental or veterinary furniture (for example, operating tables, examination tables, hospital beds with mechanical fittings, dentists' chairs); barbers' chairs and similar chairs, having rotating as well as both reclining and elevating mo"
+  },
+  {
+    "HS4": "9403",
+    "HS4 Short Name": "Other Furniture",
+    "HS4 Description": "Other furniture and parts thereof."
+  },
+  {
+    "HS4": "9404",
+    "HS4 Short Name": "Mattresses",
+    "HS4 Description": "Mattress supports; articles of bedding and similar furnishing (for example, mattresses, quilts, eiderdowns, cushions, pouffes and pillows) fitted with springs or stuffed or internally fitted with any material or of cellular rubber or plastics, whether or"
+  },
+  {
+    "HS4": "9405",
+    "HS4 Short Name": "Light Fixtures",
+    "HS4 Description": "Lamps and lighting fittings including searchlights and spotlights and parts thereof, not elsewhere specified or included; illuminated signs, illuminated name-plates and the like, having a permanently fixed light source, and parts thereof not elsewhere spe"
+  },
+  {
+    "HS4": "9406",
+    "HS4 Short Name": "Prefabricated Buildings",
+    "HS4 Description": "Prefabricated buildings."
+  },
+  {
+    "HS4": "9501",
+    "HS4 Short Name": "Wheeled Toys",
+    "HS4 Description": "(-2006) Wheeled toys designed to be ridden by children, e.g. tricycles, scooters, pedal cars (excl. normal bicycles with ball bearings); dolls'' carriages"
+  },
+  {
+    "HS4": "9502",
+    "HS4 Short Name": "Dolls",
+    "HS4 Description": "(-2006) Dolls representing only human beings"
+  },
+  {
+    "HS4": "9503",
+    "HS4 Short Name": "Models and Stuffed Animals",
+    "HS4 Description": "Tricycles, scooters, pedal cars and similar wheeled toys; dolls' carriages; dolls; other toys; reduced-size ('scale') models and similar recreational models, working or not; puzzles of all kinds."
+  },
+  {
+    "HS4": "9504",
+    "HS4 Short Name": "Video and Card Games",
+    "HS4 Description": "Video game consoles and machines, articles for funfair, table or parlour games, including pintables, billiards, special tables for casino games and automatic bowling alley equipment."
+  },
+  {
+    "HS4": "9505",
+    "HS4 Short Name": "Party Decorations",
+    "HS4 Description": "Festive, carnival or other entertainment articles, including conjuring tricks and novelty jokes."
+  },
+  {
+    "HS4": "9506",
+    "HS4 Short Name": "Sports Equipment",
+    "HS4 Description": "Articles and equipment for general physical exercise, gymnastics, athletics, other sports (including table-tennis) or outdoor games, not specified or included elsewhere in this Chapter; swimming pools and paddling pools."
+  },
+  {
+    "HS4": "9507",
+    "HS4 Short Name": "Fishing and Hunting Equipment",
+    "HS4 Description": "Fishing rods, fish-hooks and other line fishing tackle; fish landing nets, butterfly nets and similar nets; decoy “birds” (other than those of heading 92.08 or 97.05) and similar hunting or shooting requisites."
+  },
+  {
+    "HS4": "9508",
+    "HS4 Short Name": "Fairground Amusements",
+    "HS4 Description": "Roundabouts, swings, shooting galleries and other fairground amusements; travelling circuses and travelling menageries; travelling theatres."
+  },
+  {
+    "HS4": "9601",
+    "HS4 Short Name": "Worked Ivory and Bone",
+    "HS4 Description": "Worked ivory, bone, tortoise-shell, horn, antlers, coral, motherof-pearl and other animal carving material, and articles of these materials (including articles obtained by moulding)."
+  },
+  {
+    "HS4": "9602",
+    "HS4 Short Name": "Vegetable and Mineral Carvings",
+    "HS4 Description": "Worked vegetable or mineral carving material and articles of these materials; moulded or carved articles of wax, of stearin, of natural gums or natural resins or of modelling pastes, and other moulded or carved articles, not elsewhere specified or include"
+  },
+  {
+    "HS4": "9603",
+    "HS4 Short Name": "Brooms",
+    "HS4 Description": "Brooms, brushes (including brushes constituting parts of machines, appliances or vehicles), hand-operated mechanical floor sweepers, not motorised, mops and feather dusters; prepared knots and tufts for broom or brush making; paint pads and rollers; squee"
+  },
+  {
+    "HS4": "9604",
+    "HS4 Short Name": "Hand Sifters",
+    "HS4 Description": "Hand sieves and hand riddles."
+  },
+  {
+    "HS4": "9605",
+    "HS4 Short Name": "Travel Kits",
+    "HS4 Description": "Travel sets for personal toilet, sewing or shoe or clothes cleaning."
+  },
+  {
+    "HS4": "9606",
+    "HS4 Short Name": "Buttons",
+    "HS4 Description": "Buttons, press-fasteners, snap-fasteners and press-studs, button moulds and other parts of these articles; button blanks."
+  },
+  {
+    "HS4": "9607",
+    "HS4 Short Name": "Zippers",
+    "HS4 Description": "Slide fasteners and parts thereof."
+  },
+  {
+    "HS4": "9608",
+    "HS4 Short Name": "Pens",
+    "HS4 Description": "Ball point pens; felt tipped and other porous-tipped pens and markers; fountain pens, stylograph pens and other pens; duplicating stylos; propelling or sliding pencils; pen-holders, pencil-holders and similar holders; parts (including caps and clips) of t"
+  },
+  {
+    "HS4": "9609",
+    "HS4 Short Name": "Pencils and Crayons",
+    "HS4 Description": "Pencils (other than pencils of heading 96.08), crayons, pencil leads, pastels, drawing charcoals, writing or drawing chalks and tailors' chalks."
+  },
+  {
+    "HS4": "9610",
+    "HS4 Short Name": "Chalkboards",
+    "HS4 Description": "Slates and boards, with writing or drawing surfaces, whether or not framed."
+  },
+  {
+    "HS4": "9611",
+    "HS4 Short Name": "Rubber Stamps",
+    "HS4 Description": "Date, sealing or numbering stamps, and the like (including devices for printing or embossing labels), designed for operating in the hand; hand-operated composing sticks and hand printing sets incorporating such composing sticks."
+  },
+  {
+    "HS4": "9612",
+    "HS4 Short Name": "Ink Ribbons",
+    "HS4 Description": "Typewriter or similar ribbons, inked or otherwise prepared for giving impressions, whether or not on spools or in cartridges; ink-pads, whether or not inked, with or without boxes."
+  },
+  {
+    "HS4": "9613",
+    "HS4 Short Name": "Lighters",
+    "HS4 Description": "Cigarette lighters and other lighters, whether or not mechanical or electrical, and parts thereof other than flints and wicks."
+  },
+  {
+    "HS4": "9614",
+    "HS4 Short Name": "Smoking Pipes",
+    "HS4 Description": "Smoking pipes (including pipe bowls) and cigar or cigarette holders, and parts thereof."
+  },
+  {
+    "HS4": "9615",
+    "HS4 Short Name": "Combs",
+    "HS4 Description": "Combs, hair-slides and the like; hairpins, curling pins, curling grips, hair-curlers and the like, other than those of heading 85.16, and parts thereof."
+  },
+  {
+    "HS4": "9616",
+    "HS4 Short Name": "Scent Sprays",
+    "HS4 Description": "Scent sprays and similar toilet sprays, and mounts and heads therefor; powder-puffs and pads for the application of cosmetics or toilet preparations."
+  },
+  {
+    "HS4": "9617",
+    "HS4 Short Name": "Vacuum Flask",
+    "HS4 Description": "Vacuum flasks and other vacuum vessels, complete with cases; parts thereof other than glass inners."
+  },
+  {
+    "HS4": "9618",
+    "HS4 Short Name": "Mannequins",
+    "HS4 Description": "Tailors' dummies and other lay figures; automata and other animated displays used for shop window dressing."
+  },
+  {
+    "HS4": "9619",
+    "HS4 Short Name": "Infant sanitary products",
+    "HS4 Description": "Sanitary towels (pads) and tampons, napkins and napkin liners for babies and similar articles, of any material."
+  },
+  {
+    "HS4": "9620",
+    "HS4 Short Name": "Tripods and similar",
+    "HS4 Description": "Monopods, bipods, tripods and similar articles"
+  },
+  {
+    "HS4": "9701",
+    "HS4 Short Name": "Paintings",
+    "HS4 Description": "Paintings, drawings and pastels, executed entirely by hand, other than drawings of heading 49.06 and other than handpainted or hand-decorated manufactured articles; collages and similar decorative plaques."
+  },
+  {
+    "HS4": "9702",
+    "HS4 Short Name": "Prints",
+    "HS4 Description": "Original engravings, prints and lithographs."
+  },
+  {
+    "HS4": "9703",
+    "HS4 Short Name": "Sculptures",
+    "HS4 Description": "Original sculptures and statuary, in any material."
+  },
+  {
+    "HS4": "9704",
+    "HS4 Short Name": "Revenue Stamps",
+    "HS4 Description": "Postage or revenue stamps, stamp-postmarks, first-day covers, postal stationery (stamped paper), and the like, used or unused, other than those of heading 49.07."
+  },
+  {
+    "HS4": "9705",
+    "HS4 Short Name": "Collector's Items",
+    "HS4 Description": "Collections and collectors' pieces of zoological, botanical, mineralogical, anatomical, historical, archaeological, palaeontological, ethnographic or numismatic interest."
+  },
+  {
+    "HS4": "9706",
+    "HS4 Short Name": "Antiques",
+    "HS4 Description": "Antiques of an age exceeding one hundred years."
+  },
+  {
+    "HS4": "9801",
+    "HS4 Short Name": "Goods exported for exhibition or competition and intended to be returned to Canada.",
+    "HS4 Description": "Goods exported for exhibition or competition and intended to be returned to Canada, or goods shipped after exhibition in Canada."
+  },
+  {
+    "HS4": "9802",
+    "HS4 Short Name": "Repairs",
+    "HS4 Description": "Repairs"
+  },
+  {
+    "HS4": "9803",
+    "HS4 Short Name": "Unimproved containers, bags or similar articles",
+    "HS4 Description": "Containers, bags or similar articles used in shuttle service, without having been advanced in value or improved in condition by any process of manufacture or other means"
+  },
+  {
+    "HS4": "9804",
+    "HS4 Short Name": "Medals, trophies, etc, which have been awarded to foreign persons/organizations",
+    "HS4 Description": "Medals, trophies, etc, which have been awarded to foreign persons/organizations"
+  },
+  {
+    "HS4": "9805",
+    "HS4 Short Name": "Goods exported to a member of the Canadian Forces or to an employee",
+    "HS4 Description": "Goods exported to a member of the Canadian Forces or to an employee of the Canadian government stationed abroad for his personal or household use, and goods exported to members of Foreign Armed Forces returning to their countries"
+  },
+  {
+    "HS4": "9806",
+    "HS4 Short Name": "Settlers’/migrants’ personal and household effects",
+    "HS4 Description": "Settlers’/migrants’ personal and household effects valued at $2,000 CDN or more and all goods valued at $2,000 CDN or more acquired by all categories of travellers including non-resident workers."
+  },
+  {
+    "HS4": "9807",
+    "HS4 Short Name": "Private donations and gifts",
+    "HS4 Description": "Private donations and gifts"
+  },
+  {
+    "HS4": "9808",
+    "HS4 Short Name": "Items of personal or official use of the Canadian government representatives stationed abroad",
+    "HS4 Description": "Articles for the personal or official use of the Canadian government representatives stationed abroad, of foreign diplomatic representatives returning home after posting in Canada, and articles for the personal use of their families, suites or servants"
+  },
+  {
+    "HS4": "9809",
+    "HS4 Short Name": "Weapons exported to Canadian government foreign bases",
+    "HS4 Description": "Arms, military stores and munitions of war exported by the Canadian government to its foreign bases and similar goods owned by NATO countries and being returned after use in Canada"
+  },
+  {
+    "HS4": "9810",
+    "HS4 Short Name": "Contractors’ equipment and tools re-exported",
+    "HS4 Description": "Contractors’ equipment and tools to be returned to Canada after completion of contract and similar foreign contractors’ equipment re-exported after use in Canada"
+  },
+  {
+    "HS4": "9811",
+    "HS4 Short Name": "U.S. special transactions",
+    "HS4 Description": "U.S. special transactions, trade (includes merchandise of Nos. 9811.00.01 to 9811.00.58 inclusive)"
+  },
+  {
+    "HS4": "9812",
+    "HS4 Short Name": "Commercial samples,",
+    "HS4 Description": "Commercial samples, excluding those of No. 98.01"
+  },
+  {
+    "HS4": "9817",
+    "HS4 Short Name": "Imports Duty Free",
+    "HS4 Description": "Imports Duty Free Under Spec Classif Prov Nesoi"
+  },
+  {
+    "HS4": "9818",
+    "HS4 Short Name": "Equipment",
+    "HS4 Description": "Equip/pts Incl Boats Purchsd Fr O Repair Pts, Etc."
+  },
+  {
+    "HS4": "9901",
+    "HS4 Short Name": "Unclassifiable exports",
+    "HS4 Description": "Unclassifiable exports"
+  },
+  {
+    "HS4": "9902",
+    "HS4 Short Name": "Groceries",
+    "HS4 Description": "Groceries"
+  },
+  {
+    "HS4": "9903",
+    "HS4 Short Name": "Duty free shop exports",
+    "HS4 Description": "Duty free shop exports"
+  },
+  {
+    "HS4": "9904",
+    "HS4 Short Name": "Re-exports to the U.S.",
+    "HS4 Description": "Goods of US origin, not advanced in value, returning to the United States"
+  },
+  {
+    "HS4": "9999",
+    "HS4 Short Name": "Salvage",
+    "HS4 Description": "Salvage (dutiable Mdse F Vssl Sunk 2yr U.S. Watrs)"
+  }
+]
+);
 
 
  }

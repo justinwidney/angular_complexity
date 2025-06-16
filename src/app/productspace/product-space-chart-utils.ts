@@ -129,8 +129,8 @@ export class ProductSpaceChartUtils {
   }
 
   // Radius scale function - you'll need to adjust the domain/range based on your data
-  static getRadiusScale(data: GroupedData[]) {
-      d3.scaleLinear()
+  static getRadiusScale() {
+    return d3.scaleLinear()
     .domain([-1, 1200000000, 12498112477])
     .range([20,45,85])
   }
@@ -155,6 +155,9 @@ export class ProductSpaceChartUtils {
     try {
       const numericNodeId = parseInt(nodeId, 10);
       const obj = grouped.find(o => o.product === numericNodeId);
+
+      console.log("Node ID:", nodeId, "Object:", obj);
+
       return obj ? radiusScale(obj.Value) : 20;
     } catch {
       return 20;

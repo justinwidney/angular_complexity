@@ -1,8 +1,12 @@
+
 // Use the correct import for Angular Material 19
 @use '@angular/material' as mat;
 
+
 // Import the AB Gov components CSS
 @import "@abgov/web-components/index.css";
+
+
 
 // Include the common styles for Angular Material
 @include mat.core();

@@ -74,23 +74,23 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
         nodeCount: nodes.length,
         dataCount: grouped.length
       });
-      
+
       this.initializeChart();
+
+      
     });
   }
 
-  // Method to update region and reload data
-  public updateRegion(region: "Alberta" | "British Columbia" | "Manitoba" | "New Brunswick" | "Newfoundland and Labrador" | "Nova Scotia" | "Ontario" | "Prince Edward Island" | "Quebec" | "Saskatchewan"): void {
-    this.selectedRegion = region;
-    this.loadData();
-  }
+ 
 
   private initializeChart(): void {
     const config = ProductSpaceChartUtils.getChartConfig();
     
     // Setup scales
     this.colorScale = ProductSpaceChartUtils.getColorScale();
-    this.radiusScale = ProductSpaceChartUtils.getRadiusScale(this.grouped);
+    this.radiusScale = ProductSpaceChartUtils.getRadiusScale();
+
+    console.log("Radius Scale:", this.radiusScale);
 
     // Setup transform and zoom
     this.transform = d3.zoomIdentity
@@ -150,45 +150,50 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       .attr("stroke", "gray");
   }
 
-  private renderNodes(): void {
-    const svgNodes = d3.select("svg g")
-      .selectAll(".node")
-      .data(this.nodes)
-      .enter()
-      .append("circle")
+ private renderNodes(): void {
+  // 1. grab the <g> container once
+  const svgGroup = d3.select<SVGGElement, unknown>("svg g");
+
+  // 2. bind data by a stable key (d.id) so update/exit work predictably
+  const nodesSel = svgGroup.selectAll<SVGCircleElement, Node>(".node")
+    .data(this.nodes, (d: Node) => d.id);
+
+  // 3. EXIT: remove any circles no longer in data
+  nodesSel.exit()
+    .transition()
+      .duration(500)
+      .style("opacity", 0)
+    .remove();
+
+  // 4. ENTER: create new circles for any new nodes
+  const enterSel = nodesSel.enter()
+    .append("circle")
       .attr("class", "node")
       .style("stroke", "black")
-      .attr("cx", (d) => d.x)
-      .attr("cy", (d) => d.y)
+      // set up mouse handlers once
       .on("mouseover", (event, d) => this.handleMouseover(event, d))
       .on("mousemove", (event, d) => this.handleMousemove(event, d))
-      .on("mouseout", (event, d) => this.handleMouseleave(event, d))
-      .on("click", (event, d) => this.handleMouseclick(event, d))
-      .attr("r", (d) => {
-        try {
-          const obj = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
-          return obj ? this.radiusScale(obj.Value) : 20;
-        } catch {
-          return 20;
-        }
+      .on("mouseout",  (event, d) => this.handleMouseleave(event, d))
+      .on("click",    (event, d) => this.handleMouseclick(event, d));
+
+  // 5. MERGE enter + update, then apply both initial & transition attributes
+  enterSel.merge(nodesSel as any)  // cast so TS knows it's compatible
+    .transition()
+      .duration(1000)
+      .attr("cx", d => d.x)
+      .attr("cy", d => d.y)
+      .attr("r",  d => {
+        const obj = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
+        return obj ? this.radiusScale(obj.Value) : 20;
       })
-      .attr("fill", (d) => {
-
+      .attr("fill", d => {
         const rca = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
-
-        console.log(d.id, this.grouped);
-
-        if (rca !== undefined) {
-          if (rca.Value > 0) {
-            return this.colorScale(parseInt(d.id));
-          } else {
-            return "rgb(249, 251, 251)";
-          }
-        } else {
-          return "rgb(249, 251, 251)";
-        }
-      });
-  }
+        return (rca && rca.Value > 0)
+          ? this.colorScale(parseInt(d.id, 10))
+          : "rgb(249, 251, 251)";
+      })
+      .style("opacity", 1);
+}
 
  private renderGroupLabels(): void {
     if (this.showGroupLabels) {
@@ -196,19 +201,6 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
     }
   }
 
-
-  private setupTooltip(): void {
-    this.tooltip = d3.select("#graphdiv")
-      .append("div")
-      .style("opacity", 0)
-      .attr("class", "tooltip")
-      .style("background-color", "red")
-      .style("border", "solid")
-      .style("border-width", "1px")
-      .style("border-radius", "5px")
-      .style("padding", "10px")
-      .attr("position", "relative");
-  }
 
   // Event Handlers
   private handleZoom(event: any): void {
@@ -383,21 +375,25 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       .style("top", (transformedY + 50) + "px");
   }
 
-  // Public methods to update chart
-  public updateData(region: "Alberta" | "British Columbia" | "Manitoba" | "New Brunswick" | "Newfoundland and Labrador" | "Nova Scotia" | "Ontario" | "Prince Edward Island" | "Quebec" | "Saskatchewan"): void {
-    this.selectedRegion = region;
-    
-    // Clear existing chart
-    if (this.svg) {
-      this.svg.selectAll("*").remove();
-    }
-    
-    // Re-load and initialize with new data
-    this.loadData();
-  }
+
 
   public refreshChart(): void {
-    this.loadData();
+
+    this.chartService.getAllData(this.selectedRegion).subscribe(({ nodes, links, grouped, totalSum }) => {
+      this.nodes = nodes;
+      this.links = links;
+      this.grouped = grouped;
+      this.totalSum = totalSum;
+      
+    this.chartDataLoaded.emit({
+        totalSum: totalSum,
+        nodeCount: nodes.length,
+        dataCount: grouped.length
+      });
+
+        this.renderNodes();      
+    });
+  
   }
 
   // Getter for total sum (useful for parent component)

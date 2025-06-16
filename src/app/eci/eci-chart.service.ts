@@ -1,7 +1,9 @@
 // eci-chart.service.ts
 
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { UnifiedDataService } from '../service/chart-data-service';
 import { 
   ECIRawDataItem, 
   ECIDataPoint, 
@@ -32,17 +34,96 @@ export class ECIChartService {
     'Yukon': 'YT'
   };
 
-  constructor() {}
+  constructor(private unifiedDataService: UnifiedDataService) {}
 
   /**
-   * Load ECI data from API or CSV
+   * Load ECI data from unified data service
+   * This will fetch data for all available provinces
    */
   loadECIData(): Observable<ECIRawDataItem[]> {
-    // TODO: Replace with actual HTTP call
-    // return this.http.get<ECIRawDataItem[]>('/api/eci-data');
+    const availableRegions = this.unifiedDataService.getAvailableRegions();
     
-    // For now, return sample data
-    return of(this.generateSampleData());
+    // Create requests for all regions
+    const requests = availableRegions.map(region => 
+      this.unifiedDataService.getRawData(region as any, { includeHistoricalData: true })
+        .pipe(
+          map(rawData => this.extractECIData(rawData, region)),
+          catchError(error => {
+            console.error(`Error loading ECI data for ${region}:`, error);
+            return of([]); // Return empty array on error to continue with other regions
+          })
+        )
+    );
+
+    // Combine all results
+    return forkJoin(requests).pipe(
+      map(results => results.flat()) // Flatten array of arrays
+    );
+  }
+
+  /**
+   * Load ECI data for specific provinces only
+   */
+  loadECIDataForProvinces(provinces: string[]): Observable<ECIRawDataItem[]> {
+    const requests = provinces.map(province => 
+      this.unifiedDataService.getRawData(province as any, { includeHistoricalData: true })
+        .pipe(
+          map(rawData => this.extractECIData(rawData, province)),
+          catchError(error => {
+            console.error(`Error loading ECI data for ${province}:`, error);
+            return of([]);
+          })
+        )
+    );
+
+    return forkJoin(requests).pipe(
+      map(results => results.flat())
+    );
+  }
+
+  /**
+   * Extract ECI data from raw trade data
+   */
+  private extractECIData(rawData: any[], region: string): ECIRawDataItem[] {
+    // Group by year and extract unique ECI values
+    const yearlyECI = new Map<string, number>();
+    
+    rawData.forEach(item => {
+      if (item.eci !== undefined && item.eci !== null && item.Date) {
+        const year = new Date(item.Date).getFullYear().toString();
+        
+        // If we haven't seen this year yet, or if this is a more recent data point
+        // (assuming later entries in the array are more recent)
+        yearlyECI.set(year, item.eci);
+      }
+    });
+
+    // Convert to ECIRawDataItem format
+    return Array.from(yearlyECI.entries()).map(([year, eci]) => ({
+      year,
+      origin: region,
+      eci
+    }));
+  }
+
+  /**
+   * Get ECI data from cache if available
+   */
+  getCachedECIData(): Observable<ECIRawDataItem[] | null> {
+    const availableRegions = this.unifiedDataService.getAvailableRegions();
+    const cachedData: ECIRawDataItem[] = [];
+    let allCached = true;
+
+    availableRegions.forEach(region => {
+      const cached = this.unifiedDataService.getCachedData(region as any, true);
+      if (cached) {
+        cachedData.push(...this.extractECIData(cached, region));
+      } else {
+        allCached = false;
+      }
+    });
+
+    return of(allCached ? cachedData : null);
   }
 
   /**
@@ -230,36 +311,6 @@ export class ECIChartService {
   }
 
   /**
-   * Generate sample data for testing
-   */
-  private generateSampleData(): ECIRawDataItem[] {
-    const provinces = ['Alberta', 'British Columbia', 'Ontario', 'Quebec', 'Saskatchewan'];
-    const years = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023];
-    const data: ECIRawDataItem[] = [];
-
-    provinces.forEach(province => {
-      let baseECI = Math.random() * 2 - 1; // Random starting ECI between -1 and 1
-      
-      years.forEach((year, index) => {
-        // Add some year-over-year variation
-        const variation = (Math.random() - 0.5) * 0.3;
-        baseECI += variation;
-        
-        // Keep ECI within reasonable bounds
-        baseECI = Math.max(-2, Math.min(2, baseECI));
-
-        data.push({
-          year: year.toString(),
-          origin: province,
-          eci: parseFloat(baseECI.toFixed(4))
-        });
-      });
-    });
-
-    return data;
-  }
-
-  /**
    * Validate ECI data format
    */
   validateData(data: ECIRawDataItem[]): boolean {
@@ -304,5 +355,48 @@ export class ECIChartService {
 
     const sum = line.values.reduce((acc, point) => acc + point.eci, 0);
     return sum / line.values.length;
+  }
+
+  /**
+   * Get year-over-year growth rate
+   */
+  getYearOverYearGrowth(lineData: ECILineData[], provinceName: string): number[] {
+    const line = lineData.find(l => l.name === provinceName);
+    if (!line || line.values.length < 2) return [];
+
+    const growthRates: number[] = [];
+    for (let i = 1; i < line.values.length; i++) {
+      const previousYear = line.values[i - 1];
+      const currentYear = line.values[i];
+      const growthRate = ((currentYear.eci - previousYear.eci) / Math.abs(previousYear.eci)) * 100;
+      growthRates.push(growthRate);
+    }
+
+    return growthRates;
+  }
+
+  /**
+   * Get latest available year from data
+   */
+  getLatestYear(lineData: ECILineData[]): number {
+    let maxYear = 0;
+    lineData.forEach(line => {
+      line.values.forEach(point => {
+        if (point.year > maxYear) {
+          maxYear = point.year;
+        }
+      });
+    });
+    return maxYear;
+  }
+
+  /**
+   * Refresh ECI data for a specific province
+   */
+  refreshProvinceData(province: string): Observable<ECIRawDataItem[]> {
+    return this.unifiedDataService.getRawData(province as any, { includeHistoricalData: true })
+      .pipe(
+        map(rawData => this.extractECIData(rawData, province))
+      );
   }
 }

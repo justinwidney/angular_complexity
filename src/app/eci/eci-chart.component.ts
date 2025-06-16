@@ -1,11 +1,12 @@
 // eci-chart.component.ts
 
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, combineLatest } from 'rxjs';
 import * as d3 from 'd3';
 import { ECIChartService } from './eci-chart.service';
 import { ECIChartUtils } from './eci-chart-utils';
 import { ChartCoordinationService } from '../service/chart-coordination.service';
+import { UnifiedDataService } from '../service/chart-data-service';
 import { CommonModule } from '@angular/common';
 
 import { 
@@ -31,65 +32,7 @@ import {
       
       <!-- Tooltip Container -->
       <div #tooltipContainer id="eci-tooltip-container" class="tooltip-container"></div>
-      
-      <!-- Controls -->
-      <div class="chart-controls" *ngIf="showControls">
-        <div class="control-group">
-          <label>Display Mode:</label>
-          <select (change)="onDisplayModeChange()">
-            <option value="all">All Provinces</option>
-            <option value="selected">Selected Only</option>
-            <option value="comparison">Comparison</option>
-          </select>
-        </div>
-        
-        <div class="control-group" *ngIf="displayMode !== 'all'">
-          <label>Select Provinces:</label>
-          <div class="province-checkboxes">
-            <div *ngFor="let province of availableProvinces" class="checkbox-item">
-              <input 
-                type="checkbox" 
-                [id]="'province-' + province" 
-                [checked]="isProvinceSelected(province)"
-                (change)="toggleProvinceSelection(province, $event)">
-              <label [for]="'province-' + province">{{ getProvinceShortName(province) }}</label>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Statistics Panel -->
-      <div class="stats-panel" *ngIf="showStats && chartStats">
-        <h4>Chart Statistics</h4>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-label">Provinces:</span>
-            <span class="stat-value">{{ chartStats.provinceCount }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Years:</span>
-            <span class="stat-value">{{ chartStats.yearRange.min }} - {{ chartStats.yearRange.max }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">ECI Range:</span>
-            <span class="stat-value">{{ chartStats.eciRange.min.toFixed(3) }} to {{ chartStats.eciRange.max.toFixed(3) }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Data Points:</span>
-            <span class="stat-value">{{ chartStats.dataPoints }}</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Loading Indicator -->
-      <div *ngIf="isLoading" class="loading-indicator">
-        <p>Loading ECI data...</p>
-      </div>
-      
-      <!-- Error Display -->
-      <div *ngIf="errorMessage" class="error-message">
-        <p>{{ errorMessage }}</p>
-      </div>
+     
     </div>
   `,
   styleUrls: ['./eci-chart.component.scss'],
@@ -104,12 +47,14 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
   // Input properties
   @Input() showControls: boolean = true;
   @Input() showStats: boolean = true;
+  @Input() showCacheStatus: boolean = true;
   @Input() enableTooltips: boolean = true;
   @Input() enableLegend: boolean = true;
   @Input() chartWidth: number = 1440;
   @Input() chartHeight: number = 650;
   @Input() customConfig?: Partial<ECIChartConfig>;
   @Input() selectedProvinces: string[] = [];
+  @Input() autoLoadProvinces?: string[]; // Specific provinces to load on init
 
   // Output events
   @Output() lineHovered = new EventEmitter<ECITooltipData>();
@@ -117,6 +62,7 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() provinceHighlighted = new EventEmitter<string>();
   @Output() chartDataLoaded = new EventEmitter<ECIChartStats>();
   @Output() provinceSelectionChanged = new EventEmitter<string[]>();
+  @Output() dataRefreshed = new EventEmitter<void>();
 
   // Component state
   private destroy$ = new Subject<void>();
@@ -131,16 +77,22 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // UI state
   isLoading: boolean = false;
+  unifiedLoading: boolean = false;
   errorMessage: string = '';
+  unifiedError: string | null = null;
   chartStats: ECIChartStats | null = null;
   displayMode: ECIDisplayMode = ECIDisplayMode.ALL_PROVINCES;
+  DisplayModes = ECIDisplayMode; // For template access
   availableProvinces: string[] = [];
   currentRegion: string = '';
   highlightedProvince: string = '';
+  isCached: boolean = false;
+  loadingProvinces: number = 0;
 
   constructor(
     private eciService: ECIChartService,
-    private coordinationService: ChartCoordinationService
+    private coordinationService: ChartCoordinationService,
+    private unifiedDataService: UnifiedDataService
   ) {
     this.config = ECIChartUtils.mergeConfigs(
       ECIChartUtils.getDefaultConfig(),
@@ -149,7 +101,7 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscribeToCoordinationService();
+    this.subscribeToServices();
   }
 
   ngAfterViewInit(): void {
@@ -163,6 +115,14 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroyChart();
   }
 
+  private subscribeToServices(): void {
+    // Subscribe to coordination service
+    this.subscribeToCoordinationService();
+    
+    // Subscribe to unified data service
+    this.subscribeToUnifiedDataService();
+  }
+
   private subscribeToCoordinationService(): void {
     // Subscribe to region changes (though ECI typically shows all provinces)
     this.coordinationService.region$
@@ -171,6 +131,22 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
         this.currentRegion = region;
         // ECI chart typically doesn't filter by region, but you could highlight it
         this.highlightProvince(region);
+      });
+  }
+
+  private subscribeToUnifiedDataService(): void {
+    // Subscribe to loading state
+    this.unifiedDataService.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(loading => {
+        this.unifiedLoading = loading;
+      });
+
+    // Subscribe to error state
+    this.unifiedDataService.error$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(error => {
+        this.unifiedError = error;
       });
   }
 
@@ -183,7 +159,7 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.tooltip = ECIChartUtils.setupTooltip('#eci-tooltip-container');
 
     } catch (error) {
-      this.handleError(`Failed to initialize chart: ${error}`);
+      //this.handleError(`Failed to initialize chart: ${error}`);
     }
   }
 
@@ -191,47 +167,54 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.eciService.loadECIData()
+    // Check if we should load specific provinces or all
+    const loadPromise = this.autoLoadProvinces && this.autoLoadProvinces.length > 0
+      ? this.eciService.loadECIDataForProvinces(this.autoLoadProvinces)
+      : this.eciService.loadECIData();
+
+    // Update loading message
+    this.loadingProvinces = this.autoLoadProvinces?.length || this.unifiedDataService.getAvailableRegions().length;
+
+    loadPromise
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
+          console.log(`📊 ECI data loaded: ${data.length} data points`);
+          
           if (this.eciService.validateData(data)) {
             this.rawData = data;
+            this.checkCacheStatus();
             this.processData();
           } else {
-            this.handleError('Invalid data format received');
+            //this.handleError('Invalid data format received');
           }
         },
         error: (error) => {
-          this.handleError(`Failed to load data: ${error.message}`);
+          //this.handleError(`Failed to load data: ${error.message}`);
         }
       });
   }
 
+  private checkCacheStatus(): void {
+    // Check if data came from cache
+    const cacheStatus = this.unifiedDataService.getCacheStatus();
+    this.isCached = cacheStatus.some(status => status.cached);
+  }
+
   private processData(): void {
     try {
-      // Transform raw data to line format
+
       this.lineData = this.eciService.transformDataToLines(this.rawData);
-      
-      // Get available provinces
       this.availableProvinces = this.eciService.getAvailableProvinces(this.lineData);
-      
-      // Calculate statistics
-      this.chartStats = this.eciService.calculateChartStats(this.lineData);
       
       // Apply current filter
       this.applyFilter();
-      
-      // Render chart
       this.renderChart();
-      
-      // Emit loaded event
-      this.chartDataLoaded.emit(this.chartStats);
-      
+          
       this.isLoading = false;
 
     } catch (error) {
-      this.handleError(`Failed to process data: ${error}`);
+      //this.handleError(`Failed to process data: ${error}`);
     }
   }
 
@@ -261,13 +244,9 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // Clear existing chart
     this.clearChart();
 
-    // Create scales
     this.scales = ECIChartUtils.createScales(this.filteredLineData, this.config);
 
-    // Create axes
     ECIChartUtils.createAxes(this.svg, this.scales, this.config);
-    
-    // Create axis labels
     ECIChartUtils.createAxisLabels(this.svg, this.config);
 
     // Render lines and points
@@ -505,6 +484,41 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadData();
   }
 
+  public refreshAllData(): void {
+    // Clear cache before refreshing
+    this.unifiedDataService.clearCache();
+    this.loadData();
+    this.dataRefreshed.emit();
+  }
+
+  public refreshProvinceData(province: string): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.eciService.refreshProvinceData(province)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (newData) => {
+          console.log(`📊 Refreshed data for ${province}:`, newData.length, 'points');
+          
+          // Merge new data with existing data
+          const otherData = this.rawData.filter(d => d.origin !== province);
+          this.rawData = [...otherData, ...newData];
+          
+          this.processData();
+        },
+        error: (error) => {
+          //this.handleError(`Failed to refresh ${province} data: ${error.message}`);
+        }
+      });
+  }
+
+  public retryDataLoad(): void {
+    this.errorMessage = '';
+    this.unifiedError = null;
+    this.loadData();
+  }
+
   public clearSelections(): void {
     this.resetHighlighting();
     this.highlightedProvince = '';
@@ -545,11 +559,15 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public isChartReady(): boolean {
-    return !this.isLoading && !this.errorMessage && this.lineData.length > 0;
+    return !this.isLoading && !this.unifiedLoading && !this.errorMessage && !this.unifiedError && this.lineData.length > 0;
   }
 
   public hasData(): boolean {
     return this.lineData && this.lineData.length > 0;
+  }
+
+  public getCacheStatus(): { region: string; cached: boolean; lastUpdated?: Date }[] {
+    return this.unifiedDataService.getCacheStatus();
   }
 
   // UI event handlers
@@ -585,11 +603,7 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.eciService.getProvinceShortName(province);
   }
 
-  private handleError(message: string): void {
-    this.isLoading = false;
-    this.errorMessage = message;
-    console.error(message);
-  }
+ 
 
   private destroyChart(): void {
     this.clearChart();

@@ -93,6 +93,8 @@ export enum DisplayMode {
 export enum GroupingType {
   HS2 = 'hs2',
   HS4 = 'hs4',
+  HS6 = 'hs6',
+  NAICS = 'naics',
   NAICS2 = 'naics2',
   NAICS4 = 'naics4'
 }

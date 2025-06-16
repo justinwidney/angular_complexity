@@ -10,24 +10,25 @@
             <div class="data-setting-wrapper">
               <div class="data-setting-component">
                 <goa-form-item label="Region" labelSize="regular">
-                  <goa-dropdown name="region" value="" 
-                  matTooltip="Select region" 
-                  matTooltipPosition="above" 
-                  value="Alberta" 
-                  width="180px"
-                  (_change)="onChange($event, 'region')"
+                  <goa-dropdown name="region" 
+                    [value]="currentRegion"
+                    matTooltip="Select region" 
+                    matTooltipPosition="above" 
+                    width="180px"
+                    (_change)="onChange($event, 'region')"
+                    [disabled]="isLoadingData"
                   >
-                  <goa-dropdown-item value="Alberta" label="Alberta"></goa-dropdown-item>
-                  <goa-dropdown-item value="Canada" label="Canada"></goa-dropdown-item>
-                  <goa-dropdown-item value="British Columbia" label="British Columbia"></goa-dropdown-item>
-                  <goa-dropdown-item value="Manitoba" label="Manitoba"></goa-dropdown-item>
-                  <goa-dropdown-item value="New Brunswick" label="New Brunswick"></goa-dropdown-item>
-                  <goa-dropdown-item value="Newfoundland and Labrador" label="Newfoundland and Labrador"></goa-dropdown-item>
-                  <goa-dropdown-item value="Nova Scotia" label="Nova Scotia"></goa-dropdown-item>
-                  <goa-dropdown-item value="Ontario" label="Ontario"></goa-dropdown-item>
-                  <goa-dropdown-item value="Prince Edward Island" label="Prince Edward Island"></goa-dropdown-item>
-                  <goa-dropdown-item value="Quebec" label="Quebec"></goa-dropdown-item>
-                  <goa-dropdown-item value="Saskatchewan" label="Saskatchewan"></goa-dropdown-item>
+                    <goa-dropdown-item value="Alberta" label="Alberta"></goa-dropdown-item>
+                    <goa-dropdown-item value="Canada" label="Canada"></goa-dropdown-item>
+                    <goa-dropdown-item value="British Columbia" label="British Columbia"></goa-dropdown-item>
+                    <goa-dropdown-item value="Manitoba" label="Manitoba"></goa-dropdown-item>
+                    <goa-dropdown-item value="New Brunswick" label="New Brunswick"></goa-dropdown-item>
+                    <goa-dropdown-item value="Newfoundland and Labrador" label="Newfoundland and Labrador"></goa-dropdown-item>
+                    <goa-dropdown-item value="Nova Scotia" label="Nova Scotia"></goa-dropdown-item>
+                    <goa-dropdown-item value="Ontario" label="Ontario"></goa-dropdown-item>
+                    <goa-dropdown-item value="Prince Edward Island" label="Prince Edward Island"></goa-dropdown-item>
+                    <goa-dropdown-item value="Quebec" label="Quebec"></goa-dropdown-item>
+                    <goa-dropdown-item value="Saskatchewan" label="Saskatchewan"></goa-dropdown-item>
                   </goa-dropdown>
                 </goa-form-item>
               </div>
@@ -41,23 +42,19 @@
               <div class="data-setting-component">
                 <goa-form-item label="Year" labelSize="regular">
                   <goa-dropdown name="year" 
-                  value="" 
-                  matTooltip="Select year" 
-                  matTooltipPosition="above" 
-                  value="2023" 
-                  width="180px"
-                  (_change)="onChange($event, 'year')"
+                    [value]="currentYear"
+                    matTooltip="Select year" 
+                    matTooltipPosition="above" 
+                    width="180px"
+                    (_change)="onChange($event, 'year')"
+                    [disabled]="isLoadingData"
                   >
-                  <goa-dropdown-item value="2023" label="2023"></goa-dropdown-item>
-                  <goa-dropdown-item value="2022" label="2022"></goa-dropdown-item>
-                  <goa-dropdown-item value="2021" label="2021"></goa-dropdown-item>
-                  <goa-dropdown-item value="2020" label="2020"></goa-dropdown-item>
-                  <goa-dropdown-item value="2019" label="2019"></goa-dropdown-item>
-                  <goa-dropdown-item value="2018" label="2018"></goa-dropdown-item>
-                  <goa-dropdown-item value="2017" label="2017"></goa-dropdown-item>
-                  <goa-dropdown-item value="2016" label="2016"></goa-dropdown-item>
-                  <goa-dropdown-item value="2015" label="2015"></goa-dropdown-item>
-                  <goa-dropdown-item value="2014" label="2014"></goa-dropdown-item>
+                    <!-- Dynamic years based on available data -->
+                    <goa-dropdown-item 
+                      *ngFor="let year of availableYears" 
+                      [value]="year" 
+                      [label]="year">
+                    </goa-dropdown-item>
                   </goa-dropdown>
                 </goa-form-item>
               </div>
@@ -71,16 +68,16 @@
               <div class="data-setting-component">
                 <goa-form-item label="Grouping" labelSize="regular">
                   <goa-dropdown name="grouping" 
-                  value="" 
-                  matTooltip="Select HS digit grouping" 
-                  matTooltipPosition="above" 
-                  value="HS2" 
-                  width="180px"
-                  (_change)="onChange($event, 'grouping')"
+                    [value]="getGroupingValue()"
+                    matTooltip="Select HS digit grouping" 
+                    matTooltipPosition="above" 
+                    width="180px"
+                    (_change)="onChange($event, 'grouping')"
+                    [disabled]="isLoadingData"
                   >
-                  <goa-dropdown-item value="HS2" label="HS 2 Digits"></goa-dropdown-item>
-                  <goa-dropdown-item value="HS4" label="HS 4 Digits"></goa-dropdown-item>
-                  <goa-dropdown-item value="HS6" label="HS 6 Digits"></goa-dropdown-item>
+                    <goa-dropdown-item value="HS2" label="HS 2 Digits"></goa-dropdown-item>
+                    <goa-dropdown-item value="HS4" label="HS 4 Digits"></goa-dropdown-item>
+                    <goa-dropdown-item value="HS6" label="HS 6 Digits"></goa-dropdown-item>
                   </goa-dropdown>
                 </goa-form-item>
               </div>
@@ -92,17 +89,14 @@
       <div class="col-4">
         <div class="row">
           <div class="col">
-
-
             <goa-form-item label="Chart Type" labelSize="small">
-              <div class="modern-chart-toggles"
-              
-              >
+              <div class="modern-chart-toggles">
                 <mat-button-toggle-group 
                   name="chartType" 
                   aria-label="Chart Type" 
-                  value="ProductSpace" 
-                  (change)="onChartTypeChange($event)">
+                  [value]="selectedChartType" 
+                  (change)="onChartTypeChange($event)"
+                  [disabled]="isLoadingData">
                   <mat-button-toggle value="ProductSpace">Product Space</mat-button-toggle>
                   <mat-button-toggle value="Feasible">Feasible</mat-button-toggle>
                   <mat-button-toggle value="Trends">Trends</mat-button-toggle>
@@ -111,12 +105,12 @@
                 </mat-button-toggle-group>
               </div>
             </goa-form-item>
-        </div>
+          </div>
         </div>
       </div>
     </div>
 
-        <goa-spacer vspacing="m"></goa-spacer>
+    <goa-spacer vspacing="m"></goa-spacer>
     <div class="row">
       <div class="col-12">
         <goa-divider></goa-divider>
@@ -124,36 +118,48 @@
     </div>
     <goa-spacer vspacing="m"></goa-spacer>
 
-
     <!-- Second Row: Title + Stats + Controls -->
     <div class="row align-items-center space-between">
       <div class="col">
         <goa-text mt="none" mb="none" as="h4">
-          Export Dashboard
+          Export Dashboard - {{currentRegion}} ({{currentYear}})
         </goa-text>
       </div>
 
       <div class="col">
         <goa-text mt="none" mb="none" as="h5">
-          Total Value: $2.4B
+          Total Value: {{totalValue}}
         </goa-text>
       </div>
 
       <div class="col">
         <goa-text mt="none" mb="none" as="h5">
-          Number of Products: 1,247
+          Number of Products: {{productCount | number}}
         </goa-text>
       </div>
 
       <div class="col">
-        <goa-button type="secondary" size="compact">
-          <goa-icon name="filter" slot="prefix"></goa-icon>
-          Filter
+        <goa-button type="secondary" size="compact" (_click)="clearDataCache()" [disabled]="isLoadingData">
+          <goa-icon name="refresh" slot="prefix"></goa-icon>
+          Refresh
         </goa-button>
       </div>
 
       <div class="col">
         <goa-input name="search" type="search" placeholder="Search products..." width="200px"></goa-input>
+      </div>
+    </div>
+
+    <!-- Loading/Error States -->
+    <div class="row" *ngIf="isLoadingData || dataError">
+      <div class="col-12">
+        <goa-spacer vspacing="m"></goa-spacer>
+        <goa-notification *ngIf="isLoadingData" type="information">
+          <span slot="heading">Loading data...</span>
+          <p>Fetching data for {{currentRegion}} ({{currentYear}})</p>
+        </goa-notification>
+        
+
       </div>
     </div>
 
@@ -186,7 +192,7 @@
               <p class="mb-2"><strong>Value:</strong> {{selectedNode!.data?.Value | number}}</p>
               <p class="mb-2"><strong>RCA:</strong> {{selectedNode!.data?.rca | number:'1.4-4'}}</p>
               <p class="mb-2"><strong>Description:</strong> {{selectedNode!.data?.description}}</p>
-              <p class="mb-3"><strong>Industry:</strong> {{selectedNode!.data?.naics_description}}</p>
+              <p class="mb-2"><strong>Industry:</strong> {{selectedNode!.data?.naics_description}}</p>
               <button class="btn btn-sm btn-secondary w-100" (click)="clearSelection()">Clear Selection</button>
             </div>
           </div>
@@ -195,7 +201,7 @@
     </div>
 
     <!-- Optional: Chart Statistics -->
-    <div class="row" *ngIf="chartStats">
+    <div class="row" *ngIf="chartStats && selectedChartType === 'ProductSpace'">
       <div class="col-12">
         <div class="card mt-3">
           <div class="card-body">
@@ -220,36 +226,39 @@
 
     <div class="row" *ngIf="selectedChartType === 'Feasible'">
       <div class="col-12">
-           <app-feasible-chart 
-            #feasibleChart
-            [showTooltips]="true"
-            [enableIconFiltering]="true"
-            [enableTracking]="true"
-            >
+        <app-feasible-chart 
+          #feasibleChart
+          [showTooltips]="true"
+          [enableIconFiltering]="true"
+          [enableTracking]="true"
+          (chartDataLoaded)="feasibleStats = $event"
+          (nodeSelected)="onFeasiblePointSelected($event)"
+          (nodeHovered)="onFeasiblePointHovered($event)"
+        >
         </app-feasible-chart>
-        </div>  
+      </div>  
     </div>
 
     <div class="row" *ngIf="selectedChartType === 'Trends'">
       <div class="col-12">
         <app-overtime-chart
           #overtimeChart
-          [showDebugInfo]="true"
+          [showDebugInfo]="false"
           [showTooltips]="true"
           [enableCategoryToggling]="true"
           [enableDataTable]="true">
         </app-overtime-chart>
       </div>  
-
     </div>
 
     <div class="row" *ngIf="selectedChartType === 'Exports'">
       <div class="col-12">
         <app-treemap-chart
-        [enableZoomPan]="true"
-        [showControls]="true"
-        [showDebugInfo]="true">
-      </app-treemap-chart>
+          #treemapChart
+          [enableZoomPan]="true"
+          [showControls]="true"
+          [showDebugInfo]="false">
+        </app-treemap-chart>
       </div>
     </div>
 
@@ -258,13 +267,38 @@
         <app-eci-chart
           #eciChart
           [showControls]="true"
-          [showStats]="true"
+          [showCacheStatus]="true"
           [enableTooltips]="true"
           [enableLegend]="true"
-          [chartWidth]="1440"
-          [chartHeight]="650"
-         >
+        >
         </app-eci-chart>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+          <app-table></app-table>
+      </div>
+    </div>
+
+    <!-- Debug Panel (optional) -->
+    <div class="row" *ngIf="false">
+      <div class="col-12">
+        <goa-spacer vspacing="l"></goa-spacer>
+        <div class="card">
+          <div class="card-header">
+            <h6>Debug Info</h6>
+          </div>
+          <div class="card-body">
+            <p><strong>Region:</strong> {{currentRegion}}</p>
+            <p><strong>Year:</strong> {{currentYear}}</p>
+            <p><strong>Grouping:</strong> {{currentGrouping}}</p>
+            <p><strong>Chart Type:</strong> {{selectedChartType}}</p>
+            <p><strong>Loading:</strong> {{isLoadingData}}</p>
+            <p><strong>Error:</strong> {{dataError || 'None'}}</p>
+            <button class="btn btn-sm btn-info" (click)="getCacheStatus()">Check Cache Status</button>
+          </div>
+        </div>
       </div>
     </div>
 

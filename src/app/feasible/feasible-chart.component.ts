@@ -1,7 +1,7 @@
 // feasible-chart.component.ts
 
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, skip, Subject, takeUntil } from 'rxjs';
 import * as d3 from 'd3';
 import { UnifiedDataService } from '../service/chart-data-service'; // Import the unified service
 import { FeasibleChartService } from './feasible-chart-service';
@@ -100,11 +100,13 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngAfterViewInit(): void {
     this.loadData();
-
-    console.log("FeasibleChartComponent initialized with config:", this.config);
-
+    this.initializeChart()
 
   }
+
+    public refreshChart(): void {
+    this.renderChart()
+    }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -132,9 +134,13 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
     // Subscribe to year changes
     this.coordinationService.year$
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        skip(1), 
+        distinctUntilChanged(),
+        takeUntil(this.destroy$))
       .subscribe(year => {
-        //this.loadData();
+        console.log("coordinationService year change:", year);
+        this.loadData();
       });
 
     // Subscribe to grouping changes
@@ -198,7 +204,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
           
           // Store the raw data for reprocessing
           this.rawData = result.rawData;
-          
+
           // Process the data for current grouping
           this.data = this.processDataForGrouping(result.feasibleData);
           this.eci = result.eci;
@@ -212,7 +218,10 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
             eci: this.eci
           });
 
-          this.initializeChart();
+          console.log("Refreshing chart with data", this.data);
+
+          this.refreshChart();
+
         },
         error: (error) => {
           console.error("Error loading feasible chart data:", error);
@@ -341,10 +350,14 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private renderChart(): void {
     this.renderPoints();
-    this.updateDisplayMode();
+    //this.updateDisplayMode();
   }
 
   private renderPoints(): void {
+
+    console.log("Rendering points with data count:", this.data.length);
+    console.log("Current Data:", this.data);
+
     const circles = this.zoomable.selectAll(".feasible-point")
       .data(this.data);
 
@@ -396,7 +409,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
         this.displayFourQuads();
         break;
       default:
-        this.refreshData();
+        this.refreshDraw();
         break;
     }
   }
@@ -476,12 +489,9 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .attr("fill", (d: FeasiblePoint) => d.color || this.getPointColor(d));
   }
 
-  private refreshData(): void {
-    // Remove any quadrant legends
-    //this.zoomable.selectAll(".quadrant-legend").remove();
-    
+  private refreshDraw(): void {
     // Re-render points with current settings
-    //this.renderPoints();
+    this.renderPoints();
   }
 
   private updateDisplay(): void {

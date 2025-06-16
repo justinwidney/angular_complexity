@@ -1,186 +1,163 @@
-// chart-coordination.service.ts
+// enhanced-chart-coordination.service.ts
 
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { GroupingType, DisplayMode, FilterType, ChartCoordinationState } from '../feasible/feasible-chart-model';
+import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
+import { map, distinctUntilChanged } from 'rxjs/operators';
+import { DisplayMode, FilterType, GroupingType } from '../feasible/feasible-chart-model';
+
+export interface ChartCoordinationState {
+  selectedRegion: string;
+  selectedYear: string;
+  selectedGrouping: GroupingType;
+  displayMode: DisplayMode;
+  filterType: FilterType;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChartCoordinationService {
   
-  setYear(year: string) {
-     
-  }
-  setRegion(region: string) {
-  }
+  // Individual state subjects
+  private regionSubject = new BehaviorSubject<string>('Alberta');
+  private yearSubject = new BehaviorSubject<string>('2023');
+  private groupingSubject = new BehaviorSubject<GroupingType>(GroupingType.HS2);
+  private displayModeSubject = new BehaviorSubject<DisplayMode>(DisplayMode.DEFAULT);
+  private filterTypeSubject = new BehaviorSubject<FilterType>(FilterType.ALL);
   
-  private readonly initialState: ChartCoordinationState = {
-    selectedRegion: 'Alberta',
-    selectedYear: '2023',
-    selectedGrouping: GroupingType.HS4,
-    displayMode: DisplayMode.DEFAULT,
-    filterType: FilterType.ALL
-  };
+  // Public observables
+  public region$ = this.regionSubject.asObservable().pipe(distinctUntilChanged());
+  public year$ = this.yearSubject.asObservable().pipe(distinctUntilChanged());
+  public grouping$ = this.groupingSubject.asObservable().pipe(distinctUntilChanged());
+  public displayMode$ = this.displayModeSubject.asObservable().pipe(distinctUntilChanged());
+  public filterType$ = this.filterTypeSubject.asObservable().pipe(distinctUntilChanged());
+  
+  // Combined state observable
+  public state$: Observable<ChartCoordinationState> = combineLatest([
+    this.region$,
+    this.year$,
+    this.grouping$,
+    this.displayMode$,
+    this.filterType$
+  ]).pipe(
+    map(([selectedRegion, selectedYear, selectedGrouping, displayMode, filterType]) => ({
+      selectedRegion,
+      selectedYear,
+      selectedGrouping,
+      displayMode,
+      filterType
+    })),
+    distinctUntilChanged((prev, curr) => 
+      JSON.stringify(prev) === JSON.stringify(curr)
+    )
+  );
 
-  // State subjects
-  private stateSubject = new BehaviorSubject<ChartCoordinationState>(this.initialState);
-  private regionSubject = new BehaviorSubject<string>(this.initialState.selectedRegion);
-  private yearSubject = new BehaviorSubject<string>(this.initialState.selectedYear);
-  private groupingSubject = new BehaviorSubject<GroupingType>(this.initialState.selectedGrouping);
-  private displayModeSubject = new BehaviorSubject<DisplayMode>(this.initialState.displayMode);
-  private filterTypeSubject = new BehaviorSubject<FilterType>(this.initialState.filterType);
-
-  // Observables for components to subscribe to
-  public readonly state$: Observable<ChartCoordinationState> = this.stateSubject.asObservable();
-  public readonly region$: Observable<string> = this.regionSubject.asObservable();
-  public readonly year$: Observable<string> = this.yearSubject.asObservable();
-  public readonly grouping$: Observable<GroupingType> = this.groupingSubject.asObservable();
-  public readonly displayMode$: Observable<DisplayMode> = this.displayModeSubject.asObservable();
-  public readonly filterType$: Observable<FilterType> = this.filterTypeSubject.asObservable();
-
-  constructor() {}
-
-  // Getters for current state
-  public get currentState(): ChartCoordinationState {
-    return this.stateSubject.value;
+  constructor() {
+    // Log state changes in development
+    if (!window.location.hostname.includes('prod')) {
+      this.state$.subscribe(state => {
+        console.log('📊 Chart Coordination State Changed:', state);
+      });
+    }
   }
 
-  public get currentRegion(): string {
-    return this.regionSubject.value;
-  }
-
-  public get currentYear(): string {
-    return this.yearSubject.value;
-  }
-
-  public get currentGrouping(): GroupingType {
-    return this.groupingSubject.value;
-  }
-
-  public get currentDisplayMode(): DisplayMode {
-    return this.displayModeSubject.value;
-  }
-
-  public get currentFilterType(): FilterType {
-    return this.filterTypeSubject.value;
-  }
-
-  // Update methods
-  public updateRegion(region: string): void {
-    const newState = { ...this.currentState, selectedRegion: region };
-    this.updateState(newState);
+  // Setters
+  setRegion(region: string): void {
     this.regionSubject.next(region);
   }
 
-  public updateYear(year: string): void {
-    const newState = { ...this.currentState, selectedYear: year };
-    this.updateState(newState);
+  setYear(year: string): void {
     this.yearSubject.next(year);
   }
 
-  public updateGrouping(grouping: GroupingType): void {
-    const newState = { ...this.currentState, selectedGrouping: grouping };
-    this.updateState(newState);
+  setGrouping(grouping: GroupingType): void {
     this.groupingSubject.next(grouping);
   }
 
-  public updateDisplayMode(displayMode: DisplayMode): void {
-    const newState = { ...this.currentState, displayMode: displayMode };
-    this.updateState(newState);
-    this.displayModeSubject.next(displayMode);
+  setDisplayMode(mode: DisplayMode): void {
+    this.displayModeSubject.next(mode);
   }
 
-  public updateFilterType(filterType: FilterType): void {
-    const newState = { ...this.currentState, filterType: filterType };
-    this.updateState(newState);
-    this.filterTypeSubject.next(filterType);
+  setFilterType(filter: FilterType): void {
+    this.filterTypeSubject.next(filter);
   }
 
-  public updateState(state: ChartCoordinationState): void {
-    this.stateSubject.next(state);
+  // Getters
+  get currentRegion(): string {
+    return this.regionSubject.value;
   }
 
-  // Utility methods
-  public resetToDefaults(): void {
-    this.updateState(this.initialState);
-    this.regionSubject.next(this.initialState.selectedRegion);
-    this.yearSubject.next(this.initialState.selectedYear);
-    this.groupingSubject.next(this.initialState.selectedGrouping);
-    this.displayModeSubject.next(this.initialState.displayMode);
-    this.filterTypeSubject.next(this.initialState.filterType);
+  get currentYear(): string {
+    return this.yearSubject.value;
   }
 
-  // Method to get display title for grouping
-  public getGroupingTitle(grouping: GroupingType): string {
-    switch (grouping) {
-      case GroupingType.HS2:
-        return 'HS2';
-      case GroupingType.HS4:
-        return 'HS4';
-      case GroupingType.NAICS2:
-        return 'NAICS2';
-      case GroupingType.NAICS4:
-        return 'NAICS4';
-      default:
-        return 'HS4';
+  get currentGrouping(): GroupingType {
+    return this.groupingSubject.value;
+  }
+
+  get currentDisplayMode(): DisplayMode {
+    return this.displayModeSubject.value;
+  }
+
+  get currentFilterType(): FilterType {
+    return this.filterTypeSubject.value;
+  }
+
+  // Convenience methods
+  isNaicsGrouping(): boolean {
+    // Assuming NAICS is represented by a specific GroupingType value
+    // Adjust based on your actual enum values
+    return this.currentGrouping === GroupingType.NAICS;
+  }
+
+  isHS2Grouping(): boolean {
+    return this.currentGrouping === GroupingType.HS2;
+  }
+
+  isHS4Grouping(): boolean {
+    return this.currentGrouping === GroupingType.HS4;
+  }
+
+  isHS6Grouping(): boolean {
+    return this.currentGrouping === GroupingType.HS6;
+  }
+
+  // Batch update method
+  updateState(partial: Partial<ChartCoordinationState>): void {
+    if (partial.selectedRegion !== undefined) {
+      this.setRegion(partial.selectedRegion);
+    }
+    if (partial.selectedYear !== undefined) {
+      this.setYear(partial.selectedYear);
+    }
+    if (partial.selectedGrouping !== undefined) {
+      this.setGrouping(partial.selectedGrouping);
+    }
+    if (partial.displayMode !== undefined) {
+      this.setDisplayMode(partial.displayMode);
+    }
+    if (partial.filterType !== undefined) {
+      this.setFilterType(partial.filterType);
     }
   }
 
-  // Method to check if grouping is NAICS-based
-  public isNaicsGrouping(grouping?: GroupingType): boolean {
-    const currentGrouping = grouping || this.currentGrouping;
-    return currentGrouping === GroupingType.NAICS2 || currentGrouping === GroupingType.NAICS4;
+  // Reset to defaults
+  reset(): void {
+    this.regionSubject.next('Alberta');
+    this.yearSubject.next('2023');
+    this.groupingSubject.next(GroupingType.HS2);
+    this.displayModeSubject.next(DisplayMode.DEFAULT);
+    this.filterTypeSubject.next(FilterType.ALL);
   }
 
-  // Method to check if grouping is aggregated (2-digit)
-  public isAggregatedGrouping(grouping?: GroupingType): boolean {
-    const currentGrouping = grouping || this.currentGrouping;
-    return currentGrouping === GroupingType.HS2 || currentGrouping === GroupingType.NAICS2;
-  }
-
-  // Method to convert string to GroupingType enum
-  public parseGroupingType(value: string): GroupingType {
-    switch (value.toLowerCase()) {
-      case 'hs2':
-        return GroupingType.HS2;
-      case 'hs4':
-        return GroupingType.HS4;
-      case 'naics2':
-        return GroupingType.NAICS2;
-      case 'naics4':
-        return GroupingType.NAICS4;
-      default:
-        return GroupingType.HS4;
-    }
-  }
-
-  // Method to convert string to DisplayMode enum
-  public parseDisplayMode(value: string): DisplayMode {
-    switch (value.toLowerCase()) {
-      case 'frontier':
-        return DisplayMode.FRONTIER;
-      case 'four_quads':
-        return DisplayMode.FOUR_QUADS;
-      default:
-        return DisplayMode.DEFAULT;
-    }
-  }
-
-  // Method to convert string to FilterType enum
-  public parseFilterType(value: string): FilterType {
-    const numValue = parseInt(value);
-    switch (numValue) {
-      case 1:
-        return FilterType.ALL;
-      case 2:
-        return FilterType.RCA_ABOVE_1;
-      case 3:
-        return FilterType.RCA_BETWEEN;
-      case 4:
-        return FilterType.FRONTIER;
-      default:
-        return FilterType.ALL;
-    }
+  // Get current state snapshot
+  getState(): ChartCoordinationState {
+    return {
+      selectedRegion: this.currentRegion,
+      selectedYear: this.currentYear,
+      selectedGrouping: this.currentGrouping,
+      displayMode: this.currentDisplayMode,
+      filterType: this.currentFilterType
+    };
   }
 }

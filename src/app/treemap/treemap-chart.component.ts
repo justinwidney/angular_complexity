@@ -179,6 +179,12 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
+  public refreshChart(): void {
+    console.log('🔄 Refreshing treemap chart');
+    this.loadData();
+  }
+
+
   /**
    * Load data using unified service - now uses dedicated treemap method
    */

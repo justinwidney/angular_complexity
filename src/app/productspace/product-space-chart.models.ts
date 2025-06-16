@@ -34,6 +34,7 @@ export interface GroupedData {
 export interface HSDescription {
   HS4: string;
   'HS4 Short Name': string;
+  'HS4 Description': string;
 }
 
 export interface RawNode {

@@ -1,11 +1,11 @@
-// fixed-unified-data.service.ts
+// enhanced-unified-data.service.ts
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of, forkJoin } from 'rxjs';
-import { map, tap, shareReplay, catchError } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of, forkJoin, combineLatest } from 'rxjs';
+import { map, tap, shareReplay, catchError, switchMap, distinctUntilChanged } from 'rxjs/operators';
 
-// Interfaces for the unified service
+// Interfaces remain the same
 export interface RawTradeData {
   Date: string;
   product: number;
@@ -17,25 +17,27 @@ export interface RawTradeData {
   rca?: number;
   eci?: number;
   cluster_name?: string;
-  // Add other properties as needed
 }
 
 export interface ProcessedDataCache {
   rawData: RawTradeData[];
-  unfilteredRawData: RawTradeData[]; // Store unfiltered data for overtime charts
+  unfilteredRawData: RawTradeData[];
   lastUpdated: Date;
   region: string;
+  year?: string; // Add year to cache key
 }
 
 export interface HSDescription {
   HS4: string;
   'HS4 Short Name': string;
+  'HS4 Description': string;
 }
 
 export interface DataFetchOptions {
-  includeHistoricalData?: boolean; // For overtime charts that need all years
-  filterThresholdDate?: Date; // Custom threshold date
-  skipDateFiltering?: boolean; // Completely skip date filtering
+  includeHistoricalData?: boolean;
+  filterThresholdDate?: Date;
+  skipDateFiltering?: boolean;
+  filterByYear?: string; // Add year filtering option
 }
 
 @Injectable({
@@ -54,36 +56,45 @@ export class UnifiedDataService {
     'Ontario': 'https://api.economicdata.alberta.ca/api/data?code=b36d2876-996c-4afc-a388-e743c215cd0d',
     'Prince Edward Island': 'https://api.economicdata.alberta.ca/api/data?code=c7f40018-09f6-4372-828b-135bce1a7a6a',
     'Quebec': 'https://api.economicdata.alberta.ca/api/data?code=412697ba-64c3-4263-ad33-240b7b451517',
-    'Saskatchewan': 'https://api.economicdata.alberta.ca/api/data?code=96b8107d-c8dd-4315-bb83-cca5a220f2f5'
+    'Saskatchewan': 'https://api.economicdata.alberta.ca/api/data?code=96b8107d-c8dd-4315-bb83-cca5a220f2f5',
+    'Canada': 'https://api.economicdata.alberta.ca/api/data?code=canada-data-code' // Add Canada endpoint if available
   };
 
-  // Cache for storing processed data by region
+  // Cache with region+year key
   private dataCache = new Map<string, ProcessedDataCache>();
   
   // Cache expiry time (in milliseconds) - 1 hour
   private readonly CACHE_EXPIRY = 60 * 60 * 1000;
   
-  // Threshold date for filtering recent data (for product space and ECI charts)
+  // Threshold date for filtering recent data
   private readonly thresholdDate = new Date("2021-01-01T00:00:00");
   
   // HS descriptions
-  private hsDescriptions: HSDescription[] = [
-    { HS4: "8518", "HS4 Short Name": "Electronic Equipment" },
-    { HS4: "8535", "HS4 Short Name": "Electrical Machinery" },
-    // Add your actual HS descriptions here
-  ];
+  private hsDescriptions: HSDescription[] = [];
 
   // Observable subjects for reactive data
   private currentRegionSubject = new BehaviorSubject<string>('Alberta');
+  private currentYearSubject = new BehaviorSubject<string>('2023');
   private loadingSubject = new BehaviorSubject<boolean>(false);
   private errorSubject = new BehaviorSubject<string | null>(null);
 
   public currentRegion$ = this.currentRegionSubject.asObservable();
+  public currentYear$ = this.currentYearSubject.asObservable();
   public loading$ = this.loadingSubject.asObservable();
   public error$ = this.errorSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  // Combined observable for region and year changes
+  public currentSelection$ = combineLatest([
+    this.currentRegion$.pipe(distinctUntilChanged()),
+    this.currentYear$.pipe(distinctUntilChanged())
+  ]).pipe(
+    map(([region, year]) => ({ region, year }))
+  );
 
+  constructor(private http: HttpClient) {
+  }
+
+ 
   /**
    * Set HS descriptions for data processing
    */
@@ -94,9 +105,17 @@ export class UnifiedDataService {
   /**
    * Set current region and trigger data loading if needed
    */
-  setCurrentRegion(region: keyof typeof this.apiMap): Observable<RawTradeData[]> {
+  setCurrentRegion(region: keyof typeof this.apiMap): void {
+    console.log(`📍 Setting current region to: ${region}`);
     this.currentRegionSubject.next(region);
-    return this.getRawData(region);
+  }
+
+  /**
+   * Set current year
+   */
+  setCurrentYear(year: string): void {
+    console.log(`📅 Setting current year to: ${year}`);
+    this.currentYearSubject.next(year);
   }
 
   /**
@@ -104,6 +123,20 @@ export class UnifiedDataService {
    */
   getCurrentRegion(): string {
     return this.currentRegionSubject.value;
+  }
+
+  /**
+   * Get current year
+   */
+  getCurrentYear(): string {
+    return this.currentYearSubject.value;
+  }
+
+  /**
+   * Generate cache key with region and year
+   */
+  private getCacheKey(region: string, year?: string): string {
+    return year ? `${region}-${year}` : region;
   }
 
   /**
@@ -115,13 +148,16 @@ export class UnifiedDataService {
   }
 
   /**
-   * Fetch raw data from API with caching (with date filtering for recent data)
+   * Fetch raw data from API with caching and year filtering
    */
   getRawData(region: keyof typeof this.apiMap, options?: DataFetchOptions): Observable<RawTradeData[]> {
+    const year = options?.filterByYear || this.getCurrentYear();
+    const cacheKey = this.getCacheKey(region, year);
+    
     // Check cache first
-    const cached = this.dataCache.get(region);
-    if (cached && this.isCacheValid(cached)) {
-      // Return appropriate data based on options
+    const cached = this.dataCache.get(cacheKey);
+    if (cached && this.isCacheValid(cached) && (!options?.includeHistoricalData)) {
+      console.log(`✅ Using cached data for ${region} (${year})`);
       if (options?.includeHistoricalData || options?.skipDateFiltering) {
         return of(cached.unfilteredRawData);
       } else {
@@ -133,15 +169,26 @@ export class UnifiedDataService {
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
 
+    console.log(`🔄 Fetching data for ${region} (${year}) from API...`);
+
     // Fetch from API
     return this.http.get<RawTradeData[]>(this.apiMap[region]).pipe(
       map(data => {
         console.log(`📋 Fetched ${data.length} total records from API for ${region}`);
         
         // Store unfiltered data
-        const unfilteredData = data;
+        let unfilteredData = data;
         
-        // Apply filtering based on options
+        // Apply year filtering if specified
+        if (options?.filterByYear) {
+          unfilteredData = data.filter(item => {
+            const itemYear = new Date(item.Date).getFullYear().toString();
+            return itemYear === options.filterByYear;
+          });
+          console.log(`📅 Filtered to ${unfilteredData.length} records for year ${options.filterByYear}`);
+        }
+        
+        // Apply additional filtering based on options
         let filteredData: RawTradeData[];
         
         if (options?.skipDateFiltering) {
@@ -151,18 +198,16 @@ export class UnifiedDataService {
         } else if (options?.filterThresholdDate) {
           filteredData = this.filterDataByDate(unfilteredData, options.filterThresholdDate);
         } else {
-          filteredData = this.filterRecentData(unfilteredData);
+          filteredData = (unfilteredData);
         }
 
-        const years = [...new Set(unfilteredData.map(d => new Date(d.Date).getFullYear()))].sort();
-        const filteredYears = [...new Set(filteredData.map(d => new Date(d.Date).getFullYear()))].sort();
-        
         // Cache both filtered and unfiltered data
-        this.dataCache.set(region, {
+        this.dataCache.set(cacheKey, {
           rawData: filteredData,
           unfilteredRawData: unfilteredData,
           lastUpdated: new Date(),
-          region
+          region,
+          year: options?.filterByYear
         });
         
         this.loadingSubject.next(false);
@@ -180,23 +225,18 @@ export class UnifiedDataService {
   }
 
   /**
-   * Get cached data for a region (synchronous)
+   * Get data for current region and year selections
    */
-  getCachedData(region: keyof typeof this.apiMap, includeHistorical: boolean = false): RawTradeData[] | null {
-    const cached = this.dataCache.get(region);
-    if (!cached || !this.isCacheValid(cached)) {
-      return null;
-    }
+  getCurrentSelectionData(options?: Omit<DataFetchOptions, 'filterByYear'>): Observable<RawTradeData[]> {
+    const region = this.getCurrentRegion();
+    const year = this.getCurrentYear();
     
-    return includeHistorical ? cached.unfilteredRawData : cached.rawData;
+    return this.getRawData(region as any, {
+      ...options,
+      filterByYear: year
+    });
   }
 
-  /**
-   * Filter data to only include records after threshold date
-   */
-  private filterRecentData(data: RawTradeData[]): RawTradeData[] {
-    return this.filterDataByDate(data, this.thresholdDate);
-  }
 
   /**
    * Filter data by custom date
@@ -209,32 +249,17 @@ export class UnifiedDataService {
   }
 
   /**
-   * Get most recent year from data
+   * Get processed data for Product Space Chart (uses current year)
    */
-  private getMostRecentYear(data: RawTradeData[]): number {
-    const years = data.map(d => new Date(d.Date).getFullYear());
-    return Math.max(...years);
-  }
-
-  /**
-   * Filter data to most recent year only
-   */
-  private filterToMostRecentYear(data: RawTradeData[]): RawTradeData[] {
-    const mostRecentYear = this.getMostRecentYear(data);
-    return data.filter(item => {
-      const itemYear = new Date(item.Date).getFullYear();
-      return itemYear === mostRecentYear;
-    });
-  }
-
-  /**
-   * Get processed data for Product Space Chart (uses recent data only)
-   */
-  getProductSpaceData(region: keyof typeof this.apiMap): Observable<{
+  getProductSpaceData(region?: keyof typeof this.apiMap): Observable<{
     groupedData: any[];
     totalSum: number;
+    year: string;
   }> {
-    return this.getRawData(region, { includeHistoricalData: false }).pipe(
+    const targetRegion = region || this.getCurrentRegion() as keyof typeof this.apiMap;
+    const year = this.getCurrentYear();
+    
+    return this.getRawData(targetRegion, { filterByYear: year }).pipe(
       map(rawData => {
         const processedData = rawData.map(d => {
           let description = this.hsDescriptions.find(x => x.HS4 === d.product.toString())?.['HS4 Short Name'] || 'Unknown';
@@ -251,23 +276,33 @@ export class UnifiedDataService {
 
         return {
           groupedData: processedData,
-          totalSum
+          totalSum,
+          year
         };
       })
     );
   }
 
   /**
-   * Get processed data for Feasible Chart (uses recent data only)
+   * Get processed data for Feasible Chart (uses current year)
    */
-  getFeasibleChartData(region: keyof typeof this.apiMap): Observable<{
+  getFeasibleChartData(region?: keyof typeof this.apiMap): Observable<{
     feasibleData: any[];
     rawData: RawTradeData[];
     eci: number;
     bounds: any;
+    year: string;
   }> {
-    return this.getRawData(region, { includeHistoricalData: false }).pipe(
+    const targetRegion = region || this.getCurrentRegion() as keyof typeof this.apiMap;
+    const year = this.getCurrentYear();
+
+    console.log('This year: for Feasible', year);
+    
+    return this.getRawData(targetRegion, { filterByYear: year }).pipe(
       map(rawData => {
+
+        console.log('Raw data for Feasible Chart:', rawData);
+
         // Process data similar to your feasible chart service
         const modifiedData = rawData.map(obj => {
           const hs2 = Math.floor(obj.product / 100);
@@ -300,36 +335,37 @@ export class UnifiedDataService {
           feasibleData: modifiedData,
           rawData,
           eci: rawData.length > 0 ? rawData[0].eci || 0 : 0,
-          bounds
+          bounds,
+          year
         };
       })
     );
   }
 
   /**
-   * Get processed data for Treemap Chart (uses most recent year only)
+   * Get processed data for Treemap Chart (uses current year)
    */
-  getTreemapData(region: keyof typeof this.apiMap): Observable<{
+  getTreemapData(region?: keyof typeof this.apiMap): Observable<{
     rawData: RawTradeData[];
     totalValue: number;
     mostRecentYear: number;
+    year: string;
     naicsCount: number;
   }> {
-    console.log(`🌳 Getting treemap data for ${region} (most recent year only)`);
+    const targetRegion = region || this.getCurrentRegion() as keyof typeof this.apiMap;
+    const year = this.getCurrentYear();
     
-    return this.getRawData(region, { includeHistoricalData: false }).pipe(
-      map(recentData => {
-        // Filter to most recent year only
-        const mostRecentYearData = this.filterToMostRecentYear(recentData);
-        const mostRecentYear = this.getMostRecentYear(recentData);
-        
-        // Filter out items without NAICS data (required for treemap)
-        const validTreemapData = mostRecentYearData.filter(item => 
+    console.log(`🌳 Getting treemap data for ${targetRegion} (${year})`);
+    
+    return this.getRawData(targetRegion, { filterByYear: year }).pipe(
+      map(yearData => {
+        // Filter out items without NAICS data
+        const validTreemapData = yearData.filter(item => 
           item.naics && 
           item.naics_description && 
           item.Value !== undefined && 
           item.Value !== null && 
-          item.Value > 0  // Only include items with positive values
+          item.Value > 0
         );
 
         // Calculate total value
@@ -339,12 +375,13 @@ export class UnifiedDataService {
         const uniqueNaics = new Set(validTreemapData.map(item => item.naics));
         const naicsCount = uniqueNaics.size;
 
-        console.log(`🌳 Treemap data processed: ${validTreemapData.length} items, ${naicsCount} NAICS categories, year ${mostRecentYear}`);
+        console.log(`🌳 Treemap data: ${validTreemapData.length} items, ${naicsCount} NAICS categories`);
 
         return {
           rawData: validTreemapData,
           totalValue,
-          mostRecentYear,
+          mostRecentYear: parseInt(year),
+          year,
           naicsCount
         };
       })
@@ -352,29 +389,47 @@ export class UnifiedDataService {
   }
 
   /**
-   * Get processed data for Overtime Chart (uses ALL historical data)
+   * Get processed data for Overtime Chart (shows ALL years for current region)
    */
-  getOvertimeChartData(region: keyof typeof this.apiMap): Observable<{
+  getOvertimeChartData(region?: keyof typeof this.apiMap): Observable<{
     groupedByYear: any[];
     chartData: any[];
     rawData: RawTradeData[];
+    region: string;
   }> {
-    console.log(`🕐 Getting overtime chart data for ${region} with historical data`);
+    const targetRegion = region || this.getCurrentRegion() as keyof typeof this.apiMap;
     
-    return this.getRawData(region, { includeHistoricalData: true }).pipe(
+    console.log(`🕐 Getting overtime chart data for ${targetRegion} (all years)`);
+    
+    return this.getRawData(targetRegion, { includeHistoricalData: true }).pipe(
       map(rawData => {
-        
         const years = [...new Set(rawData.map(d => new Date(d.Date).getFullYear()))].sort();
+        console.log(`🕐 Found data for years: ${years.join(', ')}`);
 
-        // Group by year and category (similar to your overtime service)
+        // Group by year and category
         const groupedByYear = this.groupByYearAndCategory(rawData);
         const chartData = this.transformDataByDate(groupedByYear);
 
         return {
           groupedByYear,
           chartData,
-          rawData
+          rawData,
+          region: targetRegion
         };
+      })
+    );
+  }
+
+  /**
+   * Get available years for a specific region
+   */
+  getAvailableYears(region?: keyof typeof this.apiMap): Observable<string[]> {
+    const targetRegion = region || this.getCurrentRegion() as keyof typeof this.apiMap;
+    
+    return this.getRawData(targetRegion, { includeHistoricalData: true }).pipe(
+      map(data => {
+        const years = [...new Set(data.map(d => new Date(d.Date).getFullYear().toString()))];
+        return years.sort().reverse(); // Most recent first
       })
     );
   }
@@ -446,6 +501,62 @@ export class UnifiedDataService {
   }
 
   /**
+   * Clear cache for a specific region or all regions
+   */
+  clearCache(region?: keyof typeof this.apiMap, year?: string): void {
+    if (region) {
+      if (year) {
+        const cacheKey = this.getCacheKey(region, year);
+        this.dataCache.delete(cacheKey);
+        console.log(`🗑️ Cache cleared for ${region} (${year})`);
+      } else {
+        // Clear all year caches for this region
+        Array.from(this.dataCache.keys())
+          .filter(key => key.startsWith(region))
+          .forEach(key => this.dataCache.delete(key));
+        console.log(`🗑️ All cache cleared for ${region}`);
+      }
+    } else {
+      this.dataCache.clear();
+      console.log(`🗑️ All cache cleared`);
+    }
+  }
+
+  /**
+   * Get cache status for all regions and years
+   */
+  getCacheStatus(): { region: string; year?: string; cached: boolean; lastUpdated?: Date; recordCount?: number }[] {
+    const status: { region: string; year?: string; cached: boolean; lastUpdated?: Date; recordCount?: number }[] = [];
+    
+    this.dataCache.forEach((cache, key) => {
+      status.push({
+        region: cache.region,
+        year: cache.year,
+        cached: this.isCacheValid(cache),
+        lastUpdated: cache.lastUpdated,
+        recordCount: cache.rawData?.length
+      });
+    });
+    
+    return status;
+  }
+
+  /**
+   * Get cached data for a region (synchronous)
+   */
+  getCachedData(region: keyof typeof this.apiMap, includeHistorical: boolean = false): RawTradeData[] | null {
+    const year = this.getCurrentYear();
+    const cacheKey = this.getCacheKey(region, year);
+    const cached = this.dataCache.get(cacheKey);
+    
+    if (!cached || !this.isCacheValid(cached)) {
+      return null;
+    }
+    
+    return includeHistorical ? cached.unfilteredRawData : cached.rawData;
+  }
+
+  /**
    * Find data by product ID
    */
   findDataByProduct(data: RawTradeData[], productId: string): RawTradeData | undefined {
@@ -460,26 +571,6 @@ export class UnifiedDataService {
   }
 
   /**
-   * Get all available regions
-   */
-  getAvailableRegions(): string[] {
-    return Object.keys(this.apiMap);
-  }
-
-  /**
-   * Clear cache for a specific region or all regions
-   */
-  clearCache(region?: keyof typeof this.apiMap): void {
-    if (region) {
-      this.dataCache.delete(region);
-      console.log(`🗑️ Cache cleared for ${region}`);
-    } else {
-      this.dataCache.clear();
-      console.log(`🗑️ All cache cleared`);
-    }
-  }
-
-  /**
    * Preload data for multiple regions
    */
   preloadRegions(regions: (keyof typeof this.apiMap)[], includeHistorical: boolean = false): Observable<any> {
@@ -490,18 +581,9 @@ export class UnifiedDataService {
   }
 
   /**
-   * Get cache status for all regions
+   * Get all available regions
    */
-  getCacheStatus(): { region: string; cached: boolean; lastUpdated?: Date; recordCount?: number; historicalRecordCount?: number }[] {
-    return Object.keys(this.apiMap).map(region => {
-      const cached = this.dataCache.get(region);
-      return {
-        region,
-        cached: cached ? this.isCacheValid(cached) : false,
-        lastUpdated: cached?.lastUpdated,
-        recordCount: cached?.rawData?.length,
-        historicalRecordCount: cached?.unfilteredRawData?.length
-      };
-    });
+  getAvailableRegions(): string[] {
+    return Object.keys(this.apiMap);
   }
 }

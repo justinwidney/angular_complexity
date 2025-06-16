@@ -24,7 +24,7 @@ export class ECIChartUtils {
         left: 60
       },
       width: 1440,
-      height: 650,
+      height: 700,
       colors: [...d3.schemeCategory10],
       defaultPadding: 0.05,
       strokeWidth: 3,
@@ -151,7 +151,7 @@ export class ECIChartUtils {
 
     // X Axis
     const xAxis = svg.append("g")
-      .attr("transform", `translate(${config.margin.left}, ${dimensions.height + config.margin.top})`)
+      .attr("transform", `translate(${config.margin.left}, ${dimensions.height - 80})`)
       .call(d3.axisBottom(scales.x).ticks(11).tickFormat(d3.format("d")));
 
     return { xAxis, yAxis };
