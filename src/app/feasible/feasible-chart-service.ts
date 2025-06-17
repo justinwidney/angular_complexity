@@ -16,7 +16,6 @@ import {
 })
 export class FeasibleChartService {
 
-  private baseUrl = '/api'; // Adjust to your API base URL
 
   constructor(private http: HttpClient) {}
 

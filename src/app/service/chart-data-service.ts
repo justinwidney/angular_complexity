@@ -270,8 +270,10 @@ export class UnifiedDataService {
           };
         });
 
+        console.log('Processed data for Product Space Chart:', processedData);
+
         const totalSum = processedData.reduce((acc, curr) => {
-          return acc + (typeof curr.Value === "number" ? curr.Value : 0);
+          return acc + (typeof curr.Value === "number" ? curr.Value : Number(curr.Value));
         }, 0);
 
         return {

@@ -148,7 +148,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .pipe(takeUntil(this.destroy$))
       .subscribe(grouping => {
         this.currentGrouping = grouping;
-        //this.refreshData();
+        this.loadData();
       });
 
     // Subscribe to display mode changes
@@ -156,7 +156,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .pipe(takeUntil(this.destroy$))
       .subscribe(displayMode => {
         this.currentDisplayMode = displayMode;
-        //this.updateDisplayMode();
+        this.updateDisplayMode();
       });
 
     // Subscribe to filter type changes
@@ -401,6 +401,14 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private updateDisplayMode(): void {
+
+    
+    try{
+      this.svg.select('g').selectAll("rect").remove();
+    }
+    catch{
+    }
+
     switch (this.currentDisplayMode) {
       case DisplayMode.FRONTIER:
         this.displayFrontier();

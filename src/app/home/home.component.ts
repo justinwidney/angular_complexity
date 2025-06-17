@@ -73,7 +73,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Current selections
   currentRegion: string = 'Alberta';
   currentYear: string = '2022';
-  currentGrouping: GroupingType = GroupingType.HS2;
+  currentGrouping: GroupingType = GroupingType.HS4;
   currentDisplayMode: DisplayMode = DisplayMode.DEFAULT;
   currentFilterType: FilterType = FilterType.ALL;
 
@@ -87,6 +87,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Dashboard stats
   totalValue: string = '$0';
   productCount: number = 0;
+
+  currentDisplayFilter: 'default' | 'frontier' | 'quadrants' = 'default';
 
   private destroy$ = new Subject<void>();
   private selectionChange$ = new Subject<{type: string, value: string}>();
@@ -439,4 +441,48 @@ export class HomeComponent implements OnInit, OnDestroy {
         return 'HS2';
     }
   }
+
+  onFilterChange(filterType: 'default' | 'frontier' | 'quadrants'): void {
+    console.log('Filter changed to:', filterType);
+    
+    this.currentDisplayFilter = filterType;
+    
+    // Convert filter type to display mode for coordination service
+    let displayMode: DisplayMode;
+    
+    switch (filterType) {
+      case 'frontier':
+        displayMode = DisplayMode.FRONTIER;
+        break;
+      case 'quadrants':
+        displayMode = DisplayMode.FOUR_QUADS;
+        break;
+      default:
+        displayMode = DisplayMode.DEFAULT;
+        break;
+    }
+    
+    // Broadcast the display mode change to all components
+    this.coordinationService.setDisplayMode(displayMode);
+    
+    // Apply specific filters based on chart type
+    this.applyChartSpecificFilters(filterType);
+  }
+
+  private applyChartSpecificFilters(filterType: string): void {
+    switch (this.selectedChartType) {
+      case 'Feasible':
+        break;
+      case 'ProductSpace':
+        break;
+      case 'Trends':
+        break;
+      case 'Exports':
+        break;
+      case 'ECI':
+        break;
+    }
+  }
+
+
 }

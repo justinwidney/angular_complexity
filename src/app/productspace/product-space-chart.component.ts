@@ -90,8 +90,6 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
     this.colorScale = ProductSpaceChartUtils.getColorScale();
     this.radiusScale = ProductSpaceChartUtils.getRadiusScale();
 
-    console.log("Radius Scale:", this.radiusScale);
-
     // Setup transform and zoom
     this.transform = d3.zoomIdentity
       .translate(config.transform.x, config.transform.y)
@@ -151,26 +149,21 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
  private renderNodes(): void {
-  // 1. grab the <g> container once
   const svgGroup = d3.select<SVGGElement, unknown>("svg g");
 
-  // 2. bind data by a stable key (d.id) so update/exit work predictably
   const nodesSel = svgGroup.selectAll<SVGCircleElement, Node>(".node")
     .data(this.nodes, (d: Node) => d.id);
 
-  // 3. EXIT: remove any circles no longer in data
   nodesSel.exit()
     .transition()
       .duration(500)
       .style("opacity", 0)
     .remove();
 
-  // 4. ENTER: create new circles for any new nodes
   const enterSel = nodesSel.enter()
     .append("circle")
       .attr("class", "node")
       .style("stroke", "black")
-      // set up mouse handlers once
       .on("mouseover", (event, d) => this.handleMouseover(event, d))
       .on("mousemove", (event, d) => this.handleMousemove(event, d))
       .on("mouseout",  (event, d) => this.handleMouseleave(event, d))
@@ -242,7 +235,6 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private handleMouseover(event: any, d: Node): void {
-    // Implement your mouseover logic here
     console.log('Mouseover on node:', d);
   }
 

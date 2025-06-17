@@ -177,3 +177,71 @@
   // Animation when appearing
   animation: slideInFromRight 0.3s ease-out;
 }
+
+/* Filter buttons styling */
+.filter-buttons-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.filter-button-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-button-group goa-button {
+  min-width: 100px;
+  transition: all 0.2s ease-in-out;
+}
+
+.filter-button-group goa-button[variant="primary"] {
+  background-color: var(--goa-color-primary);
+  color: white;
+  font-weight: 600;
+}
+
+.filter-button-group goa-button[variant="secondary"] {
+  background-color: var(--goa-color-white);
+  border: 1px solid var(--goa-color-border);
+  color: var(--goa-color-text-secondary);
+}
+
+.filter-button-group goa-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-button-group goa-button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .filter-button-group {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .filter-button-group goa-button {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+/* Active filter indicator */
+.filter-button-group goa-button[variant="primary"]::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 2px solid var(--goa-color-primary);
+  border-radius: inherit;
+  opacity: 0.5;
+}

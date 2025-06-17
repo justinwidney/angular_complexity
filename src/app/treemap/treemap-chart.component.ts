@@ -224,6 +224,7 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
+
       // Group by NAICS (equivalent to your groupBy function)
       const groupedData = TreemapChartUtils.groupByNaics(rawData);
       const hierarchyRoot = TreemapChartUtils.createTreemapHierarchy(groupedData);

@@ -75,9 +75,11 @@
                     (_change)="onChange($event, 'grouping')"
                     [disabled]="isLoadingData"
                   >
-                    <goa-dropdown-item value="HS2" label="HS 2 Digits"></goa-dropdown-item>
-                    <goa-dropdown-item value="HS4" label="HS 4 Digits"></goa-dropdown-item>
-                    <goa-dropdown-item value="HS6" label="HS 6 Digits"></goa-dropdown-item>
+                    <goa-dropdown-item value="HS2" label="HS 2"></goa-dropdown-item>
+                    <goa-dropdown-item value="HS4" label="HS 4"></goa-dropdown-item>
+                    <goa-dropdown-item value="NAICS2" label="NAICS 2"></goa-dropdown-item>
+                    <goa-dropdown-item value="NAICS4" label="NAICS 4"></goa-dropdown-item>
+
                   </goa-dropdown>
                 </goa-form-item>
               </div>
@@ -134,16 +136,47 @@
 
       <div class="col">
         <goa-text mt="none" mb="none" as="h5">
-          Number of Products: {{productCount | number}}
+         Products: {{productCount | number}}
         </goa-text>
       </div>
 
-      <div class="col">
-        <goa-button type="secondary" size="compact" (_click)="clearDataCache()" [disabled]="isLoadingData">
-          <goa-icon name="refresh" slot="prefix"></goa-icon>
-          Refresh
-        </goa-button>
-      </div>
+        <div class="col">
+          <div class="filter-buttons-wrapper">
+            <goa-form-item label="Filters" labelSize="small">
+              <div class="filter-button-group">
+                <goa-button 
+                  type="secondary" 
+                  size="compact" 
+                  [variant]="currentDisplayFilter === 'default' ? 'primary' : 'secondary'"
+                  (_click)="onFilterChange('default')" 
+                  [disabled]="isLoadingData">
+                  <goa-icon name="view-grid" slot="prefix"></goa-icon>
+                  All
+                </goa-button>
+                
+                <goa-button 
+                  type="secondary" 
+                  size="compact" 
+                  [variant]="currentDisplayFilter === 'frontier' ? 'primary' : 'secondary'"
+                  (_click)="onFilterChange('frontier')" 
+                  [disabled]="isLoadingData">
+                  <goa-icon name="trending-up" slot="prefix"></goa-icon>
+                  Frontier
+                </goa-button>
+                
+                <goa-button 
+                  type="secondary" 
+                  size="compact" 
+                  [variant]="currentDisplayFilter === 'quadrants' ? 'primary' : 'secondary'"
+                  (_click)="onFilterChange('quadrants')" 
+                  [disabled]="isLoadingData">
+                  <goa-icon name="view-module" slot="prefix"></goa-icon>
+                  Quads
+                </goa-button>
+              </div>
+            </goa-form-item>
+          </div>
+        </div>
 
       <div class="col">
         <goa-input name="search" type="search" placeholder="Search products..." width="200px"></goa-input>
@@ -200,29 +233,7 @@
       </div>
     </div>
 
-    <!-- Optional: Chart Statistics -->
-    <div class="row" *ngIf="chartStats && selectedChartType === 'ProductSpace'">
-      <div class="col-12">
-        <div class="card mt-3">
-          <div class="card-body">
-            <div class="row text-center">
-              <div class="col-md-4">
-                <h6>Total Value</h6>
-                <p class="h5">{{chartStats.totalSum | number}}</p>
-              </div>
-              <div class="col-md-4">
-                <h6>Products</h6>
-                <p class="h5">{{chartStats.nodeCount}}</p>
-              </div>
-              <div class="col-md-4">
-                <h6>Data Points</h6>
-                <p class="h5">{{chartStats.dataCount}}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+
 
     <div class="row" *ngIf="selectedChartType === 'Feasible'">
       <div class="col-12">
