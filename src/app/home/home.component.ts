@@ -3,19 +3,15 @@ import { Router } from '@angular/router';
 import { ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { CommonModule } from '@angular/common';
-import { FilterSection } from './types';
-import { ChartComponent } from '../chart/chart.component';
 import { ChartSignalService } from '../chart/chart.service';
 import { FilterService } from '../filter/filter.service';
-import { AccordionFiltersComponent } from '../filter/accordian-fitlers.component';
-import { ChipListComponent } from '../filter/chip-list.component';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ProductSpaceChartComponent } from '../productspace/product-space-chart.component';
 import { DisplayMode, FeasibleEventData, FilterType, GroupingType } from '../feasible/feasible-chart-model';
 import { ChartCoordinationService } from '../service/chart-coordination.service';
 import { UnifiedDataService } from '../service/chart-data-service';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged, filter } from 'rxjs';
 import { FeasibleChartComponent } from '../feasible/feasible-chart.component';
 import { OvertimeChartComponent } from '../timeChart/overtime-chart.component';
 import { ECIChartComponent } from '../eci/eci-chart.component';
@@ -88,7 +84,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   totalValue: string = '$0';
   productCount: number = 0;
 
+  // Search properties
+  currentSearchQuery: string = '';
+  searchResultsCount: number = 0;
+  searchResults: any[] = [];
+
+
   currentDisplayFilter: 'default' | 'frontier' | 'quadrants' = 'default';
+  filterType : FilterType = FilterType.ALL;
 
   private destroy$ = new Subject<void>();
   private selectionChange$ = new Subject<{type: string, value: string}>();
@@ -145,6 +148,24 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private subscribeToServices(): void {
+
+
+    this.coordinationService.searchQuery$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(query => {
+        console.log('Home component received search query:', query);
+        this.currentSearchQuery = query;
+      });
+
+    // Subscribe to search results
+    this.coordinationService.searchResults$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(results => {
+        console.log('Home component received search results:', results);
+        this.searchResults = results;
+        this.searchResultsCount = results.length;
+      });
+
     // Subscribe to coordination service state
     this.coordinationService.state$
       .pipe(takeUntil(this.destroy$))
@@ -442,31 +463,38 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFilterChange(filterType: 'default' | 'frontier' | 'quadrants'): void {
-    console.log('Filter changed to:', filterType);
+  onFilterChange(e : Event): void {
     
-    this.currentDisplayFilter = filterType;
+    this.currentDisplayFilter =  (e as CustomEvent).detail.value;
+
+    console.log((e as CustomEvent).detail.value)
     
-    // Convert filter type to display mode for coordination service
-    let displayMode: DisplayMode;
-    
-    switch (filterType) {
+    switch ((e as CustomEvent).detail.value) {
       case 'frontier':
-        displayMode = DisplayMode.FRONTIER;
         break;
       case 'quadrants':
-        displayMode = DisplayMode.FOUR_QUADS;
+        break;
+      case 'advantage':
+        this.filterType = FilterType.RCA_ABOVE_1;
+        break;
+      case 'feasible':
+        this.filterType = FilterType.RCA_BETWEEN;
+        break;
+      case 'default':
+        this.filterType = FilterType.ALL;
         break;
       default:
-        displayMode = DisplayMode.DEFAULT;
         break;
     }
+
+
     
     // Broadcast the display mode change to all components
-    this.coordinationService.setDisplayMode(displayMode);
+    this.coordinationService.setDisplayMode(this.currentDisplayFilter as DisplayMode);
+    this.coordinationService.setFilterType(this.filterType);
     
     // Apply specific filters based on chart type
-    this.applyChartSpecificFilters(filterType);
+    this.applyChartSpecificFilters((e as CustomEvent).detail.value);
   }
 
   private applyChartSpecificFilters(filterType: string): void {
@@ -484,5 +512,22 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
+    // Search event handlers
+  onSearchInput(event: any): void {
+    // Handle real-time input (as user types)
+    const query = event.target?.value || event.detail?.value || '';
+    console.log('Search input:', query);
+    
+    // Debouncing is handled by the coordination service
+    this.coordinationService.setSearchQuery(query);
+  }
+
+  onSearchChange(event: any): void {
+    // Handle search change (when user finishes typing or presses enter)
+    const query = event.target?.value || event.detail?.value || '';
+    console.log('Search change:', query);
+    
+    this.coordinationService.setSearchQuery(query);
+  }
 
 }

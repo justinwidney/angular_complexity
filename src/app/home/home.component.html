@@ -140,46 +140,57 @@
         </goa-text>
       </div>
 
-        <div class="col">
+        <div class="col" *ngIf=" selectedChartType === 'Feasible' ">
           <div class="filter-buttons-wrapper">
-            <goa-form-item label="Filters" labelSize="small">
-              <div class="filter-button-group">
-                <goa-button 
-                  type="secondary" 
-                  size="compact" 
-                  [variant]="currentDisplayFilter === 'default' ? 'primary' : 'secondary'"
-                  (_click)="onFilterChange('default')" 
-                  [disabled]="isLoadingData">
-                  <goa-icon name="view-grid" slot="prefix"></goa-icon>
-                  All
-                </goa-button>
-                
-                <goa-button 
-                  type="secondary" 
-                  size="compact" 
-                  [variant]="currentDisplayFilter === 'frontier' ? 'primary' : 'secondary'"
-                  (_click)="onFilterChange('frontier')" 
-                  [disabled]="isLoadingData">
-                  <goa-icon name="trending-up" slot="prefix"></goa-icon>
-                  Frontier
-                </goa-button>
-                
-                <goa-button 
-                  type="secondary" 
-                  size="compact" 
-                  [variant]="currentDisplayFilter === 'quadrants' ? 'primary' : 'secondary'"
-                  (_click)="onFilterChange('quadrants')" 
-                  [disabled]="isLoadingData">
-                  <goa-icon name="view-module" slot="prefix"></goa-icon>
-                  Quads
-                </goa-button>
-              </div>
-            </goa-form-item>
+                <form>
+                <goa-form-item >
+                  <goa-radio-group 
+                    orientation="horizontal" 
+                    name="displayFilter" 
+                    [value]="currentDisplayFilter" 
+                    (_change)="onFilterChange($event)"
+                    >
+                    <goa-radio-item value="default" label="All Data"></goa-radio-item>
+                    <goa-radio-item value="frontier" label="Frontier"></goa-radio-item>
+                    <goa-radio-item value="quadrants" label="Quadrants"></goa-radio-item>
+                  </goa-radio-group>
+                </goa-form-item>
+              </form>
+          </div>
+        </div>
+
+      <div class="col" *ngIf=" selectedChartType === 'ProductSpace' ">
+          <div class="filter-buttons-wrapper">
+                <form>
+                <goa-form-item >
+                  <goa-radio-group 
+                    orientation="horizontal" 
+                    name="displayFilter" 
+                    [value]="currentDisplayFilter" 
+                    (_change)="onFilterChange($event)"
+                    >
+                    <goa-radio-item value="default" label="All Data"></goa-radio-item>
+                    <goa-radio-item value="advantage" label="Advantage"></goa-radio-item>
+                    <goa-radio-item value="feasible" label="Feasible"></goa-radio-item>
+                  </goa-radio-group>
+                </goa-form-item>
+              </form>
           </div>
         </div>
 
       <div class="col">
-        <goa-input name="search" type="search" placeholder="Search products..." width="200px"></goa-input>
+       <goa-form-item >
+          <goa-input 
+            name="search" 
+            type="search" 
+            placeholder="Search products..." 
+            width="200px"
+            [value]="currentSearchQuery"
+            (_input)="onSearchInput($event)"
+            (_change)="onSearchChange($event)">
+            <goa-icon name="search" slot="prefix"></goa-icon>
+          </goa-input>
+      </goa-form-item>
       </div>
     </div>
 

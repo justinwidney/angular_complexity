@@ -2,7 +2,7 @@
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { map, distinctUntilChanged } from 'rxjs/operators';
+import { map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
 import { DisplayMode, FilterType, GroupingType } from '../feasible/feasible-chart-model';
 
 export interface ChartCoordinationState {
@@ -11,6 +11,8 @@ export interface ChartCoordinationState {
   selectedGrouping: GroupingType;
   displayMode: DisplayMode;
   filterType: FilterType;
+  searchQuery: string;
+  searchResults: any[];
 }
 
 @Injectable({
@@ -25,6 +27,10 @@ export class ChartCoordinationService {
   private displayModeSubject = new BehaviorSubject<DisplayMode>(DisplayMode.DEFAULT);
   private filterTypeSubject = new BehaviorSubject<FilterType>(FilterType.ALL);
   
+  // Search state subjects
+  private searchQuerySubject = new BehaviorSubject<string>('');
+  private searchResultsSubject = new BehaviorSubject<any[]>([]);
+  
   // Public observables
   public region$ = this.regionSubject.asObservable().pipe(distinctUntilChanged());
   public year$ = this.yearSubject.asObservable().pipe(distinctUntilChanged());
@@ -32,20 +38,31 @@ export class ChartCoordinationService {
   public displayMode$ = this.displayModeSubject.asObservable().pipe(distinctUntilChanged());
   public filterType$ = this.filterTypeSubject.asObservable().pipe(distinctUntilChanged());
   
+  // Search observables
+  public searchQuery$ = this.searchQuerySubject.asObservable().pipe(
+    distinctUntilChanged(),
+    debounceTime(300) // Debounce search queries for performance
+  );
+  public searchResults$ = this.searchResultsSubject.asObservable().pipe(distinctUntilChanged());
+  
   // Combined state observable
   public state$: Observable<ChartCoordinationState> = combineLatest([
     this.region$,
     this.year$,
     this.grouping$,
     this.displayMode$,
-    this.filterType$
+    this.filterType$,
+    this.searchQuery$,
+    this.searchResults$
   ]).pipe(
-    map(([selectedRegion, selectedYear, selectedGrouping, displayMode, filterType]) => ({
+    map(([selectedRegion, selectedYear, selectedGrouping, displayMode, filterType, searchQuery, searchResults]) => ({
       selectedRegion,
       selectedYear,
       selectedGrouping,
       displayMode,
-      filterType
+      filterType,
+      searchQuery,
+      searchResults
     })),
     distinctUntilChanged((prev, curr) => 
       JSON.stringify(prev) === JSON.stringify(curr)
@@ -59,6 +76,15 @@ export class ChartCoordinationService {
         console.log('📊 Chart Coordination State Changed:', state);
       });
     }
+
+    // Subscribe to search query changes to perform search
+    this.searchQuery$.subscribe(query => {
+      if (query.trim()) {
+        this.performSearch(query);
+      } else {
+        this.clearSearchResults();
+      }
+    });
   }
 
   // Setters
@@ -79,7 +105,30 @@ export class ChartCoordinationService {
   }
 
   setFilterType(filter: FilterType): void {
+
+    console.log('Setting filter type:', filter);
+
     this.filterTypeSubject.next(filter);
+  }
+
+  // Search methods
+  setSearchQuery(query: string): void {
+    console.log('Setting search query:', query);
+    this.searchQuerySubject.next(query);
+  }
+
+  setSearchResults(results: any[]): void {
+    console.log('Setting search results:', results);
+    this.searchResultsSubject.next(results);
+  }
+
+  clearSearch(): void {
+    this.searchQuerySubject.next('');
+    this.searchResultsSubject.next([]);
+  }
+
+  clearSearchResults(): void {
+    this.searchResultsSubject.next([]);
   }
 
   // Getters
@@ -103,10 +152,16 @@ export class ChartCoordinationService {
     return this.filterTypeSubject.value;
   }
 
+  get currentSearchQuery(): string {
+    return this.searchQuerySubject.value;
+  }
+
+  get currentSearchResults(): any[] {
+    return this.searchResultsSubject.value;
+  }
+
   // Convenience methods
   isNaicsGrouping(): boolean {
-    // Assuming NAICS is represented by a specific GroupingType value
-    // Adjust based on your actual enum values
     return this.currentGrouping === GroupingType.NAICS;
   }
 
@@ -120,6 +175,69 @@ export class ChartCoordinationService {
 
   isHS6Grouping(): boolean {
     return this.currentGrouping === GroupingType.HS6;
+  }
+
+  isSearchActive(): boolean {
+    return this.currentSearchQuery.trim().length > 0;
+  }
+
+  // Search functionality
+  private performSearch(query: string): void {
+    // This method will be called when search query changes
+    // The actual search logic will be handled by individual chart components
+    // but we can store common search results here if needed
+    console.log('Performing search for:', query);
+  }
+
+  // Search helper methods
+  searchInData(data: any[], query: string, searchFields: string[] = ['description']): any[] {
+    if (!query.trim()) {
+      return data;
+    }
+
+    const lowercaseQuery = query.toLowerCase().trim();
+    
+    return data.filter(item => {
+      return searchFields.some(field => {
+        const fieldValue = item[field];
+        if (typeof fieldValue === 'string') {
+          return fieldValue.toLowerCase().includes(lowercaseQuery);
+        }
+        if (typeof fieldValue === 'number') {
+          return fieldValue.toString().includes(lowercaseQuery);
+        }
+        return false;
+      });
+    });
+  }
+
+  // Create search suggestions/autocomplete data
+  getSearchSuggestions(data: any[], maxSuggestions: number = 10): string[] {
+    const suggestions = new Set<string>();
+    
+    data.forEach(item => {
+      if (item.description && suggestions.size < maxSuggestions) {
+        suggestions.add(item.description);
+      }
+    });
+    
+    return Array.from(suggestions).slice(0, maxSuggestions);
+  }
+
+  // Get unique product names for search dropdown
+  getUniqueProductNames(data: any[]): Array<{id: string, text: string}> {
+    const uniqueNames = new Map<string, string>();
+    
+    data.forEach(item => {
+      if (item.description && !uniqueNames.has(item.description)) {
+        uniqueNames.set(item.description, item.product?.toString() || item.id?.toString() || '');
+      }
+    });
+    
+    return Array.from(uniqueNames.entries()).map(([text, id]) => ({
+      id,
+      text
+    }));
   }
 
   // Batch update method
@@ -139,6 +257,12 @@ export class ChartCoordinationService {
     if (partial.filterType !== undefined) {
       this.setFilterType(partial.filterType);
     }
+    if (partial.searchQuery !== undefined) {
+      this.setSearchQuery(partial.searchQuery);
+    }
+    if (partial.searchResults !== undefined) {
+      this.setSearchResults(partial.searchResults);
+    }
   }
 
   // Reset to defaults
@@ -148,6 +272,8 @@ export class ChartCoordinationService {
     this.groupingSubject.next(GroupingType.HS2);
     this.displayModeSubject.next(DisplayMode.DEFAULT);
     this.filterTypeSubject.next(FilterType.ALL);
+    this.searchQuerySubject.next('');
+    this.searchResultsSubject.next([]);
   }
 
   // Get current state snapshot
@@ -157,7 +283,9 @@ export class ChartCoordinationService {
       selectedYear: this.currentYear,
       selectedGrouping: this.currentGrouping,
       displayMode: this.currentDisplayMode,
-      filterType: this.currentFilterType
+      filterType: this.currentFilterType,
+      searchQuery: this.currentSearchQuery,
+      searchResults: this.currentSearchResults
     };
   }
 }

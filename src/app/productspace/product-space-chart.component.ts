@@ -1,13 +1,16 @@
+import { distinctUntilChanged, filter, skip } from 'rxjs';
 // product-space-chart.component.ts
 
 interface TooltipDatum { x: number; y: number; }
 
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import * as d3 from 'd3';
 import { ProductSpaceChartService } from './product-space-chart-service';
 import { ProductSpaceChartUtils } from './product-space-chart-utils';
+import { ChartCoordinationService } from '../service/chart-coordination.service';
 import { Link, Node, GroupedData , GroupLabel} from './product-space-chart.models';
-import { forkJoin } from 'rxjs';
+import { FilterType } from '../feasible/feasible-chart-model';
 
 @Component({
   selector: 'app-product-space-chart',
@@ -28,9 +31,9 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   @Output() rowHighlight = new EventEmitter<number>();
   @Output() chartDataLoaded = new EventEmitter<{totalSum: number, nodeCount: number, dataCount: number}>();
 
+  private destroy$ = new Subject<void>();
   private svg: any;
   private zoomable: any;
-  private tooltip: any;
   private links: Link[] = [];
   private nodes: Node[] = [];
   private grouped: GroupedData[] = [];
@@ -41,10 +44,18 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   private zoom: any;
   private transform: any;
   private clickMeGroup: any;
+  private filterType: FilterType = FilterType.ALL;
+  // Search state
+  private currentSearchQuery: string = '';
+  private searchResults: GroupedData[] = [];
 
-  constructor(private chartService: ProductSpaceChartService) {}
+  constructor(
+    private chartService: ProductSpaceChartService,
+    private coordinationService: ChartCoordinationService
+  ) {}
 
   ngOnInit(): void {
+    this.subscribeToCoordinationService();
     this.loadData();
   }
 
@@ -53,6 +64,8 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
 
     if (this.svg) {
       this.svg.remove();
@@ -61,27 +74,68 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
     d3.selectAll('.tooltip').remove();
   }
 
+  private subscribeToCoordinationService(): void {
+    // Subscribe to search query changes
+    this.coordinationService.searchQuery$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(query => {
+        console.log('Product space chart received search query:', query);
+        this.currentSearchQuery = query;
+        this.performSearch(query);
+      });
+
+    // Subscribe to other coordination service changes
+    this.coordinationService.region$
+      .pipe(       
+         skip(1), 
+         distinctUntilChanged(),
+        takeUntil(this.destroy$))
+      .subscribe(region => {
+        // Handle region changes if needed
+        this.selectedRegion = region as any;
+        this.loadData();
+      });
+
+    this.coordinationService.displayMode$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(displayMode => {
+        this.applyDisplayMode();
+      });
+
+    this.coordinationService.filterType$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(filterType => {
+
+        console.log('Product space chart received filter type:', filterType);
+
+        this.filterType = filterType;
+        this.applyDisplayMode();
+
+      });
+      
+  }
+
   private loadData(): void {
-    
     this.chartService.getAllData(this.selectedRegion).subscribe(({ nodes, links, grouped, totalSum }) => {
       this.nodes = nodes;
       this.links = links;
       this.grouped = grouped;
       this.totalSum = totalSum;
       
-    this.chartDataLoaded.emit({
+      this.chartDataLoaded.emit({
         totalSum: totalSum,
         nodeCount: nodes.length,
         dataCount: grouped.length
       });
 
       this.initializeChart();
-
       
+      // Re-apply current search if active
+      if (this.currentSearchQuery) {
+        this.performSearch(this.currentSearchQuery);
+      }
     });
   }
-
- 
 
   private initializeChart(): void {
     const config = ProductSpaceChartUtils.getChartConfig();
@@ -148,77 +202,178 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       .attr("stroke", "gray");
   }
 
- private renderNodes(): void {
-  const svgGroup = d3.select<SVGGElement, unknown>("svg g");
+  private renderNodes(): void {
+    const svgGroup = d3.select<SVGGElement, unknown>("svg g");
 
-  const nodesSel = svgGroup.selectAll<SVGCircleElement, Node>(".node")
-    .data(this.nodes, (d: Node) => d.id);
+    const nodesSel = svgGroup.selectAll<SVGCircleElement, Node>(".node")
+      .data(this.nodes, (d: Node) => d.id);
 
-  nodesSel.exit()
-    .transition()
-      .duration(500)
-      .style("opacity", 0)
-    .remove();
+    nodesSel.exit()
+      .transition()
+        .duration(500)
+        .style("opacity", 0)
+      .remove();
 
-  const enterSel = nodesSel.enter()
-    .append("circle")
-      .attr("class", "node")
-      .style("stroke", "black")
-      .on("mouseover", (event, d) => this.handleMouseover(event, d))
-      .on("mousemove", (event, d) => this.handleMousemove(event, d))
-      .on("mouseout",  (event, d) => this.handleMouseleave(event, d))
-      .on("click",    (event, d) => this.handleMouseclick(event, d));
+    const enterSel = nodesSel.enter()
+      .append("circle")
+        .attr("class", "node")
+        .style("stroke", "black")
+        .on("mouseover", (event, d) => this.handleMouseover(event, d))
+        .on("mousemove", (event, d) => this.handleMousemove(event, d))
+        .on("mouseout",  (event, d) => this.handleMouseleave(event, d))
+        .on("click",    (event, d) => this.handleMouseclick(event, d));
 
-  // 5. MERGE enter + update, then apply both initial & transition attributes
-  enterSel.merge(nodesSel as any)  // cast so TS knows it's compatible
-    .transition()
-      .duration(1000)
-      .attr("cx", d => d.x)
-      .attr("cy", d => d.y)
-      .attr("r",  d => {
-        const obj = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
-        return obj ? this.radiusScale(obj.Value) : 20;
-      })
-      .attr("fill", d => {
-        const rca = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
-        return (rca && rca.Value > 0)
-          ? this.colorScale(parseInt(d.id, 10))
-          : "rgb(249, 251, 251)";
-      })
-      .style("opacity", 1);
-}
+    // Merge enter + update, then apply both initial & transition attributes
+    enterSel.merge(nodesSel as any)
+      .transition()
+        .duration(1000)
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r",  d => {
+          const obj = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
+          return obj ? this.radiusScale(obj.Value) : 20;
+        })
+        .attr("fill", d => this.getNodeColor(d))
+        .style("opacity", 1);
+  }
 
- private renderGroupLabels(): void {
+  private renderGroupLabels(): void {
     if (this.showGroupLabels) {
       ProductSpaceChartUtils.createGroupLabels(this.zoomable, this.customGroupLabels);
     }
   }
 
+  // Search functionality
+  private performSearch(query: string): void {
+    if (!query.trim()) {
+      this.clearSearch();
+      return;
+    }
+
+    const lowercaseQuery = query.toLowerCase().trim();
+    
+    // Search in grouped data based on description
+    this.searchResults = this.grouped.filter(item => {
+      return item.description && item.description.toLowerCase().includes(lowercaseQuery);
+    });
+
+    console.log(`Search for "${query}" found ${this.searchResults.length} results`);
+    
+    // Update node colors based on search results
+    this.updateNodesForSearch();
+    
+    // Update coordination service with results
+    this.coordinationService.setSearchResults(this.searchResults);
+  }
+
+  private updateNodesForSearch(): void {
+    const searchSet = new Set(this.searchResults.map(result => result.product.toString()));
+    
+    d3.select("svg g").selectAll<SVGCircleElement, Node>(".node")
+      .attr("fill", (d: Node) => {
+        if (this.currentSearchQuery.trim()) {
+          // If searching, only show color for matching nodes
+          const match = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
+          if (match && searchSet.has(match.product.toString())) {
+            return this.getNodeColorNormal(d);
+          } else {
+            return "rgb(249, 251, 251)"; // Gray for non-matching
+          }
+        } else {
+          // Normal coloring when not searching
+          return this.getNodeColorNormal(d);
+        }
+      });
+  }
+
+  private getNodeColor(d: Node): string {
+
+    if (this.currentSearchQuery.trim()) {
+      // Search mode coloring
+      const match = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
+      if (match) {
+        const searchSet = new Set(this.searchResults.map(result => result.product.toString()));
+
+        if (searchSet.has(match.product.toString())) {
+          return this.getNodeColorNormal(d);
+        }
+      }
+      return "rgb(249, 251, 251)";
+    } else {
+
+      // Normal coloring
+      return this.getNodeColorNormal(d);
+    }
+  }
+
+  private getNodeColorNormal(d: Node): string {
+    const rca = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
+
+    let baseRCAValue: number;
+
+
+
+    switch(this.filterType) {
+      case FilterType.ALL:
+        baseRCAValue = 0;
+        break;
+      case FilterType.RCA_ABOVE_1:
+        baseRCAValue = 1;
+        break;  
+      case FilterType.RCA_BETWEEN:
+        baseRCAValue = 0.5; // Example value for between 0.5 and 1
+        break;
+      default:
+        baseRCAValue = 0;
+    }
+    
+
+
+    return (rca && rca.Value > 0 && rca.rca! > baseRCAValue)
+      ? this.colorScale(parseInt(d.id, 10))
+      : "rgb(249, 251, 251)";
+  }
+
+  private clearSearch(): void {
+    this.searchResults = [];
+    this.updateNodesForSearch();
+    this.coordinationService.setSearchResults([]);
+  }
+
+  private applyDisplayMode(): void {
+    this.renderNodes();
+  }
+
+  // Public search methods
+  public search(query: string): void {
+    this.coordinationService.setSearchQuery(query);
+  }
+
+  public clearSearchQuery(): void {
+    this.coordinationService.clearSearch();
+  }
+
+  public getSearchResults(): GroupedData[] {
+    return this.searchResults;
+  }
 
   // Event Handlers
   private handleZoom(event: any): void {
-
     if (this.zoomable){
       this.zoomable.attr("transform", event.transform);
     }
 
-
-   d3.selectAll<HTMLDivElement, TooltipDatum>('div.tooltip')
-    .each((d, i, nodes) => {
-
+    d3.selectAll<HTMLDivElement, TooltipDatum>('div.tooltip')
+      .each((d, i, nodes) => {
         const el = nodes[i] as HTMLDivElement;
-
-      
-      if (d !== undefined) {
+        
+        if (d !== undefined) {
           const [tx, ty] = event.transform.apply([d.x, d.y]);
-
           d3.select(el)
             .style('left', `${tx - 50}px`)
             .style('top',  `${ty + 50}px`);
-        
-      }
-    })
-
+        }
+      })
   }
 
   private handleSvgClick(event: any): void {
@@ -239,7 +394,6 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private handleMousemove(event: any, d: Node): void {
-
     if (!this.tooltipEnabled) return;
 
     let value = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
@@ -275,18 +429,17 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
     const transformedX = point.x * transform.k + transform.x;
     const transformedY = point.y * transform.k + transform.y;
 
-    // Create tooltip if it doesn't exist (key part from your original code)
+    // Create tooltip if it doesn't exist
     if (d3.select("#tooltip-" + d.id).empty()) {
       const tooltip = this.createTooltip(d);
       tooltip
         .style("left", (transformedX - 50) + "px")
         .style("top", (transformedY + 50) + "px");
     }
-
   }
 
   private handleMouseleave(event: any, d: Node): void {
-       // Only remove tooltip and reset styles if node is NOT selected (state = 0)
+    // Only remove tooltip and reset styles if node is NOT selected (state = 0)
     if (d.state === 0) {
       d3.select(event.currentTarget).style("stroke-width", "1");
       d3.select("#tooltip-" + d.id).remove();
@@ -302,7 +455,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private handleMouseclick(event: any, d: Node): void {
-     event.stopPropagation();
+    event.stopPropagation();
     
     const value = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
     
@@ -367,25 +520,26 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       .style("top", (transformedY + 50) + "px");
   }
 
-
-
   public refreshChart(): void {
-
     this.chartService.getAllData(this.selectedRegion).subscribe(({ nodes, links, grouped, totalSum }) => {
       this.nodes = nodes;
       this.links = links;
       this.grouped = grouped;
       this.totalSum = totalSum;
       
-    this.chartDataLoaded.emit({
+      this.chartDataLoaded.emit({
         totalSum: totalSum,
         nodeCount: nodes.length,
         dataCount: grouped.length
       });
 
-        this.renderNodes();      
+      this.renderNodes();
+      
+      // Re-apply search if active
+      if (this.currentSearchQuery) {
+        this.performSearch(this.currentSearchQuery);
+      }
     });
-  
   }
 
   // Getter for total sum (useful for parent component)
@@ -404,50 +558,44 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       .append("div")
       .attr("id", "tooltip-" + d.id)
       .attr("class", "tooltip")
-          .datum(d)               // ← bind the circle’s data object {x,y,…}
+      .datum(d)
       .style("opacity", 0.9)
-        .style("background-color", "rgba(0, 33, 69, .8)")
-        .style("border-width", "1px")
-        .style("color", "white")
-        .style("padding", "20px 15px")
-        .style("position", "absolute")
+      .style("background-color", "rgba(0, 33, 69, .8)")
+      .style("border-width", "1px")
+      .style("color", "white")
+      .style("padding", "20px 15px")
+      .style("position", "absolute")
       .style("z-index", "1000")
-         .html(`
-            <div style="position: relative;">
-                <button class="close-button" 
-                        style="position: absolute; top: -20px; right: -14px; background: none; color: white; border: none; border-radius: 50%; cursor: pointer; width: 20px; height: 20px;">X</button>
-                <div>${d.id}<br>  ${description}  </div>
-            </div>
-        `);
+      .html(`
+        <div style="position: relative;">
+          <button class="close-button" 
+                  style="position: absolute; top: -20px; right: -14px; background: none; color: white; border: none; border-radius: 50%; cursor: pointer; width: 20px; height: 20px;">X</button>
+          <div>${d.id}<br>  ${description}  </div>
+        </div>
+      `);
 
-        newTooltip.select(".close-button").on("click", function() {
-                d3.select("#tooltip-" + d.id).remove(); // Remove the tooltip when "X" is clicked
-                
-                d.state = 0
+    newTooltip.select(".close-button").on("click", function() {
+      d3.select("#tooltip-" + d.id).remove();
+      
+      d.state = 0
 
-                //clearRowHighlight(d.id)
-            
-                links.filter(function(x) {
+      links.filter(function(x) {
+        return (x.source === d.id || x.target === d.id)
+      }).forEach(function(x) {
+        x.state = 0
+      })
 
-                    return (x.source === d.id || x.target === d.id)
-                    }).forEach(function(x) {
-                        x.state = 0
-                    })
+      d3.selectAll('line').filter(function(x) { 
+        if(!x) return false
+        return ((x as Link).source === d.id || (x as Link).target === d.id) 
+      }).style("stroke", "gray")
+      .style("stroke-width", "1")
+    });
 
-                d3.selectAll('line').filter(function(x) { 
-                    if(!x) return false
-                        return ((x as Link).source === d.id || (x as Link).target === d.id) 
-                }).style("stroke", "gray")
-                .style("stroke-width", "1")
-
-
-            });
-
-        return newTooltip;
+    return newTooltip;
   }
 
-    private changeInfoBox(d: Node): void {
-    // Implement your info box update logic here
+  private changeInfoBox(d: Node): void {
     console.log('Updating info box for node:', d);
     const value = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
     console.log('Node data:', value);
@@ -457,7 +605,6 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private highlightRowByProductId(productId: number): void {
-    // Implement your data table row highlighting logic here
     console.log('Highlighting row for product:', productId);
     
     // Emit event for parent component to handle
@@ -488,13 +635,8 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
     d3.selectAll('.tooltip').remove();
   }
 
-
   // Getter for grouped data count
   public getDataCount(): number {
     return this.grouped.length;
   }
-
-
-
-
 }

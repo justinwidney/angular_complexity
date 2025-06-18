@@ -245,3 +245,39 @@
   border-radius: inherit;
   opacity: 0.5;
 }
+
+/* Radio button filter styling */
+.filter-radio-wrapper form {
+  margin: 0;
+  padding: 0;
+}
+
+.filter-radio-wrapper goa-form-item {
+  margin-bottom: 0;
+}
+
+.filter-radio-wrapper goa-radio-group {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.filter-radio-wrapper goa-radio-item {
+  margin-right: 0;
+  white-space: nowrap;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .filter-radio-wrapper goa-radio-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* When disabled */
+.filter-radio-wrapper goa-radio-group[disabled] {
+  opacity: 0.6;
+  pointer-events: none;
+}
