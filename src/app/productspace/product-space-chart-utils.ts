@@ -92,46 +92,44 @@ export class ProductSpaceChartUtils {
 
   
 
-  // Get label by cluster name (useful for dynamic labeling)
-  static getLabelByClusterName(clusterName: string): GroupLabel | undefined {
-    const labelMap: { [key: string]: string } = {
-      'Minerals': 'MineralsGroup',
-      'Industrial Chemicals and Metals': 'ChemicalsGroup',
-      'Electronic and Electrical Goods': 'ElectronicsGroup',
-      'Metalworking and Electrical Machinery and Parts': 'MetalsGroup',
-      'Textile and Home Goods': 'TextileGroup',
-      'Textile Apparel and Accessories': 'ApparelGroup',
-      'Agriculture': 'AgricultureGroup',
-      'Construction, Building, and Home Supplies': 'ConstructionGroup'
-    };
-    
-    const labelName = labelMap[clusterName];
-    return this.getGroupLabels().find(label => label.name === labelName);
-  }
 
 
   // Color scale function
   static getColorScale() {
     return d3.scaleThreshold<number, string>()
-      .domain([1, 1599, 2499, 3899, 4999, 6799, 8399, 8599, 8999, 9999])
+      .domain([
+        100,   // Start of HS codes (before this = white/no group)
+        2500,  // Animal & Food Products (HS 1-24) → Minerals (HS 25-27)
+        2800,  // Minerals (HS 25-27) → Chemicals & Plastics (HS 28-40)  
+        4100,  // Chemicals & Plastics (HS 28-40) → Raw Materials (HS 41-49)
+        5000,  // Raw Materials (HS 41-49) → Textiles (HS 50-63)
+        6400,  // Textiles (HS 50-63) → Footwear & Accessories (HS 64-67)
+        6800,  // Footwear & Accessories (HS 64-67) → Stone & Glass (HS 68-71)
+        7200,  // Stone & Glass (HS 68-71) → Metals (HS 72-83)
+        8400,  // Metals (HS 72-83) → Machinery & Electronics (HS 84-85)
+        8600,  // Machinery & Electronics (HS 84-85) → Transportation (HS 86-89)
+        9000   // Transportation (HS 86-89) → Miscellaneous (HS 90-97)
+      ])
       .range([
-        "#FFFFFF", // White
-        "#FF0000", // Red
-        "#00FF00", // Lime
-        "#0000FF", // Blue
-        "#FFFF00", // Yellow
-        "#FF00FF", // Magenta
-        "#00FFFF", // Cyan
-        "#800000", // Maroon
-        "#008000", // Green
-        "#000080", // Navy
+        "#999999",  // Default/unassigned (HS codes < 100)
+        "#E53E3E",  // Animal & Food Products (HS 1-24) - Vibrant Red
+        "#00B4D8",  // Minerals (HS 25-27) - Strong Cyan
+        "#6F42C1",  // Chemicals & Plastics (HS 28-40) - Deep Purple
+        "#28A745",  // Raw Materials (HS 41-49) - Forest Green
+        "#FFC107",  // Textiles (HS 50-63) - Bright Amber
+        "#E91E63",  // Footwear & Accessories (HS 64-67) - Deep Pink
+        "#795548",  // Stone & Glass (HS 68-71) - Brown
+        "#FF9800",  // Metals (HS 72-83) - Deep Orange
+        "#3F51B5",  // Machinery & Electronics (HS 84-85) - Indigo
+        "#009688",  // Transportation (HS 86-89) - Teal
+        "#9C27B0"   // Miscellaneous (HS 90-97) - Deep Magenta
       ]);
   }
-
+  
   // Radius scale function - you'll need to adjust the domain/range based on your data
   static getRadiusScale() {
     return d3.scaleLinear()
-    .domain([-1, 1200000000, 12498112477])
+    .domain([-1, 1500000000, 112498112477])
     .range([20,45,85])
   }
 

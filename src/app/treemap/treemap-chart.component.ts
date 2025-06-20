@@ -8,9 +8,7 @@ import { ChartCoordinationService } from '../service/chart-coordination.service'
 import { TreemapChartUtils } from './treemap-chart.utils';
 import { 
   TreemapConfig, 
-  TreemapDataPoint, 
   TreemapNode, 
-  TreemapRootData, 
   TreemapTooltipData,
   RawTreemapItem,
   TreemapDimensions,
@@ -51,7 +49,6 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
   // Input properties
   @Input() showTooltips: boolean = true;
   @Input() showControls: boolean = true;
-  @Input() enableZoomPan: boolean = false;
   @Input() customConfig?: Partial<TreemapConfig>;
   @Input() showCacheStatus: boolean = false;
   @Input() showDebugInfo: boolean = false;
@@ -173,9 +170,10 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.coordinationService.year$
       .pipe(takeUntil(this.destroy$))
       .subscribe(year => {
-        // Note: Treemap now uses most recent year automatically
-        // No need to filter by year since service handles this
-        console.log(`📅 Year coordination received: ${year}, but treemap uses most recent year`);
+        if (year) {
+          this.currentYear = year.toString();
+          this.loadData();
+        }
       });
   }
 
@@ -200,9 +198,6 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
      
           
           this.rawData = TreemapChartUtils.cloneData(result.rawData);
-          this.currentYear = result.mostRecentYear.toString();
-          
-          // Process the data directly (no year filtering needed)
           this.processTreemapData(this.rawData);
         },
         error: (error) => {
@@ -367,10 +362,7 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
         .style('opacity', 1);
     }
 
-    // Enable zoom if requested
-    if (this.enableZoomPan) {
-      //this.enableZoom();
-    }
+
   }
 
   /**
@@ -469,33 +461,7 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.renderTreemap();
   }
 
-  /**
-   * Zoom functionality
-   */
-  public enableZoom(): void {
-    if (!this.svg) return;
 
-    const zoom = d3.zoom()
-      .scaleExtent([0.5, 5])
-      .on('zoom', (event) => {
-        const { transform } = event;
-        this.svg.select('.treemap-group')
-          .attr('transform', 
-            `translate(${this.dimensions.margin.left + transform.x}, ${this.dimensions.margin.top + transform.y}) scale(${transform.k})`
-          );
-      });
-
-    this.svg.call(zoom);
-  }
-
-  public resetZoom(): void {
-    if (!this.svg) return;
-    this.svg.transition().duration(750).call(d3.zoom().transform, d3.zoomIdentity);
-  }
-
-  public zoomToFit(): void {
-    this.resetZoom();
-  }
 
   /**
    * Error handling

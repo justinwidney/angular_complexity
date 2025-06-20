@@ -108,17 +108,6 @@
   margin: 0;
 }
 
-
-  mat-chip-row  {
-    background-color: white !important;
-    border: gainsboro 1px solid !important;
-  }
-
-  .mat-mdc-chip-action {
-    padding-left: 5px;
-    padding-right: 5px;
-  }
-
   .space-between {
     justify-content: space-between;
   }
@@ -131,47 +120,6 @@
   max-width: 350px;
   min-width: 280px;
   
-  .card {
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-    
-    .card-header {
-      background-color: rgba(248, 249, 250, 0.8);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-      padding: 8px 12px;
-      
-      h6 {
-        color: #495057;
-        font-weight: 600;
-      }
-    }
-    
-    .card-body {
-      font-size: 14px;
-      
-      p {
-        margin-bottom: 8px;
-        line-height: 1.4;
-        
-        strong {
-          color: #495057;
-          font-weight: 600;
-        }
-      }
-      
-      .btn {
-        font-size: 12px;
-        padding: 6px 12px;
-      }
-    }
-  }
-
- 
-
-
 
   
   // Animation when appearing
@@ -220,18 +168,7 @@
   box-shadow: none;
 }
 
-/* Responsive design for smaller screens */
-@media (max-width: 768px) {
-  .filter-button-group {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .filter-button-group goa-button {
-    width: 100%;
-    min-width: auto;
-  }
-}
+
 
 /* Active filter indicator */
 .filter-button-group goa-button[variant="primary"]::before {
@@ -258,7 +195,7 @@
 
 .filter-radio-wrapper goa-radio-group {
   display: flex;
-  gap: 16px;
+  gap: 8px;
   align-items: center;
 }
 
@@ -281,3 +218,165 @@
   opacity: 0.6;
   pointer-events: none;
 }
+
+.search-container-goa {
+  position: relative;
+  width: 100%;
+  
+  &.has-suggestions {
+    z-index: 1000;
+  }
+}
+
+
+// Spinning icon animation for loading
+.spinning-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// GOA Suggestions Dropdown Styles
+.goa-suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--goa-color-greyscale-white);
+  border: 2px solid var(--goa-color-greyscale-200);
+  border-top: none;
+  border-radius: 0 0 var(--goa-border-radius) var(--goa-border-radius);
+  box-shadow: var(--goa-shadow-e400);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: -2px;
+  animation: slideDownGoa 0.2s ease-out;
+}
+
+@keyframes slideDownGoa {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.suggestions-header-goa {
+  padding: var(--goa-space-s) var(--goa-space-m);
+  background-color: var(--goa-color-greyscale-100);
+  border-bottom: 1px solid var(--goa-color-greyscale-200);
+}
+
+.suggestions-list-goa {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.suggestion-item-goa {
+  cursor: pointer;
+  border-bottom: 1px solid var(--goa-color-greyscale-100);
+  transition: background-color 0.15s ease-in-out;
+  
+  &:hover,
+  &.selected {
+    background-color: rgb(130, 230, 255);
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:focus {
+    outline: 2px solid var(--goa-color-interactive-focus);
+    outline-offset: -2px;
+  }
+}
+
+.suggestion-content-goa {
+  display: flex;
+  align-items: center;
+  padding: var(--goa-space-s) var(--goa-space-m);
+  gap: var(--goa-space-s);
+}
+
+.suggestion-icon-goa {
+  flex-shrink: 0;
+  width: 1.25rem;
+  text-align: center;
+  
+  goa-icon {
+    font-size: 1.1rem;
+  }
+}
+
+.suggestion-text-goa {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.suggestion-main-text-goa {
+  font-size: var(--goa-font-size-4);
+}
+
+  /* Tooltip container */
+  .tooltipx {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 10px;
+    width: auto;
+    margin: 3px;
+    font-size: 2rem;
+  
+    }
+    
+    .tooltipx .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    font-size: 16px;
+    
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 2;
+    }
+    
+    .tooltipx:hover .tooltiptext {
+    visibility: visible;
+    }
+
+    icons{
+      div{
+          i{
+              font-size: 2.5em;
+            
+          }
+      }
+  }
+
+  .custom-flex{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+  }

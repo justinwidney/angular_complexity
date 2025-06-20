@@ -29034,7 +29034,9 @@ export class ProductSpaceChartService {
   }
 
   findGroupedDataByProduct(grouped: GroupedData[], productId: string): GroupedData | undefined {
+
     return this.unifiedDataService.findDataByProduct(grouped as any[], productId) as GroupedData;
+    
   }
 
   // Methods to update data if needed

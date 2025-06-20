@@ -22,7 +22,6 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   @ViewChild('chartContainer', { static: true }) chartContainer!: ElementRef;
   @Input() showGroupLabels: boolean = true;
   @Input() customGroupLabels?: Partial<GroupLabel>[];
-  @Input() tooltipEnabled: boolean = true;
   @Input() highlightConnections: boolean = true;
 
   // Event emitters for parent component interaction
@@ -48,6 +47,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   // Search state
   private currentSearchQuery: string = '';
   private searchResults: GroupedData[] = [];
+  private enabledProductGroups: any[] = [];
 
   constructor(
     private chartService: ProductSpaceChartService,
@@ -111,6 +111,15 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
         this.filterType = filterType;
         this.applyDisplayMode();
 
+      });
+
+        // NEW: Subscribe to product group changes
+      this.coordinationService.productGroups$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(productGroups => {
+        console.log('🎯 Product space chart received product groups:', productGroups);
+        this.enabledProductGroups = productGroups.filter(group => group.enabled);
+        this.applyDisplayMode(); // Re-render nodes with new product group filtering
       });
       
   }
@@ -250,21 +259,69 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       return;
     }
 
-    const lowercaseQuery = query.toLowerCase().trim();
-    
-    // Search in grouped data based on description
-    this.searchResults = this.grouped.filter(item => {
-      return item.description && item.description.toLowerCase().includes(lowercaseQuery);
-    });
+    const trimmedQuery = query.trim();
 
-    console.log(`Search for "${query}" found ${this.searchResults.length} results`);
+    const lowercaseQuery = trimmedQuery.toLowerCase();
+    const isNumericQuery = /^\d+$/.test(trimmedQuery);
+
+    let searchResults: any[] = [];
+
+    // Search in grouped data based on description
+    if (isNumericQuery) {
+      // Search by HS codes
+      searchResults = this.searchByHSCode(trimmedQuery);
+      console.log(`📊 HS Code search found ${searchResults.length} results`);
+    } else {
+      // Search by description (your existing logic)
+      searchResults = this.searchByDescription(lowercaseQuery);
+      console.log(`📝 Description search found ${searchResults.length} results`);
+    }
     
-    // Update node colors based on search results
+    this.searchResults = searchResults;
     this.updateNodesForSearch();
     
     // Update coordination service with results
     this.coordinationService.setSearchResults(this.searchResults);
   }
+
+ private searchByDescription(lowercaseQuery: string): any[] {
+
+  const cleanQuery = lowercaseQuery
+  .replace(/^\d+[\.\s]*-\s*/, '') // Remove "2711 - " pattern
+  .toLowerCase();
+
+  return this.grouped.filter(item => {
+    if (!item.description) return false;
+    
+    const originalDescription = item.description.toLowerCase();
+    
+    // Match against both original and cleaned descriptions
+    return originalDescription.includes(lowercaseQuery) || 
+          originalDescription.includes(cleanQuery);
+  });
+}
+
+  private searchByHSCode(hsCode: string): any[] {
+    const currentGrouping = this.coordinationService.currentGrouping;
+    console.log(`🏷️ Searching HS codes with grouping: ${currentGrouping}`);
+
+    return this.grouped.filter(item => {
+      // Get the appropriate HS field based on current grouping
+      const itemHSCode = item['product'];
+      
+      if (!itemHSCode) {
+        return false;
+      }
+
+      const itemHSString = itemHSCode.toString();
+      const isMatch = itemHSString === hsCode || itemHSString.startsWith(hsCode);
+      
+    
+      
+      return isMatch;
+    });
+  }
+
 
   private updateNodesForSearch(): void {
     const searchSet = new Set(this.searchResults.map(result => result.product.toString()));
@@ -307,11 +364,18 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private getNodeColorNormal(d: Node): string {
+
     const rca = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
 
+
+    if (!this.isNodeInEnabledProductGroup(d)) {
+      return "rgb(249, 251, 251)"; // Gray out if product group is disabled
+    }
+
+
+
     let baseRCAValue: number;
-
-
+    let topValue: number = 10000;
 
     switch(this.filterType) {
       case FilterType.ALL:
@@ -322,6 +386,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
         break;  
       case FilterType.RCA_BETWEEN:
         baseRCAValue = 0.5; // Example value for between 0.5 and 1
+        topValue = 1;
         break;
       default:
         baseRCAValue = 0;
@@ -329,10 +394,38 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
     
 
 
-    return (rca && rca.Value > 0 && rca.rca! > baseRCAValue)
+    return (rca && rca.Value > 0 && (rca.rca! > baseRCAValue && rca.rca! < topValue))
       ? this.colorScale(parseInt(d.id, 10))
       : "rgb(249, 251, 251)";
   }
+
+  // NEW: Helper method to check if node belongs to enabled product group
+  private isNodeInEnabledProductGroup(node: Node): boolean {
+    // If all product groups are enabled, show all nodes
+    const allProductGroups = this.coordinationService.currentProductGroups;
+    const enabledGroups = allProductGroups.filter(group => group.enabled);
+    
+    if (enabledGroups.length === 0 || enabledGroups.length === allProductGroups.length) {
+      return true;
+    }
+
+    // Get the product from grouped data
+    const groupedData = this.chartService.findGroupedDataByProduct(this.grouped, node.id);
+    if (!groupedData) {
+      return false;
+    }
+
+    const productCode = parseInt(groupedData.product?.toString() || '0');
+    const hs2Code = Math.floor(productCode / 100);
+
+    // Check if product's HS2 code falls within any enabled product group's ranges
+    return enabledGroups.some(group => {
+      return group.hsCodeRanges.some((range: any) => 
+        hs2Code >= range.min && hs2Code <= range.max
+      );
+    });
+  }
+
 
   private clearSearch(): void {
     this.searchResults = [];
@@ -390,11 +483,10 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private handleMouseover(event: any, d: Node): void {
-    console.log('Mouseover on node:', d);
+    //pass
   }
 
   private handleMousemove(event: any, d: Node): void {
-    if (!this.tooltipEnabled) return;
 
     let value = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
     const displayValue = value !== undefined ? value.Value : 0;
@@ -548,6 +640,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private createTooltip(d: Node): any {
+
     const value = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
     const displayValue = value !== undefined ? value.Value : 0;
     const description = value?.description || 'No description available';

@@ -367,6 +367,11 @@ export class FeasibleChartUtils {
     return { textX, textY };
   }
 
+
+
+
+
+  
   // Create reference lines (ECI line and center line)
   public static createReferenceLines(
     zoomable: any,
@@ -422,10 +427,34 @@ export class FeasibleChartUtils {
       .attr("class", "axis-label-right")
       .attr("y", config.height - 25)
       .attr("x", 850)
-      .style("fill", "black")
-      .style("font-size", "16px")
       .text("Less Nearby")
       .style("pointer-events", "none");
+
+
+      svg.append("text")
+    .attr("class", "axis-label-left")
+    .attr("transform", `
+      translate(35, 200)
+      rotate(-90)
+    `)
+    .style("fill", "black")
+    .style("font-size", "16px")
+    .text("More complex")
+    .style("pointer-events", "none");
+
+    svg.append("text")
+    .attr("class", "axis-label-left")
+    .attr("transform", `
+      translate(35, 600)
+      rotate(-90)
+    `)
+    .style("fill", "black")
+    .style("font-size", "16px")
+    .text("Less complex")
+    .style("pointer-events", "none");
+
+
+
   }
 
   // Utility method to format numbers

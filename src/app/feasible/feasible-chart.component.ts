@@ -129,7 +129,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.coordinationService.region$
       .pipe(takeUntil(this.destroy$))
       .subscribe(region => {
-        //this.loadData();
+        this.loadData();
       });
 
     // Subscribe to year changes
@@ -191,16 +191,36 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       });
   }
 
+
+
+  private updateReferenceLines(): void {
+    if (!this.zoomable || !this.scales) {
+      return;
+    }
+  
+    // Remove old reference lines
+    this.zoomable.selectAll('.eci-line').remove();
+    this.zoomable.selectAll('.center-line').remove();
+    this.zoomable.selectAll('.eci-label').remove();
+  
+    // Create new reference lines with updated values
+    FeasibleChartUtils.createReferenceLines(
+      this.zoomable, 
+      this.scales, 
+      this.eci, 
+      this.centerX, 
+      this.centerY
+    );
+  }
+
   private loadData(): void {
     const region = this.coordinationService.currentRegion || this.unifiedDataService.getCurrentRegion();
     
-    console.log(`Loading feasible chart data for region: ${region}`);
 
     this.unifiedDataService.getFeasibleChartData(region as any)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {
-          console.log("Feasible chart data loaded:", result);
           
           // Store the raw data for reprocessing
           this.rawData = result.rawData;
@@ -218,7 +238,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
             eci: this.eci
           });
 
-          console.log("Refreshing chart with data", this.data);
+          this.updateReferenceLines();
 
           this.refreshChart();
 
@@ -355,8 +375,6 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private renderPoints(): void {
 
-    console.log("Rendering points with data count:", this.data.length);
-    console.log("Current Data:", this.data);
 
     const circles = this.zoomable.selectAll(".feasible-point")
       .data(this.data);
@@ -408,6 +426,9 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     catch{
     }
+
+
+    console.log("Updating display mode to:", this.currentDisplayMode);
 
     switch (this.currentDisplayMode) {
       case DisplayMode.FRONTIER:
@@ -703,7 +724,6 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   public clearSelections(): void {
-    // Reset all point states
     this.data.forEach(point => point.state = 0);
 
     // Reset visual styles
