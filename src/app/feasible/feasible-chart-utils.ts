@@ -100,34 +100,61 @@ export class FeasibleChartUtils {
 
     // Color scales
     const color = d3.scaleThreshold<number, string>()
-      .domain([1, 16, 25, 39, 50, 68, 84, 86, 90, 100])
+      .domain([  1,   // Start of HS codes (before this = white/no group)
+        25,  // Animal & Food Products (HS 1-24) → Minerals (HS 25-27)
+        28,  // Minerals (HS 25-27) → Chemicals & Plastics (HS 28-40)  
+        41,  // Chemicals & Plastics (HS 28-40) → Raw Materials (HS 41-49)
+        50,  // Raw Materials (HS 41-49) → Textiles (HS 50-63)
+        64,  // Textiles (HS 50-63) → Footwear & Accessories (HS 64-67)
+        68,  // Footwear & Accessories (HS 64-67) → Stone & Glass (HS 68-71)
+        72,  // Stone & Glass (HS 68-71) → Metals (HS 72-83)
+        84,  // Metals (HS 72-83) → Machinery & Electronics (HS 84-85)
+        86,  // Machinery & Electronics (HS 84-85) → Transportation (HS 86-89)
+        90   // Transportation (HS 86-89) → Miscellaneous (HS 90-97)])
+      ])
       .range([
-        "#FFFFFF", // White
-        "#FF0000", // Red
-        "#00FF00", // Lime
-        "#0000FF", // Blue
-        "#FFFF00", // Yellow
-        "#FF00FF", // Magenta
-        "#00FFFF", // Cyan
-        "#800000", // Maroon
-        "#008000", // Green
-        "#000080"  // Navy
+        "#999999",  // Default/unassigned (HS codes < 100)
+        "#E53E3E",  // Animal & Food Products (HS 1-24) - Vibrant Red
+        "#00B4D8",  // Minerals (HS 25-27) - Strong Cyan
+        "#6F42C1",  // Chemicals & Plastics (HS 28-40) - Deep Purple
+        "#28A745",  // Raw Materials (HS 41-49) - Forest Green
+        "#FFC107",  // Textiles (HS 50-63) - Bright Amber
+        "#E91E63",  // Footwear & Accessories (HS 64-67) - Deep Pink
+        "#795548",  // Stone & Glass (HS 68-71) - Brown
+        "#FF9800",  // Metals (HS 72-83) - Deep Orange
+        "#3F51B5",  // Machinery & Electronics (HS 84-85) - Indigo
+        "#009688",  // Transportation (HS 86-89) - Teal
+        "#9C27B0"   // Miscellaneous (HS 90-97) - Deep Magenta
       ]);
 
-    const hs4Color = d3.scaleThreshold<number, string>()
-      .domain([1, 1599, 2499, 3899, 4999, 6799, 8399, 8599, 8999, 9999])
-      .range([
-        "#FFFFFF", // White
-        "#FF0000", // Red
-        "#00FF00", // Lime
-        "#0000FF", // Blue
-        "#FFFF00", // Yellow
-        "#FF00FF", // Magenta
-        "#00FFFF", // Cyan
-        "#800000", // Maroon
-        "#008000", // Green
-        "#000080"  // Navy
-      ]);
+    const hs4Color =  d3.scaleThreshold<number, string>()
+          .domain([
+            100,   // Start of HS codes (before this = white/no group)
+            2500,  // Animal & Food Products (HS 1-24) → Minerals (HS 25-27)
+            2800,  // Minerals (HS 25-27) → Chemicals & Plastics (HS 28-40)  
+            4100,  // Chemicals & Plastics (HS 28-40) → Raw Materials (HS 41-49)
+            5000,  // Raw Materials (HS 41-49) → Textiles (HS 50-63)
+            6400,  // Textiles (HS 50-63) → Footwear & Accessories (HS 64-67)
+            6800,  // Footwear & Accessories (HS 64-67) → Stone & Glass (HS 68-71)
+            7200,  // Stone & Glass (HS 68-71) → Metals (HS 72-83)
+            8400,  // Metals (HS 72-83) → Machinery & Electronics (HS 84-85)
+            8600,  // Machinery & Electronics (HS 84-85) → Transportation (HS 86-89)
+            9000   // Transportation (HS 86-89) → Miscellaneous (HS 90-97)
+          ])
+          .range([
+            "#999999",  // Default/unassigned (HS codes < 100)
+            "#E53E3E",  // Animal & Food Products (HS 1-24) - Vibrant Red
+            "#00B4D8",  // Minerals (HS 25-27) - Strong Cyan
+            "#6F42C1",  // Chemicals & Plastics (HS 28-40) - Deep Purple
+            "#28A745",  // Raw Materials (HS 41-49) - Forest Green
+            "#FFC107",  // Textiles (HS 50-63) - Bright Amber
+            "#E91E63",  // Footwear & Accessories (HS 64-67) - Deep Pink
+            "#795548",  // Stone & Glass (HS 68-71) - Brown
+            "#FF9800",  // Metals (HS 72-83) - Deep Orange
+            "#3F51B5",  // Machinery & Electronics (HS 84-85) - Indigo
+            "#009688",  // Transportation (HS 86-89) - Teal
+            "#9C27B0"   // Miscellaneous (HS 90-97) - Deep Magenta
+          ]);
 
     const naicsColor = d3.scaleThreshold<number, string>()
       .domain([1111, 1131, 1151, 2111, 2131, 2211, 2361, 2381, 3111, 3151, 3211, 3241, 3361, 3391, 5111, 5191])
@@ -216,14 +243,46 @@ export class FeasibleChartUtils {
     return null;
   }
 
+
+
+
+  // NEW: Helper method to check if point belongs to enabled product group
+  public static isPointInEnabledProductGroup(
+    point: FeasiblePoint, 
+    currentProductGroups: any[]
+  ): boolean {
+
+    const enabledGroups = currentProductGroups.filter(group => group.enabled);
+    
+    if (enabledGroups.length === 0 || enabledGroups.length === currentProductGroups.length) {
+      return true;
+    }
+
+    const hs2Code = point.hs4 ;
+
+    return enabledGroups.some(group => {
+      return group.hsCodeRanges.some((range: any) => 
+        hs2Code >= range.min && hs2Code <= range.max
+      );
+    });
+  }
+
+
   // Get color for point based on various criteria
   public static getPointColor(
     point: FeasiblePoint,
     grouping: GroupingType,
     iconTruthMapping: IconTruthMapping,
     filterType: number,
-    scales: FeasibleScales
+    scales: FeasibleScales,
+    currentProductGroups?: any[] // NEW: Add product groups parameter
   ): string {
+
+
+    if (currentProductGroups && !this.isPointInEnabledProductGroup(point, currentProductGroups)) {
+      return "rgb(249, 251, 251)"; // Gray out if product group is disabled
+    }
+
     // For NAICS grouping, use NAICS color
     if (grouping === GroupingType.NAICS2 || grouping === GroupingType.NAICS4) {
       return scales.naicsColor(point.hs2);
@@ -324,7 +383,7 @@ export class FeasibleChartUtils {
         
         tooltip
           .style("left", (transformedX - 50) + "px")
-          .style("top", (transformedY + 50) + "px");
+          .style("top", (transformedY - 75) + "px");
       }
     });
   }
@@ -386,9 +445,9 @@ export class FeasibleChartUtils {
       .style("stroke", "black")
       .style("stroke-dasharray", "3, 3")
       .style("stroke-width", 2)
-      .attr("x1", -2000)
+      .attr("x1", -4000)
       .attr("y1", scales.y(eci))
-      .attr("x2", 2000)
+      .attr("x2", 4000)
       .attr("y2", scales.y(eci));
 
     // Center vertical line

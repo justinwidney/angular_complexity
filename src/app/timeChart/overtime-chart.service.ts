@@ -59,8 +59,17 @@ export class OvertimeChartService {
         "Miscellaneous"
       ],
       colors: [
-        "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
-        "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf", "#aec7e8"
+        "#E53E3E",  // Animal & Food Products (HS 1-24) - Vibrant Red
+        "#00B4D8",  // Minerals (HS 25-27) - Strong Cyan
+        "#6F42C1",  // Chemicals & Plastics (HS 28-40) - Deep Purple
+        "#28A745",  // Raw Materials (HS 41-49) - Forest Green
+        "#FFC107",  // Textiles (HS 50-63) - Bright Amber
+        "#E91E63",  // Footwear & Accessories (HS 64-67) - Deep Pink
+        "#795548",  // Stone & Glass (HS 68-71) - Brown
+        "#FF9800",  // Metals (HS 72-83) - Deep Orange
+        "#3F51B5",  // Machinery & Electronics (HS 84-85) - Indigo
+        "#009688",  // Transportation (HS 86-89) - Teal
+        "#9C27B0"   // Miscellaneous (HS 90-97) - Deep Magenta
       ],
       iconMapping: {
         "Animal & Food Products": { min: 1, max: 24 },
@@ -131,6 +140,61 @@ export class OvertimeChartService {
   }
 
   /**
+   * NEW: Filter raw data based on enabled product groups
+   */
+  filterByProductGroups(data: RawDataItem[], enabledProductGroups: any[]): RawDataItem[] {
+    // If no product groups specified or all are enabled, return all data
+    if (!enabledProductGroups || enabledProductGroups.length === 0) {
+      return data;
+    }
+
+    return data.filter(item => this.isItemInEnabledProductGroup(item, enabledProductGroups));
+  }
+
+  /**
+   * NEW: Check if a data item belongs to any enabled product group
+   */
+  private isItemInEnabledProductGroup(item: RawDataItem, enabledProductGroups: any[]): boolean {
+
+    // Extract HS2 code from the product field
+    const hs2Code =item.product 
+
+    // Check if this HS2 code falls within any enabled product group's ranges
+    return enabledProductGroups.some(group => {
+      return group.hsCodeRanges.some((range: any) => 
+        hs2Code >= range.min && hs2Code <= range.max
+      );
+    });
+  }
+
+  /**
+   * NEW: Get categories that should be visible based on enabled product groups
+   */
+  getVisibleCategories(enabledProductGroups: any[]): string[] {
+    if (!enabledProductGroups || enabledProductGroups.length === 0) {
+      return this.config.keys; // Return all categories if no filtering
+    }
+
+    const visibleCategories: string[] = [];
+
+    // For each category, check if any of its HS2 codes overlap with enabled product groups
+    Object.entries(this.config.iconMapping).forEach(([categoryName, range]) => {
+      const categoryHasSomeEnabledCodes = enabledProductGroups.some(group => {
+        return group.hsCodeRanges.some((groupRange: any) => {
+          // Check if there's any overlap between category range and group range
+          return Math.max(range.min, groupRange.min) <= Math.min(range.max, groupRange.max);
+        });
+      });
+
+      if (categoryHasSomeEnabledCodes) {
+        visibleCategories.push(categoryName);
+      }
+    });
+
+    return visibleCategories;
+  }
+
+  /**
    * Groups raw data by year and category based on HS2 codes
    */
   groupByYearAndCategory(data: RawDataItem[]): GroupedDataPoint[] {
@@ -186,6 +250,18 @@ export class OvertimeChartService {
   }
 
   /**
+   * NEW: Process raw data with product group filtering
+   */
+  processRawDataWithProductGroups(data: RawDataItem[], enabledProductGroups: any[]): ChartDataPoint[] {
+    // Filter data by product groups first
+    const filteredData = this.filterByProductGroups(data, enabledProductGroups);
+    
+    // Then process normally
+    const groupedData = this.groupByYearAndCategory(filteredData);
+    return this.transformDataByDate(groupedData);
+  }
+
+  /**
    * Process raw data directly into chart format (convenience method)
    */
   processRawDataToChart(data: RawDataItem[]): ChartDataPoint[] {
@@ -221,6 +297,28 @@ export class OvertimeChartService {
       this.config.keys.forEach(key => {
         if (!categories.includes(key)) {
           filtered[key] = 0;
+        }
+      });
+
+      return filtered;
+    });
+  }
+
+  /**
+   * NEW: Hide categories that don't have enabled product groups
+   */
+  hideDisabledCategories(data: ChartDataPoint[], enabledProductGroups: any[]): ChartDataPoint[] {
+    const visibleCategories = this.getVisibleCategories(enabledProductGroups);
+    
+    return data.map(item => {
+      const filtered: ChartDataPoint = { Date: item.Date };
+      
+      // Only include categories that have enabled product groups
+      this.config.keys.forEach(key => {
+        if (visibleCategories.includes(key)) {
+          filtered[key] = item[key] || 0;
+        } else {
+          filtered[key] = 0; // Hide disabled categories
         }
       });
 
@@ -419,66 +517,6 @@ export class OvertimeChartService {
     const scaled = number / scale;
     
     return scaled.toFixed(1) + suffix;
-  }
-
-  /**
-   * Gets category name from icon class
-   */
-  getCategoryFromIcon(iconClass: string): string | undefined {
-    return this.config.iconCategoryMapping[iconClass];
-  }
-
-  /**
-   * Gets icon class from category name
-   */
-  getIconFromCategory(category: string): string | undefined {
-    for (const [iconClass, cat] of Object.entries(this.config.iconCategoryMapping)) {
-      if (cat === category) {
-        return iconClass;
-      }
-    }
-    return undefined;
-  }
-
-  /**
-   * Validates if category exists in configuration
-   */
-  isValidCategory(category: string): boolean {
-    return this.config.keys.includes(category);
-  }
-
-  /**
-   * Get all valid categories
-   */
-  getAllCategories(): string[] {
-    return [...this.config.keys];
-  }
-
-  /**
-   * Get category color
-   */
-  getCategoryColor(category: string): string {
-    const index = this.config.keys.indexOf(category);
-    return index >= 0 ? this.config.colors[index] : '#cccccc';
-  }
-
-  /**
-   * Get HS range for category
-   */
-  getHSRangeForCategory(category: string): {min: number, max: number} | undefined {
-    return this.config.iconMapping[category];
-  }
-
-  /**
-   * Search categories by HS code
-   */
-  findCategoryByHSCode(hsCode: number): string {
-    for (const [categoryName, range] of Object.entries(this.config.iconMapping)) {
-      if (hsCode >= range.min && hsCode <= range.max) {
-        return categoryName;
-      }
-    }
-    return "Unknown category";
   }
 
   /**

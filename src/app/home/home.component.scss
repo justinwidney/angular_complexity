@@ -1,6 +1,8 @@
 
 @use '@angular/material' as mat;
 
+
+
 .modern-chart-toggles .mat-pseudo-checkbox {
   width: 18px !important;
   height: 18px !important;
@@ -112,19 +114,211 @@
     justify-content: space-between;
   }
 
-  .floating-info-panel {
+/* Enhanced Floating Info Panel */
+.floating-info-panel {
   position: absolute;
-  bottom: 20px;
+  bottom: 10px;
   right: 20px;
   z-index: 1000;
-  max-width: 350px;
-  min-width: 280px;
+  max-width: 300px;
+  min-width: 300px;
   
-
+  /* Modern card styling */
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
   
-  // Animation when appearing
-  animation: slideInFromRight 0.3s ease-out;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  
+  /* Enhanced animations */
+  animation: slideInFromRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom right;
+  
+  /* Smooth transitions for interactions */
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* Hover effect for the panel */
+.floating-info-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 25px 30px -5px rgba(0, 0, 0, 0.15),
+    0 15px 15px -5px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Card styling */
+.floating-info-panel .card {
+  background: transparent;
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Card header */
+.floating-info-panel .card-header {
+  background: linear-gradient(135deg, #4d94ff 0%, #007bff 100%);
+  color: white !important;
+  padding: 16px 20px;
+  border-bottom: none;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+
+  --goa-color-text-default: white !important;
+  --goa-color-text-primary: white !important;
+  --goa-color-heading: white !important;
+
+
+
+}
+
+.floating-info-panel .card-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+/* Card body */
+.floating-info-panel .card-body {
+  padding: 20px 20px 0px 20px;
+}
+
+/* Text styling */
+.floating-info-panel p {
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+.floating-info-panel p:last-of-type {
+  margin-bottom: 16px;
+}
+
+.floating-info-panel strong {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+/* Button styling */
+.floating-info-panel .card-body goa-button {
+  margin-top: 8px;
+}
+
+.floating-info-panel .close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  height: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.floating-info-panel .close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.floating-info-panel .close-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Enhanced slide-in animation */
+@keyframes slideInFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100%) translateY(20px) scale(0.95);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateX(-5px) translateY(0) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) translateY(0) scale(1);
+  }
+}
+
+/* Slide-out animation for when panel is removed */
+@keyframes slideOutToRight {
+  0% {
+    opacity: 1;
+    transform: translateX(0) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%) translateY(20px) scale(0.95);
+  }
+}
+
+/* Class for exit animation */
+.floating-info-panel.exiting {
+  animation: slideOutToRight 0.3s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .floating-info-panel {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    min-width: auto;
+    
+    /* Adjust animation for mobile */
+    animation: slideInFromBottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .floating-info-panel .card-header {
+    padding: 14px 16px;
+  }
+  
+  .floating-info-panel .card-body {
+    padding: 16px;
+  }
+}
+
+/* Mobile slide-in animation */
+@keyframes slideInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(100%) scale(0.95);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-5px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+
+
+
+
 
 /* Filter buttons styling */
 .filter-buttons-wrapper {
@@ -347,7 +541,7 @@
     top: 100%;
     left: 50%;
     margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
-    background-color: black;
+    background-color: rgba(0, 33, 69, 0.95);
     color: #fff;
     text-align: center;
     border-radius: 6px;

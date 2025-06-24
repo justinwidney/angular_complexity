@@ -92,44 +92,32 @@ export class UnifiedDataService {
   constructor(private http: HttpClient) {
   }
 
-  /**
-   * Set HS descriptions for data processing
-   */
+ 
   setHSDescriptions(descriptions: HSDescription[]): void {
     this.hsDescriptions = descriptions;
   }
 
-  /**
-   * Set current region and trigger data loading if needed
-   */
+
   setCurrentRegion(region: keyof typeof this.apiMap): void {
     this.currentRegionSubject.next(region);
   }
 
-  /**
-   * Set current year
-   */
+
   setCurrentYear(year: string): void {
     this.currentYearSubject.next(year);
   }
 
-  /**
-   * Get current region
-   */
+
   getCurrentRegion(): string {
     return this.currentRegionSubject.value;
   }
 
-  /**
-   * Get current year
-   */
+
   getCurrentYear(): string {
     return this.currentYearSubject.value;
   }
 
-  /**
-   * Generate cache key with region, year, and data type
-   */
+
   private getCacheKey(region: string, year?: string, isHistorical: boolean = false): string {
     if (isHistorical) {
       return `${region}-ALL_YEARS`; // Special key for historical data

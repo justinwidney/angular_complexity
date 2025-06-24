@@ -25,7 +25,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   @Input() highlightConnections: boolean = true;
 
   // Event emitters for parent component interaction
-  @Output() nodeSelected = new EventEmitter<{node: Node, data: GroupedData | undefined}>();
+  @Output() nodeSelected = new EventEmitter<{node: Node, data: GroupedData | undefined,   connectedProducts: string[]  }>();
   @Output() nodeHovered = new EventEmitter<{node: Node, data: GroupedData | undefined}>();
   @Output() rowHighlight = new EventEmitter<number>();
   @Output() chartDataLoaded = new EventEmitter<{totalSum: number, nodeCount: number, dataCount: number}>();
@@ -93,7 +93,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       .subscribe(region => {
         // Handle region changes if needed
         this.selectedRegion = region as any;
-        this.loadData();
+        this.reloadData();
       });
 
     this.coordinationService.displayMode$
@@ -117,7 +117,6 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       this.coordinationService.productGroups$
       .pipe(takeUntil(this.destroy$))
       .subscribe(productGroups => {
-        console.log('🎯 Product space chart received product groups:', productGroups);
         this.enabledProductGroups = productGroups.filter(group => group.enabled);
         this.applyDisplayMode(); // Re-render nodes with new product group filtering
       });
@@ -146,6 +145,22 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
     });
   }
 
+  private reloadData(): void {
+    this.chartService.getAllData(this.selectedRegion).subscribe(({ nodes, links, grouped, totalSum }) => {
+      this.nodes = nodes;
+      this.links = links;
+      this.grouped = grouped;
+      this.totalSum = totalSum;
+      
+      this.chartDataLoaded.emit({
+        totalSum: totalSum,
+        nodeCount: nodes.length,
+        dataCount: grouped.length
+      });
+
+    });
+  }
+
   private initializeChart(): void {
     const config = ProductSpaceChartUtils.getChartConfig();
     
@@ -168,6 +183,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       .attr('width', config.width)
       .attr('height', config.height)
       .style("background", config.background)
+      .style("cursor", "grab")
       .on("click", (event) => this.handleSvgClick(event))
       .call(this.zoom)
       .call(this.zoom.transform, this.transform);
@@ -227,6 +243,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       .append("circle")
         .attr("class", "node")
         .style("stroke", "black")
+        .style("cursor", "pointer")
         .on("mouseover", (event, d) => this.handleMouseover(event, d))
         .on("mousemove", (event, d) => this.handleMousemove(event, d))
         .on("mouseout",  (event, d) => this.handleMouseleave(event, d))
@@ -416,7 +433,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
     }
 
     const productCode = parseInt(groupedData.product?.toString() || '0');
-    const hs2Code = Math.floor(productCode / 100);
+    const hs2Code = Math.floor(productCode );
 
     // Check if product's HS2 code falls within any enabled product group's ranges
     return enabledGroups.some(group => {
@@ -464,7 +481,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
           const [tx, ty] = event.transform.apply([d.x, d.y]);
           d3.select(el)
             .style('left', `${tx - 50}px`)
-            .style('top',  `${ty + 50}px`);
+            .style('top',  `${ty - 75}px`);
         }
       })
   }
@@ -488,11 +505,6 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
 
   private handleMousemove(event: any, d: Node): void {
 
-    let value = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
-    const displayValue = value !== undefined ? value.Value : 0;
-    
-    // Emit hover event
-    this.nodeHovered.emit({ node: d, data: value });
     
     const svgElement = this.svg.node()
 
@@ -526,7 +538,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       const tooltip = this.createTooltip(d);
       tooltip
         .style("left", (transformedX - 50) + "px")
-        .style("top", (transformedY + 50) + "px");
+        .style("top", (transformedY - 75) + "px");
     }
   }
 
@@ -552,21 +564,23 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
     const value = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
     
     // Emit node selected event
-    this.nodeSelected.emit({ node: d, data: value });
     
     this.changeInfoBox(d);
+    let connectedProducts: string[] = [];
+    const connectedProductsSet = new Set<string>();
+
     
     if (this.highlightConnections) {
       const edges = this.links.filter((x) => {
         return (x.source === d.id || x.target === d.id);
       });
       
-      const connectedProducts: string[] = [];
       this.highlightRowByProductId(value ? value.product : parseInt(d.id));
       
       edges.forEach((x) => {
-        const addon = x.source !== d.id ? x.target : x.source;
-        connectedProducts.push(addon);
+        const addon = x.source !== d.id ? x.source : x.target;
+        connectedProductsSet.add(addon);
+
         
         const lines = d3.selectAll('line').filter((t: any) => {
           if (!t) return false;
@@ -581,7 +595,10 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       });
     }
     
-    // Set node as selected (state = 1) - this makes tooltip "stick"
+    connectedProducts = Array.from(connectedProductsSet);
+
+    this.nodeSelected.emit({ node: d, data: value,      connectedProducts: connectedProducts });
+
     d.state = 1;
 
     // Update tooltip position for click coordinates
@@ -609,7 +626,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
     
     tooltip
       .style("left", (transformedX - 50) + "px")
-      .style("top", (transformedY + 50) + "px");
+      .style("top", (transformedY - 75) + "px");
   }
 
   public refreshChart(): void {
@@ -642,7 +659,6 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   private createTooltip(d: Node): any {
 
     const value = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
-    const displayValue = value !== undefined ? value.Value : 0;
     const description = value?.description || 'No description available';
 
     const links = this.links
@@ -653,17 +669,29 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
       .attr("class", "tooltip")
       .datum(d)
       .style("opacity", 0.9)
-      .style("background-color", "rgba(0, 33, 69, .8)")
+      .style('background', 'linear-gradient(135deg, #4d94ff 0%, #007bff 100%)')
       .style("border-width", "1px")
       .style("color", "white")
-      .style("padding", "20px 15px")
+      .style('padding', '12px')
       .style("position", "absolute")
       .style("z-index", "1000")
+      .style('border-radius', '6px')
+      .style('font-size', '13px')
+      .style('box-shadow', '0 4px 12px rgba(0, 0, 0, 0.3)')
+      .style('z-index', '1000')
+      .style('max-width', '300px')
+
+
+
       .html(`
         <div style="position: relative;">
           <button class="close-button" 
-                  style="position: absolute; top: -20px; right: -14px; background: none; color: white; border: none; border-radius: 50%; cursor: pointer; width: 20px; height: 20px;">X</button>
-          <div>${d.id}<br>  ${description}  </div>
+                  style="position: absolute; top: -13px; right: -9px; 
+                  background: none; color: white; border: none; 
+                  border-radius: 50%; cursor: pointer; width: 20px; 
+                  font-size: 13px;
+                  height: 20px;">X</button>
+          <div>${description}  </div>
         </div>
       `);
 
@@ -689,12 +717,9 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private changeInfoBox(d: Node): void {
-    console.log('Updating info box for node:', d);
+
     const value = this.chartService.findGroupedDataByProduct(this.grouped, d.id);
-    console.log('Node data:', value);
-    
-    // Emit event for parent component to handle
-    this.nodeSelected.emit({ node: d, data: value });
+    this.nodeSelected.emit({ node: d, data: value, connectedProducts: [] });
   }
 
   private highlightRowByProductId(productId: number): void {

@@ -3,8 +3,7 @@ import { Router } from '@angular/router';
 import { ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { CommonModule } from '@angular/common';
-import { ChartSignalService } from '../chart/chart.service';
-import { FilterService } from '../filter/filter.service';
+
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ProductSpaceChartComponent } from '../productspace/product-space-chart.component';
@@ -21,6 +20,7 @@ import { TableComponent } from '../dataTable/data-table.component';
 interface NodeData {
   node: any;
   data: any;
+  connectedProducts: string[]
 }
 
 
@@ -139,16 +139,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   private productGroups$ = this.coordinationService.productGroups$;
 
   constructor(
-    private router: Router, 
-    private chartService: ChartSignalService, 
-    private filterSvc: FilterService,
     private coordinationService: ChartCoordinationService,
     private unifiedDataService: UnifiedDataService,
     private cdr: ChangeDetectorRef
   ) {}
   
   ngOnInit(): void {
-    this.chartService.initialize();
+    //this.chartService.initialize();
     
     // Initialize with default values
     this.initializeServices();
@@ -219,7 +216,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.coordinationService.filteredTotals
       .pipe(
         skip(1),
-
         takeUntil(this.destroy$))
       .subscribe(filteredTotals => {
         console.log('📊 Home component received filtered totals:', filteredTotals);
@@ -291,11 +287,10 @@ export class HomeComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(({ type, value }) => {
-        console.log(`📊 Selection changed: ${type} = ${value}`);
         
         // Refresh the current chart
         this.refreshCurrentChart();
-        this.updateDashboardStats();
+        //this.updateDashboardStats();
       });
   }
 
@@ -397,19 +392,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.originalTotalValue = this.formatCurrency(originalTotal);
     this.originalProductCount = this.chartData.length;
     
-    console.log('📊 Dashboard stats updated:', {
-      filtered: this.totalValue,
-      original: this.originalTotalValue,
-      hasActiveFilters: this.filteredTotals.filterSummary.hasActiveFilters
-    });
+ 
   }
 
 
   private updateDashboardStats(): void {
     // Get stats based on current chart type (for original totals)
-
-
-    console.log('📊 Updating dashboard stats for chart type:', this.selectedChartType);
 
     switch (this.selectedChartType) {
       case 'ProductSpace':
@@ -540,7 +528,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private refreshCurrentChart(): void {
-    console.log(`? Refreshing current chart ?`);
     
     // Reload search data when chart refreshes
     this.loadChartDataForSearch();
@@ -556,20 +543,17 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       case 'Feasible':
         if (this.feasibleChart) {
-          //this.feasibleChart.refreshChart();
-          //console.log('Feasible chart refreshed');
+  
         }
         break;
 
       case 'Trends':
         if (this.overtimeChart) {
-          this.overtimeChart.refreshChart();
         }
         break;
 
       case 'Exports':
         if (this.treemapChart) {
-          this.treemapChart.refreshChart();
         }
         break;
 
@@ -602,6 +586,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.selectedNode = null;
     if (this.productSpaceChart) {
       this.productSpaceChart.clearSelections();
+    }
+    if (this.feasibleChart) {
+      this.feasibleChart.clearSelections();
     }
     this.cdr.markForCheck();
   }
@@ -667,30 +654,15 @@ export class HomeComponent implements OnInit, OnDestroy {
         break;
     }
 
-    console.log('Display mode changed to:', this.currentDisplayFilter, 'with filter type:', this.filterType);
 
     // Broadcast the display mode change to all components
     this.coordinationService.setDisplayMode(this.currentDisplayFilter as DisplayMode);
     this.coordinationService.setFilterType(this.filterType);
     
-    // Apply specific filters based on chart type
-    this.applyChartSpecificFilters((e as CustomEvent).detail.value);
+  
   }
 
-  private applyChartSpecificFilters(filterType: string): void {
-    switch (this.selectedChartType) {
-      case 'Feasible':
-        break;
-      case 'ProductSpace':
-        break;
-      case 'Trends':
-        break;
-      case 'Exports':
-        break;
-      case 'ECI':
-        break;
-    }
-  }
+
 
   // Enhanced Search event handlers
   onSearchInput(event: any): void {
@@ -863,6 +835,43 @@ export class HomeComponent implements OnInit, OnDestroy {
     } else {
       return `${enabledGroups.length} of ${this.coordinationService.currentProductGroups.length} groups`;
     }
+  }
+
+
+
+  onNodeSelected(event: {node: any, data: any, connectedProducts: string[]}): void {
+    console.log('Node selected:', event);
+    this.selectedNode = {
+      node: event.node,
+      data: event.data,
+      connectedProducts: event.connectedProducts
+    };
+    this.cdr.markForCheck();
+  }
+  
+ 
+
+
+  getConnectedProductDescriptions(connectedProductIds: string[]): any[] {
+    if (!connectedProductIds || connectedProductIds.length === 0) {
+      return [];
+    }
+
+    // You'll need access to your chart data here
+    // This assumes you have access to the grouped data from your chart service
+    return connectedProductIds.map(productId => {
+      // Find the product data for each connected product
+      const productData = this.chartData.find(item => 
+        item.product?.toString() === productId
+      );
+      
+      return {
+        id: productId,
+        description: productData?.description || `Product ${productId}`,
+        value: productData?.Value || 0,
+        rca: productData?.rca || 0
+      };
+    }).slice(0, 5); // Limit to first 5 to avoid overwhelming the UI
   }
 
 

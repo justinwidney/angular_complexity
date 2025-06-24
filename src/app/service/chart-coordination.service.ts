@@ -190,10 +190,8 @@ export class ChartCoordinationService {
 
   // FIXED: Calculate filtered totals based on current filters
   private calculateFilteredTotals(): void {
-    console.log('🔍 Calculating filtered totals...');
 
-    // FIXED: If no data cache is set, don't calculate filtered totals
-    // This prevents charts that don't use filtering from getting 0 values
+
     if (!this.dataCacheSet || !this.dataCache || this.dataCache.length === 0) {
       console.log('📊 No data cache set or empty - using base totals');
       
@@ -217,10 +215,12 @@ export class ChartCoordinationService {
     // 1. Apply RCA filter
     filteredData = this.applyRCAFilter(filteredData, filterType);
     
+
     // 2. Apply product group filter
     if (enabledProductGroups.length > 0 && enabledProductGroups.length < this.productGroupsSubject.value.length) {
       filteredData = this.applyProductGroupFilter(filteredData, enabledProductGroups);
     }
+
     
     // 3. Apply search filter
     if (searchQuery.trim().length > 0 && searchResults.length > 0) {
@@ -319,13 +319,12 @@ export class ChartCoordinationService {
     
     return data.filter(item => {
       const productCode = parseInt(item.product?.toString() || '0');
-      const hs2Code = Math.floor(productCode / 100);
+      const hs2Code = Math.floor(productCode );
       
       return enabledRanges.some(range => hs2Code >= range.min && hs2Code <= range.max);
     });
   }
 
-  // NEW: Calculate total sum helper
   private calculateTotalSum(data: any[]): number {
     return data.reduce((acc, item) => acc + (Number(item.Value) || 0), 0);
   }
@@ -336,84 +335,83 @@ export class ChartCoordinationService {
       {
         id: 'animal-food',
         name: 'Animal & Food Products',
-        hsCodeRanges: [{ min: 1, max: 24 }],
+        hsCodeRanges: [{ min: 100, max: 2499 }],
         color: '#FF6B6B',
         enabled: true
       },
       {
         id: 'minerals',
         name: 'Minerals',
-        hsCodeRanges: [{ min: 25, max: 27 }],
+        hsCodeRanges: [{ min: 2500, max: 2799 }],
         color: '#4ECDC4',
         enabled: true
       },
       {
         id: 'chemicals',
         name: 'Chemicals & Plastics',
-        hsCodeRanges: [{ min: 28, max: 40 }],
+        hsCodeRanges: [{ min: 2800, max: 4099 }],
         color: '#45B7D1',
         enabled: true
       },
       {
         id: 'raw-materials',
         name: 'Raw Materials',
-        hsCodeRanges: [{ min: 41, max: 49 }],
+        hsCodeRanges: [{ min: 4100, max: 4999 }],
         color: '#96CEB4',
         enabled: true
       },
       {
         id: 'textiles',
         name: 'Textiles',
-        hsCodeRanges: [{ min: 50, max: 63 }],
+        hsCodeRanges: [{ min: 5000, max: 6399 }],
         color: '#FFEAA7',
         enabled: true
       },
       {
         id: 'footwear',
         name: 'Footwear & Accessories',
-        hsCodeRanges: [{ min: 64, max: 67 }],
+        hsCodeRanges: [{ min: 6400, max: 6799 }],
         color: '#DDA0DD',
         enabled: true
       },
       {
         id: 'stone-glass',
         name: 'Stone & Glass',
-        hsCodeRanges: [{ min: 68, max: 71 }],
+        hsCodeRanges: [{ min: 6800, max: 7199 }],
         color: '#98D8C8',
         enabled: true
       },
       {
         id: 'metals',
         name: 'Metals',
-        hsCodeRanges: [{ min: 72, max: 83 }],
+        hsCodeRanges: [{ min: 7200, max: 8399 }],
         color: '#F7DC6F',
         enabled: true
       },
       {
         id: 'machinery',
         name: 'Machinery & Electronics',
-        hsCodeRanges: [{ min: 84, max: 85 }],
+        hsCodeRanges: [{ min: 8400, max: 8599 }],
         color: '#BB8FCE',
         enabled: true
       },
       {
         id: 'transportation',
         name: 'Transportation',
-        hsCodeRanges: [{ min: 86, max: 89 }],
+        hsCodeRanges: [{ min: 8600, max: 8999 }],
         color: '#85C1E9',
         enabled: true
       },
       {
         id: 'miscellaneous',
         name: 'Miscellaneous',
-        hsCodeRanges: [{ min: 90, max: 97 }],
+        hsCodeRanges: [{ min: 9000, max: 9799 }],
         color: '#F8C471',
         enabled: true
       }
     ];
   }
 
-  // FIXED: Empty filtered totals
   private getEmptyFilteredTotals(): FilteredTotals {
     return {
       totalSum: 0,
@@ -430,9 +428,7 @@ export class ChartCoordinationService {
     };
   }
 
-  // ===== ALL YOUR EXISTING METHODS BELOW (MOSTLY UNCHANGED) =====
 
-  // Setters (keeping all your existing ones)
   setRegion(region: string): void {
     this.regionSubject.next(region);
   }
@@ -452,10 +448,8 @@ export class ChartCoordinationService {
   setFilterType(filter: FilterType): void {
     console.log('Setting filter type:', filter);
     this.filterTypeSubject.next(filter);
-    // Filtered totals will be recalculated automatically via the pipeline
   }
 
-  // Enhanced search methods (keeping all your existing logic)
   setSearchQuery(query: string): void {
     console.log('Setting search query:', query);
     this.searchQueryInputSubject.next(query);
@@ -490,8 +484,7 @@ export class ChartCoordinationService {
   setDataCache(data: any[], totalSum?: number): void {
     console.log('📊 Setting data cache with', data.length, 'records');
     
-    // FIXED: Don't override existing data cache with empty data
-    // This prevents charts with no data from clearing other charts' filtering
+    
     if (data.length === 0 && this.dataCacheSet && this.dataCache.length > 0) {
       console.log('⚠️  Ignoring empty data cache - keeping existing data for filtering');
       return;
@@ -522,7 +515,6 @@ export class ChartCoordinationService {
 
   // NEW: Method for charts that don't use filtering - doesn't affect coordination service state
   getIndependentTotals(data: any[]): FilteredTotals {
-    console.log('📊 Calculating independent totals for', data.length, 'records (no coordination service interference)');
     return this.getBaseTotals(data);
   }
 
@@ -631,12 +623,10 @@ export class ChartCoordinationService {
     return this.currentSearchQuery.trim().length > 0;
   }
 
-  // NEW: Check if any filters are active
   hasActiveFilters(): boolean {
     return this.currentFilteredTotals.filterSummary.hasActiveFilters;
   }
 
-  // ===== ALL YOUR EXISTING SEARCH METHODS (KEEPING THEM UNCHANGED) =====
 
   private processSearchQuery(query: string): Observable<{suggestions: SearchSuggestion[], results: any[]}> {
     return new Observable(observer => {
@@ -682,7 +672,6 @@ export class ChartCoordinationService {
       results = this.searchByText(data, lowercaseQuery);
     }
 
-    console.log('Search results found:', results.length, 'for query:', query);
     return results.slice(0, maxResults);
   }
 

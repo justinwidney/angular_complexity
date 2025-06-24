@@ -121,6 +121,7 @@ export interface RawTreemapItem {
   naics: string;
   naics_description: string;
   Value: number;
+  product: number;
   Date?: string;
   Region?: string;
   [key: string]: any;

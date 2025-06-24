@@ -31,7 +31,6 @@ export class FeasibleChartService {
     minPci: number,
     maxPci: number
   }> {
-    const yearParam = year || '2023';
     
     return this.getRawData().pipe(
       map((rawData) => {
@@ -212,14 +211,34 @@ public aggregateData(
 
   // Filter data for frontier view
   public getFrontierData(data: FeasiblePoint[]): FeasiblePoint[] {
-    return data
-      .filter(d => d.distance > 0 && d.pci > 0)
+    const filtered = data.filter(d => d.distance > 0 && d.pci > 0);
+    const paretoFrontier: FeasiblePoint[] = [];
+    
+    for (const point of filtered) {
+      let isDominated = false;
+      
+      // Check if this point is dominated by any other point
+      for (const other of filtered) {
+        if (other !== point && 
+            (1 - other.distance) >= (1 - point.distance) && // other has equal or better distance
+            other.pci >= point.pci && // other has equal or better PCI
+            ((1 - other.distance) > (1 - point.distance) || other.pci > point.pci)) { // other is strictly better in at least one dimension
+          isDominated = true;
+          break;
+        }
+      }
+      
+      if (!isDominated) {
+        paretoFrontier.push(point);
+      }
+    }
+    
+    // Sort by distance priority, then PCI
+    return paretoFrontier
       .sort((a, b) => {
-        const scoreA = Math.sqrt((1 - a.distance) ** 2 + 0.001 * a.pci ** 2);
-        const scoreB = Math.sqrt((1 - b.distance) ** 2 + 0.001 * b.pci ** 2);
-        return scoreB - scoreA;
+        const distDiff = (1 - a.distance) - (1 - b.distance);
+        return distDiff !== 0 ? -distDiff : b.pci - a.pci;
       })
-      .slice(0, 15);
   }
 
   // Filter data for four quadrants view

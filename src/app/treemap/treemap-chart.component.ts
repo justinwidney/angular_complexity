@@ -33,8 +33,6 @@ import { CommonModule } from '@angular/common';
       
       <!-- Tooltip Container -->
       <div #tooltipContainer id="treemap-tooltip-container" class="tooltip-container"></div>
-      
-    
     </div>
   `,
   styleUrls: ['./treemap-chart.component.scss'],
@@ -72,6 +70,9 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
   private hierarchyData: d3.HierarchyRectangularNode<any> | null = null;
   private config!: TreemapConfig;
   private dimensions!: TreemapDimensions;
+
+  // NEW: Product group filtering
+  private enabledProductGroups: any[] = [];
 
   // Component state
   loading = false;
@@ -133,8 +134,6 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dimensions = TreemapChartUtils.calculateDimensions({
       ...this.config,
     });
-
-
   }
 
   /**
@@ -175,6 +174,14 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
           this.loadData();
         }
       });
+
+    // NEW: Subscribe to product group changes (same as feasible chart)
+    this.coordinationService.productGroups$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(productGroups => {
+        this.enabledProductGroups = productGroups.filter(group => group.enabled);
+        this.updateDisplay(); // Re-render treemap with new product group filtering
+      });
   }
 
   public refreshChart(): void {
@@ -182,21 +189,17 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadData();
   }
 
-
   /**
    * Load data using unified service - now uses dedicated treemap method
    */
   private loadData(): void {
     const region = this.coordinationService.currentRegion || this.unifiedDataService.getCurrentRegion();
     
-    
     // Use the new dedicated treemap method
     this.unifiedDataService.getTreemapData(region as any)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {
-     
-          
           this.rawData = TreemapChartUtils.cloneData(result.rawData);
           this.processTreemapData(this.rawData);
         },
@@ -208,20 +211,47 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Process raw data for treemap - simplified since data is already filtered
+   * NEW: Helper method to check if treemap item belongs to enabled product group
+   */
+  private isItemInEnabledProductGroup(item: RawTreemapItem): boolean {
+    // Get all product groups and filter for enabled ones
+    const enabledGroups = this.coordinationService.currentProductGroups.filter(group => group.enabled);
+    
+    // If all product groups are enabled or none specified, show all items
+    if (enabledGroups.length === 0 || enabledGroups.length === this.coordinationService.currentProductGroups.length) {
+      return true;
+    }
+
+    console.log(item) 
+   
+    const hs2Code = item.product;
+
+    // Check if item's HS2 code falls within any enabled product group's ranges
+    return enabledGroups.some(group => {
+      return group.hsCodeRanges.some((range: any) => 
+        hs2Code >= range.min && hs2Code <= range.max
+      );
+    });
+  }
+
+
+
+  /**
+   * Process raw data for treemap - now with product group filtering
    */
   private processTreemapData(rawData: RawTreemapItem[]): void {
     try {
-
       // Validate data
       if (!TreemapChartUtils.validateTreemapData(rawData)) {
         this.handleError('Invalid treemap data structure');
         return;
       }
 
+      // NEW: Filter data based on enabled product groups
+      const filteredData = rawData.filter(item => this.isItemInEnabledProductGroup(item));
 
       // Group by NAICS (equivalent to your groupBy function)
-      const groupedData = TreemapChartUtils.groupByNaics(rawData);
+      const groupedData = TreemapChartUtils.groupByNaics(filteredData);
       const hierarchyRoot = TreemapChartUtils.createTreemapHierarchy(groupedData);
       
       // Create D3 treemap layout
@@ -236,9 +266,9 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.data = this.hierarchyData.children || [];
 
       // Calculate debug info
-      this.debugInfo.dataLength = rawData.length;
+      this.debugInfo.dataLength = filteredData.length; // Use filtered data length
       this.debugInfo.nodesCount = this.data.length;
-      this.debugInfo.totalValue = TreemapChartUtils.calculateTotalValue(rawData);
+      this.debugInfo.totalValue = TreemapChartUtils.calculateTotalValue(filteredData);
 
       // Emit events
       this.chartDataLoaded.emit({
@@ -253,6 +283,16 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
     } catch (error) {
       this.handleError(`Failed to process treemap data: ${error}`);
+    }
+  }
+
+  /**
+   * NEW: Update display when product groups change
+   */
+  private updateDisplay(): void {
+    if (this.rawData && this.rawData.length > 0) {
+      // Reprocess data with new product group filters
+      this.processTreemapData(this.rawData);
     }
   }
 
@@ -361,8 +401,6 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
         .duration(this.config.animationDuration)
         .style('opacity', 1);
     }
-
-
   }
 
   /**
@@ -460,8 +498,6 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.currentState.selectedNode = null;
     this.renderTreemap();
   }
-
-
 
   /**
    * Error handling

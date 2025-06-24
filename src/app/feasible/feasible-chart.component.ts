@@ -50,7 +50,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   // Event emitters
   @Output() chartDataLoaded = new EventEmitter<{dataCount: number, eci: number}>();
-  @Output() nodeSelected = new EventEmitter<{node: Node, data: GroupedData | undefined}>();
+  @Output() nodeSelected = new EventEmitter<{node: Node | FeasiblePoint, data: GroupedData | undefined, connectedProducts: string[]}>();
   @Output() nodeHovered = new EventEmitter<{node: Node, data: GroupedData | undefined}>();
 
   // Component state
@@ -71,12 +71,17 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private trackingText: { textX: any, textY: any } = { textX: null, textY: null };
   private tooltip: any;
   private hideTooltipTimeout: any;
+  private zoom: any; // Add this line
 
   // State
   private iconTruthMapping: IconTruthMapping = FeasibleChartUtils.getDefaultIconTruthMapping();
   private currentGrouping: GroupingType = GroupingType.HS4;
   private currentDisplayMode: DisplayMode = DisplayMode.DEFAULT;
   private currentFilterType: FilterType = FilterType.ALL;
+
+  private enabledProductGroups: any[] = [];
+
+
   pointSelected: any;
   pointHovered: any;
 
@@ -166,6 +171,14 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
         this.currentFilterType = filterType;
         //this.updateDisplay();
       });
+
+      this.coordinationService.productGroups$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(productGroups => {
+        this.enabledProductGroups = productGroups.filter(group => group.enabled);
+        this.updateDisplay(); // Re-render points with new product group filtering
+      });
+
   }
 
   private subscribeToUnifiedService(): void {
@@ -189,6 +202,9 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .subscribe(region => {
         //this.loadData();
       });
+
+
+
   }
 
 
@@ -232,6 +248,8 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
           this.centerX = result.bounds.centerX;
           this.centerY = result.bounds.centerY;
 
+          console.log(this.centerX, this.centerY, "centerX, centerY");
+
           // Emit data loaded event
           this.chartDataLoaded.emit({
             dataCount: this.data.length,
@@ -241,6 +259,10 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
           this.updateReferenceLines();
 
           this.refreshChart();
+
+          setTimeout(() => {
+            this.updateZoomForNewCenter();
+          }, 100);
 
         },
         error: (error) => {
@@ -252,7 +274,6 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private initializeChart(): void {
 
-    console.log("Initializing chart with data count:", this.data.length, "and ECI:", this.eci);
 
     this.clearChart();
     this.setupSVG();
@@ -316,11 +337,24 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private setupZoom(): void {
 
-    console.log("Setting up zoom with centerX:", this.centerX, "centerY:", this.centerY);
-
-    const translateX = (this.config.width / 2 - this.scales.x(this.centerX));
-    const translateY = (this.config.height / 2 - this.scales.y(this.centerY));
-    const transform = d3.zoomIdentity.scale(1).translate(translateX, translateY);
+    const scale = 0.75; // Preserve current scale
+    const margins = this.config.margins; // Assuming margins are in your config
+    const chartWidth = this.config.width + margins.left + margins.right;
+    const chartHeight = this.config.height - margins.top - margins.bottom;
+    
+    // Center of the actual chart area (not the full SVG)
+    const screenCenterX = margins.left + chartWidth / 2;
+    const screenCenterY = margins.top + chartHeight / 2;
+  
+    // Calculate where the data center point is in unscaled coordinates
+    const dataCenterX = this.scales.x(this.centerX);
+    const dataCenterY = this.scales.y(this.centerY);
+    
+    // Calculate translation needed to center the data point
+    const translateX = screenCenterX - dataCenterX * scale;
+    const translateY = screenCenterY - dataCenterY * scale;
+  
+    const transform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
 
     this.zoomable = this.svg
       .append("g")
@@ -328,32 +362,51 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .attr("transform", transform);
 
     const axes = FeasibleChartUtils.createAxes(this.svg, this.scales, this.config);
-    const zoom = FeasibleChartUtils.createZoom(
+    this.zoom = FeasibleChartUtils.createZoom(
       this.svg, 
       this.zoomable, 
       this.scales, 
       axes,
-      () => this.onZoomUpdate()
     );
 
     this.svg
-      .call(zoom)
-      .call(zoom.transform, transform);
+      .call(this.zoom)
+      .call(this.zoom.transform, transform);
+  }
+
+  private updateZoomForNewCenter(): void {
+    if (!this.svg || !this.scales || !this.zoom) return;
+  
+      const currentTransform = d3.zoomTransform(this.svg.node());
+      const scale = currentTransform.k; // Preserve current scale
+      const margins = this.config.margins; // Assuming margins are in your config
+      const chartWidth = this.config.width + margins.left + margins.right;
+      const chartHeight = this.config.height - margins.top - margins.bottom;
+      
+      // Center of the actual chart area (not the full SVG)
+      const screenCenterX = margins.left + chartWidth / 2;
+      const screenCenterY = margins.top + chartHeight / 2;
+    
+      // Calculate where the data center point is in unscaled coordinates
+      const dataCenterX = this.scales.x(this.centerX);
+      const dataCenterY = this.scales.y(this.centerY);
+      
+      // Calculate translation needed to center the data point
+      const translateX = screenCenterX - dataCenterX * scale;
+      const translateY = screenCenterY - dataCenterY * scale;
+    
+      const newTransform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
+ 
+    // Apply the new transform with a smooth transition
+    this.svg.transition()
+      .duration(750)
+      .call(this.zoom.transform, newTransform);
   }
 
   private setupUI(): void {
     // Create tracking lines and text
     this.trackingLines = FeasibleChartUtils.createTrackingLines(this.svg, this.config);
     this.trackingText = FeasibleChartUtils.createTrackingText(this.svg, this.config);
-
-    // Create tooltip
-    this.tooltip = d3.select("#feasiblediv")
-      .append("div")
-      .style("opacity", 0)
-      .attr("class", "tooltip3")
-      .style("display", "block")
-      .style("padding", "10px")
-      .attr("position", "relative");
 
     // Create reference lines
     FeasibleChartUtils.createReferenceLines(
@@ -370,7 +423,6 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private renderChart(): void {
     this.renderPoints();
-    //this.updateDisplayMode();
   }
 
   private renderPoints(): void {
@@ -414,7 +466,9 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       this.currentGrouping,
       this.iconTruthMapping,
       this.currentFilterType as number,
-      this.scales
+      this.scales,
+      this.coordinationService.currentProductGroups // Pass current product groups
+
     );
   }
 
@@ -426,9 +480,6 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     catch{
     }
-
-
-    console.log("Updating display mode to:", this.currentDisplayMode);
 
     switch (this.currentDisplayMode) {
       case DisplayMode.FRONTIER:
@@ -553,7 +604,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       if (d3.select("#tooltip-" + d.hs2).empty()) {
         const tooltip = this.createTooltip(d);
         tooltip.style("left", (transformedX - 50) + "px")
-               .style("top", (transformedY + 50) + "px");
+               .style("top", (transformedY - 75) + "px");
       }
 
       // Update tracking lines
@@ -562,7 +613,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       }
 
       // Emit hover event
-      this.pointHovered.emit({ point: d, event });
+      //this.pointHovered.emit({ point: d, event });
     }
   }
 
@@ -588,11 +639,8 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     // Set point as selected
     d.state = 1;
 
-    // Update info box
-    this.updateInfoBox(d);
-
     // Emit selection event
-    this.pointSelected.emit({ point: d, event });
+    this.nodeSelected.emit({ node: d, data: undefined, connectedProducts: [] });
 
     // Ensure tooltip persists
     const svgElement = this.svg.node();
@@ -610,7 +658,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     
     tooltip.style("left", (transformedX - 50) + "px")
-           .style("top", (transformedY + 50) + "px");
+           .style("top", (transformedY - 75) + "px");
   }
 
   private createTooltip(data: FeasiblePoint): any {
@@ -623,17 +671,33 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .attr("class", "tooltip")
       .attr("id", "tooltip-" + data.hs2)
       .datum(data)
-      .style("opacity", 1)
-      .style("background-color", "rgba(0, 33, 69, .8)")
-      .style("border-width", "1px")
       .style("color", "white")
       .style("max-width", "500px")
-      .style("padding", "13px 12px")
       .style("position", "absolute")
+      .style("opacity", 0.9)
+      .style('background', 'linear-gradient(135deg, #4d94ff 0%, #007bff 100%)')
+      .style("border-width", "1px")
+      .style("color", "white")
+      .style('padding', '12px')
+      .style("position", "absolute")
+      .style("z-index", "1000")
+      .style('border-radius', '6px')
+      .style('font-size', '13px')
+      .style('box-shadow', '0 4px 12px rgba(0, 0, 0, 0.3)')
+      .style('z-index', '1000')
+      .style('max-width', '300px')
+
+
+
+
       .html(`
         <div style="position: relative;">
-          <button class="close-button" 
-                  style="position: absolute; top: -13px; right: -9px; background: none; color: white; border: none; border-radius: 50%; cursor: pointer; width: 20px; height: 20px;">X</button>
+           <button class="close-button" 
+                  style="position: absolute; top: -13px; right: -9px; 
+                  background: none; color: white; border: none; 
+                  border-radius: 50%; cursor: pointer; width: 20px; 
+                  font-size: 13px;
+                  height: 20px;">X</button>
           <div>${titleString}<br>${descriptionString}</div>
         </div>
       `);
@@ -673,35 +737,9 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .style("opacity", 1);
   }
 
-  private updateInfoBox(d: FeasiblePoint): void {
-    const infoBox = document.getElementById("info-box");
-    if (infoBox) {
-      infoBox.style.visibility = "visible";
-    }
 
-    const isNaics = this.coordinationService.isNaicsGrouping();
-    const titleString = isNaics ? `NAICS ${d.hs2}` : `HS ${d.hs2}`;
-    const hsCodes = this.chartService.getHSCodes();
-    const descriptionString = isNaics ? d.description : (hsCodes[d.hs2] || d.description2);
 
-    // Update info box elements
-    const productTitle = document.getElementById("ProductTitle");
-    const productDescription = document.getElementById("ProductDescription");
-    const countryTrade = document.getElementById("CountryTrade");
-    const rca = document.getElementById("RCA");
-    const pci = document.getElementById("PCI");
 
-    if (productTitle) productTitle.innerHTML = titleString;
-    if (productDescription) productDescription.innerHTML = descriptionString;
-    if (countryTrade) countryTrade.innerHTML = `$${this.chartService.abbreviateNumber(d.value)}`;
-    if (rca) rca.innerHTML = `${Math.round(d.rca * 1000) / 1000}`;
-    if (pci) pci.innerHTML = `${Math.round(d.pci * 1000) / 1000}`;
-  }
-
-  private onZoomUpdate(): void {
-    // This method is called during zoom events
-    // Can be used for additional zoom-related updates
-  }
 
   // Public methods for external control
   public updateIconFilter(iconClass: string, enabled: boolean): void {
@@ -734,11 +772,5 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     d3.selectAll('.tooltip').remove();
   }
 
-  public resetZoom(): void {
-    if (this.svg) {
-      this.svg.transition()
-        .duration(750)
-        .call(d3.zoom().transform, d3.zoomIdentity);
-    }
-  }
+  
 }

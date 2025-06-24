@@ -130,7 +130,7 @@
 
       <div class="col">
         <goa-text mt="none" mb="none" as="h5">
-          Total Value: {{totalValue}}
+          Total Value: {{totalValue}} USD
         </goa-text>
       </div>
 
@@ -308,7 +308,7 @@
           [customGroupLabels]="customLabels"
           [tooltipEnabled]="true"
           [highlightConnections]="true"
-
+          (nodeSelected)="onNodeSelected($event)"
           (rowHighlight)="onRowHighlight($event)"
           >
         </app-product-space-chart>
@@ -316,35 +316,71 @@
         <!-- Floating Info Panel for Selected Node -->
         <div class="floating-info-panel" *ngIf="selectedNode">
           <div class="card">
+
             <div class="card-header">
-              <goa-text as="h6" mb="none">Selected Product: {{selectedNode!.node.id}}</goa-text>
+              <goa-text as="h4" mb="none" >Selected Product: {{selectedNode!.node.id}}</goa-text>
+
+              <button class="close-btn" (click)="clearSelection()" type="button" title="Close">
+                <span>&times;</span>
+              </button>
+
             </div>
             <div class="card-body p-3">
               <p class="mb-2"><strong>Cluster:</strong> {{selectedNode!.node.cluster_name}}</p>
               <p class="mb-2"><strong>Value:</strong> {{selectedNode!.data?.Value | number}}</p>
               <p class="mb-2"><strong>RCA:</strong> {{selectedNode!.data?.rca | number:'1.4-4'}}</p>
               <p class="mb-2"><strong>Description:</strong> {{selectedNode!.data?.description}}</p>
-              <p class="mb-2"><strong>Industry:</strong> {{selectedNode!.data?.naics_description}}</p>
-              <goa-button type="secondary" size="compact" (click)="clearSelection()">
-                Clear Selection
-              </goa-button>
+              <p ><strong>Industry:</strong> {{selectedNode!.data?.naics_description}}</p>
+
+              <p class="mb-2" *ngIf="selectedNode.connectedProducts.length > 0">
+                <strong>Connected Products:</strong> {{selectedNode!.connectedProducts.join(', ')}}
+              </p>
+
+
             </div>
+           
           </div>
         </div>
       </div>
     </div>
 
     <div class="row" *ngIf="selectedChartType === 'Feasible'">
-      <div class="col-12">
+      <div class="col-12" style="position: relative;" >
         <app-feasible-chart 
           #feasibleChart
           [showTooltips]="true"
           [enableIconFiltering]="true"
           [enableTracking]="true"
           (chartDataLoaded)="feasibleStats = $event"
+          (nodeSelected)="onNodeSelected($event)"
 
         >
         </app-feasible-chart>
+
+      <!-- Floating Info Panel for Selected Node -->
+      <div class="floating-info-panel" *ngIf="selectedNode">
+        <div class="card">
+
+          <div class="card-header">
+            <goa-text as="h4" mb="none" >Selected Product: {{selectedNode!.node.hs2}}</goa-text>
+
+            <button class="close-btn" (click)="clearSelection()" type="button" title="Close">
+              <span>&times;</span>
+            </button>
+
+          </div>
+          <div class="card-body p-3">
+            <p class="mb-2"><strong>Value:</strong> {{selectedNode!.node?.value | number}}</p>
+            <p class="mb-2"><strong>PCI:</strong> {{selectedNode!.node.pci}}</p>
+            <p class="mb-2"><strong>Distance:</strong> {{selectedNode!.node?.distance | number}}</p>
+            <p class="mb-2"><strong>RCA:</strong> {{selectedNode!.node?.rca | number:'1.4-4'}}</p>
+
+
+          </div>
+        
+        </div>
+      </div>
+
       </div>  
     </div>
 
@@ -421,7 +457,7 @@
            [class.disabled]="!isProductGroupEnabled('raw-materials')"
            (click)="toggleProductGroup('raw-materials')"
            style="cursor: pointer;">
-        <i class="ph ph2 ph-factory ph-test" 
+        <i class="ph ph2 ph-warehouse ph-test" 
            [style.color]="isProductGroupEnabled('raw-materials') ? '#28A745' : '#ccc'"></i>
         <span class="tooltiptext">Raw Materials</span>
       </div>
@@ -431,7 +467,7 @@
            [class.disabled]="!isProductGroupEnabled('textiles')"
            (click)="toggleProductGroup('textiles')"
            style="cursor: pointer;">
-        <i class="ph ph2 ph-sneaker ph-test" 
+        <i class="ph ph2  ph-scissors ph-test" 
            [style.color]="isProductGroupEnabled('textiles') ? '#FFC107' : '#ccc'"></i>
         <span class="tooltiptext">Textiles</span>
       </div>
@@ -441,7 +477,7 @@
            [class.disabled]="!isProductGroupEnabled('footwear')"
            (click)="toggleProductGroup('footwear')"
            style="cursor: pointer;">
-        <i class="ph ph2 ph-scissors ph-test" 
+        <i class="ph ph2 ph-sneaker ph-test" 
            [style.color]="isProductGroupEnabled('footwear') ? '#E91E63' : '#ccc'"></i>
         <span class="tooltiptext">Footwear & Accessories</span>
       </div>
@@ -461,7 +497,7 @@
            [class.disabled]="!isProductGroupEnabled('metals')"
            (click)="toggleProductGroup('metals')"
            style="cursor: pointer;">
-        <i class="ph ph2 ph-hammer ph-test" 
+        <i class="ph ph2 ph-pipe ph-test" 
            [style.color]="isProductGroupEnabled('metals') ? '#FF9800' : '#ccc'"></i>
         <span class="tooltiptext">Metals</span>
       </div>
@@ -471,7 +507,7 @@
            [class.disabled]="!isProductGroupEnabled('machinery')"
            (click)="toggleProductGroup('machinery')"
            style="cursor: pointer;">
-        <i class="ph ph2 ph-factory ph-test" 
+        <i class="ph ph2 ph-circuitry ph-test" 
            [style.color]="isProductGroupEnabled('machinery') ? '#3F51B5' : '#ccc'"></i>
         <span class="tooltiptext">Machinery & Electronics</span>
       </div>
@@ -491,12 +527,14 @@
            [class.disabled]="!isProductGroupEnabled('miscellaneous')"
            (click)="toggleProductGroup('miscellaneous')"
            style="cursor: pointer;">
-        <i class="ph ph2 ph-scissors ph-test" 
+        <i class="ph ph2 ph-factory ph-test" 
            [style.color]="isProductGroupEnabled('miscellaneous') ? '#9C27B0' : '#ccc'"></i>
         <span class="tooltiptext">Miscellaneous</span>
       </div>
     
     </div>
+    
+    <goa-spacer vspacing="m"></goa-spacer>
 
     <div class="row">
       <div class="col-12">

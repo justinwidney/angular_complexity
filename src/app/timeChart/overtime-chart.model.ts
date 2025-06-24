@@ -168,7 +168,7 @@ export const DEFAULT_CHART_DIMENSIONS: ChartDimensions = {
     bottom: 30,
     left: 50
   },
-  width: 1440,
+  width: 1342,
   height: 650
 };
 

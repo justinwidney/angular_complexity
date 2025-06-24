@@ -39,46 +39,6 @@ import { CommonModule } from '@angular/common';
       
       <!-- Tooltip Container -->
       <div #tooltipContainer id="overtime-tooltip-container" class="tooltip-container"></div>
-      
-      <!-- Category Icons -->
-      <div class="icons">
-        <div class="icon-row">
-          <i class="ph ph-horse" title="Agricultural Products" 
-             [class.active]="isCategoryVisible('Animal & Food Products')"
-             (click)="toggleCategoryFromIcon('ph-horse')"></i>
-          <i class="ph ph-bowl-food" title="Food Products"
-             [class.active]="isCategoryVisible('Animal & Food Products')"
-             (click)="toggleCategoryFromIcon('ph-bowl-food')"></i>
-          <i class="ph ph-sketch-logo" title="Industrial Products"
-             [class.active]="isCategoryVisible('Chemicals & Plastics')"
-             (click)="toggleCategoryFromIcon('ph-sketch-logo')"></i>
-          <i class="ph ph-graph" title="Raw Materials"
-             [class.active]="isCategoryVisible('Raw Materials')"
-             (click)="toggleCategoryFromIcon('ph-graph')"></i>
-          <i class="ph ph-factory" title="Machinery and Equipment"
-             [class.active]="isCategoryVisible('Machinery & Electronics')"
-             (click)="toggleCategoryFromIcon('ph-factory')"></i>
-          <i class="ph ph-sneaker" title="Textiles and Apparel"
-             [class.active]="isCategoryVisible('Textiles')"
-             (click)="toggleCategoryFromIcon('ph-sneaker')"></i>
-          <i class="ph ph-hammer" title="Metals and Metal Products"
-             [class.active]="isCategoryVisible('Metals')"
-             (click)="toggleCategoryFromIcon('ph-hammer')"></i>
-          <i class="ph ph-car" title="Transportation Equipment"
-             [class.active]="isCategoryVisible('Transportation')"
-             (click)="toggleCategoryFromIcon('ph-car')"></i>
-          <i class="ph ph-scissors" title="Miscellaneous Manufactured Products"
-             [class.active]="isCategoryVisible('Miscellaneous')"
-             (click)="toggleCategoryFromIcon('ph-scissors')"></i>
-        </div>
-      </div>
-      
-      <!-- Data Cache Status (optional debug info) -->
-      <div *ngIf="showCacheStatus" class="cache-status">
-        <small>Data cached: {{ isDataCached() ? 'Yes' : 'No' }} | 
-               Current region: {{ getCurrentRegion() }}</small>
-      </div>
-      
   `,
   styleUrls: ['./overtime-chart.component.scss'],
   imports: [CommonModule]
@@ -94,7 +54,7 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   @Input() showTooltips: boolean = true;
   @Input() enableCategoryToggling: boolean = true;
   @Input() enableDataTable: boolean = true;
-  @Input() chartWidth: number = 1440;
+  @Input() chartWidth: number = 1342;
   @Input() chartHeight: number = 650;
   @Input() customConfig?: Partial<ChartConfig>;
   @Input() showCacheStatus: boolean = false; // Debug option
@@ -124,10 +84,13 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private config!: ChartConfig;
   private dataTableInstance: any = null;
 
+  // NEW: Product group filtering
+  private enabledProductGroups: any[] = [];
+
   // Chart dimensions
   private chartWidthCalculated: number = 0;
   private chartHeightCalculated: number = 0;
-  private margin = { top: 20, right: 80, bottom: 30, left: 50 };
+  private margin = { top: 20, right: 0, bottom: 30, left: 50 };
 
   // State from unified service
   loading = false;
@@ -193,18 +156,13 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private initializeConfig(): void {
-    // Initialize service with custom config
     this.overtimeService.initializeWithConfig(this.customConfig);
-    
-    // Get the merged config from service
     this.config = this.overtimeService.getConfig();
 
-    // Use config dimensions or fallback to component inputs
     const dimensions = this.overtimeService.getDimensions();
     this.chartWidthCalculated = this.chartWidth || dimensions.width;
     this.chartHeightCalculated = this.chartHeight || dimensions.height;
     this.margin = dimensions.margin;
-
   }
 
   private subscribeToCoordinationService(): void {
@@ -212,26 +170,16 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.coordinationService.region$
       .pipe(takeUntil(this.destroy$))
       .subscribe(region => {
-        // Set the region in unified service which will trigger data loading
         this.unifiedDataService.setCurrentRegion(region as any);
       });
 
-    // Subscribe to year changes
-    this.coordinationService.year$
+    // NEW: Subscribe to product group changes (same as feasible chart)
+    this.coordinationService.productGroups$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(year => {
-        console.log('🔍 Year changed to:', year);
-        this.currentYear = year;
-        
-        // For overtime charts, year changes typically shouldn't filter the data
-        // since overtime charts show trends over multiple years
-        // Only reprocess if you specifically want year filtering
-        if (this.shouldFilterByYear()) {
-          console.log('🔍 Reprocessing data due to year change');
-          this.reprocessData();
-        } else {
-          console.log('🔍 Year change ignored for overtime chart - showing all years');
-        }
+      .subscribe(productGroups => {
+        this.enabledProductGroups = productGroups.filter(group => group.enabled);
+        console.log('Product groups changed in overtime chart:', this.enabledProductGroups);
+        this.updateDisplay(); // Re-process and re-render chart with new product group filtering
       });
   }
 
@@ -240,31 +188,16 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
    */
   private loadData(): void {
     const region = this.coordinationService.currentRegion || this.unifiedDataService.getCurrentRegion();
-    
 
     this.unifiedDataService.getOvertimeChartData(region as any)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {
-          
-          // Store raw data for reprocessing
           this.rawData = result.rawData;
           this.originalData = [...result.rawData]; // Clone data
         
-          // Use the processed data
-          this.data = result.chartData;
-
-          // Emit data loaded event
-          const maxValue = this.overtimeService.getMaxTotal(this.data);
-          this.debugInfo.maxValue = maxValue;
-          this.debugInfo.dataLength = this.data.length;
-          
-          this.chartDataLoaded.emit({
-            dataCount: this.data.length,
-            maxValue: maxValue
-          });
-
-          this.renderChart();
+          // NEW: Apply product group filtering if enabled
+          this.processDataWithFiltering();
         },
         error: (error) => {
           console.error("Error loading overtime chart data:", error);
@@ -274,54 +207,28 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   /**
-   * Reprocess data when year changes or other filters change
+   * NEW: Process data with product group filtering
    */
-  private reprocessData(): void {
-    if (!this.rawData || this.rawData.length === 0) {
-      this.loadData();
-      return;
-    }
-
-    // For overtime charts, we typically want ALL years, not just the current year
-    // Only filter by year if specifically requested
-    let filteredData = this.rawData;
-    
-    if (this.currentYear && this.currentYear !== '' && this.shouldFilterByYear()) {
-      filteredData = this.rawData.filter(item => {
-        const itemYear = new Date(item.Date).getFullYear().toString();
-        return itemYear === this.currentYear;
-      });
-    } 
-    
-
-    this.processData(filteredData);
-  }
-
-  /**
-   * Determine if we should filter by year for overtime charts
-   * Overtime charts typically show trends over time, so filtering by year is usually not desired
-   */
-  private shouldFilterByYear(): boolean {
-    // For now, let's NOT filter by year for overtime charts since they show trends
-    // You can change this logic based on your requirements
-    return false;
-  }
-
-  /**
-   * Process raw data into chart format
-   */
-  private processData(rawData: RawDataItem[]): void {
-
+  private processDataWithFiltering(): void {
     try {
-      // Store original data
-      this.originalData = [...rawData]; // Clone data
+      // Apply product group filtering to raw data
+      let filteredData = this.rawData;
       
-      // Process data using service
-      const groupedData = this.overtimeService.groupByYearAndCategory(rawData);
-      this.data = this.overtimeService.transformDataByDate(groupedData);
+      if (this.enabledProductGroups && this.enabledProductGroups.length > 0) {
+        // Check if all product groups are enabled
+        const allProductGroups = this.coordinationService.currentProductGroups || [];
+        const allEnabled = this.enabledProductGroups.length === allProductGroups.length;
+        
+        if (!allEnabled) {
+          // Filter data by enabled product groups
+          filteredData = this.overtimeService.filterByProductGroups(this.rawData, this.enabledProductGroups);
+          console.log(`Filtered overtime data: ${this.rawData.length} → ${filteredData.length} items`);
+        }
+      }
 
+      // Process filtered data
+      this.data = this.overtimeService.processRawDataToChart(filteredData);
 
-      // Emit data loaded event
       const maxValue = this.overtimeService.getMaxTotal(this.data);
       this.debugInfo.maxValue = maxValue;
       this.debugInfo.dataLength = this.data.length;
@@ -337,6 +244,18 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
       this.handleError(`Failed to process data: ${error}`);
     }
   }
+
+  /**
+   * NEW: Update display when product groups change
+   */
+  private updateDisplay(): void {
+    if (this.rawData && this.rawData.length > 0) {
+      // Reprocess data with new product group filters
+      this.processDataWithFiltering();
+    }
+  }
+
+  
 
   /**
    * Retry loading data
@@ -363,48 +282,18 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
     return this.unifiedDataService.getCachedData(currentRegion as any) !== null;
   }
 
-  /**
-   * Get current region
-   */
-  public getCurrentRegion(): string {
-    return this.unifiedDataService.getCurrentRegion();
-  }
-
-  /**
-   * Check if a category is currently visible
-   */
-  public isCategoryVisible(category: string): boolean {
-    return this.data.some(d => d[category] && d[category] > 0);
-  }
-
-  /**
-   * Toggle category from icon click
-   */
-  public toggleCategoryFromIcon(iconClass: string): void {
-    const category = this.overtimeService.getCategoryFromIcon(iconClass);
-    if (category) {
-      this.toggleCategory(category);
-    }
-  }
-
   private initializeChart(): void {
     try {
-      // Create D3 SVG selection
       this.svg = d3.select(this.svgContainer.nativeElement);
-
-      // Initialize scales and generators
       this.initializeScales();
-
     } catch (error) {
       this.handleError(`Failed to initialize chart: ${error}`);
     }
   }
 
   private initializeScales(): void {
-    // Initialize color scale
     this.colorScale = OvertimeChartUtils.createColorScale(this.config.keys, this.config.colors);
     this.stackGenerator = OvertimeChartUtils.createStackGenerator(this.config.keys);
-
   }
 
   private renderChart(): void {
@@ -412,13 +301,7 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
       console.warn('No data to render');
       return;
     }
-
-    console.log('Starting chart render with data:', this.data);
-
-    // Clear existing chart
     this.clearChart();
-
-    // Setup chart elements
     this.setupChart();
     this.renderAreas();
   }
@@ -432,14 +315,8 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private setupChart(): void {
     if (!this.svg) return;
 
-    console.log('Setting up chart with dimensions:', {
-      chartWidth: this.chartWidthCalculated,
-      chartHeight: this.chartHeightCalculated,
-      margin: this.margin
-    });
-
     // Calculate inner dimensions
-    const innerWidth = this.chartWidthCalculated - this.margin.left - this.margin.right;
+    const innerWidth = this.chartWidthCalculated - this.margin.left ;
     const innerHeight = this.chartHeightCalculated - this.margin.top - this.margin.bottom;
 
     const maxTotal = this.overtimeService.getMaxTotal(this.data);
@@ -533,11 +410,6 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
         .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
     }
 
-    // Handle single data point case
-    if (this.data.length === 1) {
-      this.renderSinglePointChart(chartGroup, stackedData);
-      return;
-    }
 
     // Create areas for multiple data points
     const areas = chartGroup
@@ -548,7 +420,6 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .attr("class", "area")
       .style("fill", (d: any) => {
         const color = this.colorScale!(d.key);
-        console.log(`Area ${d.key} color:`, color);
         return color;
       })
       .style("stroke", "none")
@@ -561,111 +432,9 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .on("mousemove", (event: MouseEvent, d: any) => this.handleMousemove(event, d))
       .on("mouseout", (event: MouseEvent, d: any) => this.handleMouseleave(event, d))
       .on("click", (event: MouseEvent, d: any) => this.handleMouseclick(event, d));
-
-  
   }
 
-  private renderSinglePointChart(chartGroup: any, stackedData: any[]): void {
-    console.log('Rendering single data point as bar chart');
-    
-    const innerWidth = this.chartWidthCalculated - this.margin.left - this.margin.right;
-    const barWidth = Math.min(100, innerWidth * 0.3); // Max 100px or 30% of width
-    const xPosition = innerWidth / 2 - barWidth / 2; // Center the bar
 
-    // Create bars instead of areas for single data point
-    const bars = chartGroup
-      .selectAll(".bar")
-      .data(stackedData)
-      .enter()
-      .append("rect")
-      .attr("class", "bar")
-      .attr("x", xPosition)
-      .attr("y", (d: any) => this.yScale!(d[0][1]))
-      .attr("width", barWidth)
-      .attr("height", (d: any) => {
-        const height = this.yScale!(d[0][0]) - this.yScale!(d[0][1]);
-        return Math.max(0, height); // Ensure non-negative height
-      })
-      .style("fill", (d: any) => this.colorScale!(d.key))
-      .style("stroke", "#fff")
-      .style("stroke-width", 1)
-      .on("mouseover", (event: MouseEvent, d: any) => this.handleMouseover(event, d))
-      .on("mousemove", (event: MouseEvent, d: any) => this.handleSinglePointMousemove(event, d))
-      .on("mouseout", (event: MouseEvent, d: any) => this.handleMouseleave(event, d))
-      .on("click", (event: MouseEvent, d: any) => this.handleSinglePointClick(event, d));
-
-    // Update debug info
-    this.debugInfo.areasCount = bars.size();
-    this.debugInfo.dataLength = this.data.length;
-    this.debugInfo.maxValue = this.overtimeService.getMaxTotal(this.data);
-    
-    console.log(`Rendered ${this.debugInfo.areasCount} bars for single data point`);
-
-    // Add year label
-    chartGroup.append('text')
-      .attr('x', innerWidth / 2)
-      .attr('y', this.chartHeightCalculated - this.margin.top - this.margin.bottom + 15)
-      .attr('text-anchor', 'middle')
-      .style('font-size', '14px')
-      .style('fill', '#333')
-      .text(this.data[0].Date);
-
-    // Add warning message
-    this.showSinglePointWarning();
-  }
-
-  private handleSinglePointMousemove = (event: MouseEvent, d: any): void => {
-    if (!this.tooltip || !this.showTooltips) return;
-
-    const dataPoint = this.data[0]; // Only one data point
-    const tooltipData: TooltipData = {
-      category: d.key,
-      value: dataPoint[d.key] || 0,
-      year: dataPoint.Date
-    };
-
-    // Update tooltip content and position
-    this.tooltip
-      .html(`${tooltipData.category}: ${this.overtimeService.abbreviateNumber(tooltipData.value)} (${tooltipData.year})`)
-      .style("left", (event.pageX + 10) + "px")
-      .style("top", (event.pageY - 10) + "px")
-      .style("opacity", 0.9);
-
-    // Emit hover event
-    this.nodeHovered.emit(tooltipData);
-  };
-
-  private handleSinglePointClick = (event: MouseEvent, d: any): void => {
-    const dataPoint = this.data[0]; // Only one data point
-    const tooltipData: TooltipData = {
-      category: d.key,
-      value: dataPoint[d.key] || 0,
-      year: dataPoint.Date
-    };
-
-    this.updateInfoBox(tooltipData);
-    this.nodeClicked.emit(tooltipData);
-  };
-
-  private showSinglePointWarning(): void {
-    if (!this.showDebugInfo) return;
-    
-    // Add warning message to the chart
-    const warningGroup = this.svg.select('.warning-group');
-    if (warningGroup.empty()) {
-      const warning = this.svg.append('g')
-        .attr('class', 'warning-group')
-        .attr('transform', `translate(${this.margin.left}, ${this.margin.top - 5})`);
-      
-      warning.append('text')
-        .attr('x', 0)
-        .attr('y', 0)
-        .style('font-size', '12px')
-        .style('fill', '#ff6600')
-        .style('font-weight', 'bold')
-        .text('⚠️ Single data point - showing as bar chart. Need multiple years for area chart.');
-    }
-  }
 
   private updateChart(): void {
     if (!this.svg || !this.stackGenerator || !this.areaGenerator || !this.yScale || !this.yAxis) return;
@@ -847,53 +616,8 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.loadData();
   }
 
-  public clearSelections(): void {
-    // Reset any selections
-  }
-
-  public updateData(newData: RawDataItem[]): void {
-    this.originalData = [...newData];
-    this.processData(newData);
-  }
-
-  public updateRegion(region: string): void {
-    this.coordinationService.setRegion(region);
-  }
-
-  public updateYear(year: string): void {
-    this.coordinationService.setYear(year);
-  }
-
-  public toggleCategory(category: string): boolean {
-    if (!this.overtimeService.isValidCategory(category)) {
-      console.warn(`Invalid category: ${category}`);
-      return false;
-    }
-
-    const wasVisible = this.data.some(d => d[category] && d[category] > 0);
-    this.data = this.overtimeService.toggleCategory(this.data, this.originalData, category);
-    this.updateChart();
-
-    this.categoryToggled.emit({ category, isVisible: !wasVisible });
-
-    return !wasVisible;
-  }
-
-  public getChartData(): ChartDataPoint[] {
-    return [...this.data];
-  }
-
   public isChartReady(): boolean {
     return !this.loading && !this.error && this.data.length > 0;
-  }
-
-  public hasData(): boolean {
-    return this.data && this.data.length > 0;
-  }
-
-  // New methods for unified service integration
-  public getAvailableRegions(): string[] {
-    return this.unifiedDataService.getAvailableRegions();
   }
 
   public getCacheStatus(): any[] {
@@ -908,5 +632,6 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
       });
   }
 
+ 
 
 }
