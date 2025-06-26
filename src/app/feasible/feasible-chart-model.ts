@@ -23,8 +23,8 @@ export interface FeasiblePoint {
   description: string;
   description2: string;
   value: number;
-  hs2: number;
-  hs4: number;
+  hs2: string;
+  hs4: string;
   length: number;
   rca: number;
   Date: string;

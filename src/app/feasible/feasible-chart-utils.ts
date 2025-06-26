@@ -268,54 +268,7 @@ export class FeasibleChartUtils {
   }
 
 
-  // Get color for point based on various criteria
-  public static getPointColor(
-    point: FeasiblePoint,
-    grouping: GroupingType,
-    iconTruthMapping: IconTruthMapping,
-    filterType: number,
-    scales: FeasibleScales,
-    currentProductGroups?: any[] // NEW: Add product groups parameter
-  ): string {
-
-
-    if (currentProductGroups && !this.isPointInEnabledProductGroup(point, currentProductGroups)) {
-      return "rgb(249, 251, 251)"; // Gray out if product group is disabled
-    }
-
-    // For NAICS grouping, use NAICS color
-    if (grouping === GroupingType.NAICS2 || grouping === GroupingType.NAICS4) {
-      return scales.naicsColor(point.hs2);
-    }
-
-    // Get icon for the point
-    const iconClass = this.getIconClassForNumber(point.hs4);
-    
-    // Check if this icon category is enabled
-    if (iconClass && iconTruthMapping[iconClass]) {
-      switch (filterType) {
-        case 1: // All
-          if (grouping === GroupingType.HS4) {
-            return scales.hs4Color(point.hs4);
-          } else if (grouping === GroupingType.HS2) {
-            return scales.color(point.hs2);
-          }
-          break;
-        case 2: // RCA > 1
-          if (point.rca > 1) {
-            return scales.color(point.hs2);
-          }
-          break;
-        case 3: // RCA between 0.2 and 1
-          if (point.rca > 0.2 && point.rca < 1) {
-            return scales.color(point.hs2);
-          }
-          break;
-      }
-    }
-
-    return "rgb(249, 251, 251)"; // Default gray
-  }
+  
 
   // Create axes
   public static createAxes(svg: any, scales: FeasibleScales, config: FeasibleChartConfig): { xAxis: any, yAxis: any } {
@@ -392,14 +345,14 @@ export class FeasibleChartUtils {
   public static createTrackingLines(svg: any, config: FeasibleChartConfig): { lineX: any, lineY: any } {
     const lineX = svg.append("line")
       .attr("class", "tracking-line-x")
-      .style("stroke", "red")
+      .style("stroke", "black")
       .style("stroke-dasharray", "4,4")
       .style("stroke-width", 1)
       .style("opacity", 0);
 
     const lineY = svg.append("line")
       .attr("class", "tracking-line-y")
-      .style("stroke", "red")
+      .style("stroke", "black")
       .style("stroke-dasharray", "4,4")
       .style("stroke-width", 1)
       .style("opacity", 0);
