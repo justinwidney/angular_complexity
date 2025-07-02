@@ -9,7 +9,7 @@ import {
   ColorConfig,
   CircleNodeData,
   RectNodeData
-} from './d3-chart-node-utility';
+} from './chart-nodes-utility';
 import { ChartCoordinationService } from '../service/chart-coordination.service';
 
 /**
@@ -194,13 +194,7 @@ export class TreemapUtilityConfig {
       defaultGrayColor: 'rgb(249, 251, 251)',
       scales: {
         // Treemap uses different coloring scheme
-        naicsColor: d3.scaleThreshold<number, string>()
-          .domain([1111, 1131, 1151, 2111, 2131, 2211, 2361, 2381, 3111, 3151, 3211, 3241, 3361, 3391, 5111, 5191])
-          .range([
-            "#E53E3E", "#00B4D8", "#6F42C1", "#28A745", "#FFC107", 
-            "#E91E63", "#795548", "#FF9800", "#3F51B5", "#009688", 
-            "#9C27B0", "#607D8B", "#FF5722", "#4CAF50", "#2196F3"
-          ])
+        naicsColor: d3.scaleOrdinal<string>()
           .range([
             "#E53E3E", "#00B4D8", "#6F42C1", "#28A745", "#FFC107", 
             "#E91E63", "#795548", "#FF9800", "#3F51B5", "#009688", 
@@ -366,11 +360,11 @@ export class ChartUtilityHelpers {
    * Setup common event handlers for Treemap Chart
    */
   static setupTreemapEvents(
-    utility: any,
+    utility: D3ChartNodeUtility<RectNodeData>,
     chartComponent: any
   ): void {
     utility.setEventCallbacks({
-      onNodeClick: (event: any, data: { description: any; id: any; value: number; naics: any; totalValue: number; }) => {
+      onNodeClick: (event, data) => {
         const tooltipData = {
           title: data.description || data.id,
           value: data.value || 0,
@@ -383,7 +377,7 @@ export class ChartUtilityHelpers {
         chartComponent.nodeClicked.emit(tooltipData);
       },
       
-      onNodeHover: (event: any, data: { description: any; id: any; value: number; naics: any; totalValue: number; }) => {
+      onNodeHover: (event, data) => {
         const tooltipData = {
           title: data.description || data.id,
           value: data.value || 0,

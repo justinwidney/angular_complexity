@@ -1,4 +1,4 @@
-// feasible-chart.component.ts - Updated to use ChartUtility
+// feasible-chart.component.ts - Fixed with proper axis rescaling during zoom
 
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { distinctUntilChanged, skip, Subject, takeUntil } from 'rxjs';
@@ -20,7 +20,19 @@ import {
 } from './feasible-chart-model';
 import { GroupedData } from '../productspace/product-space-chart.models';
 import { CommonModule } from '@angular/common';
-import { ChartUtility, NodeColorOptions, TooltipOptions } from '../d3_utility/chart-search-utility';
+import { ChartUtility, NodeColorOptions, TooltipOptions } from '../d3_utility/chart-nodes-utility';
+
+// Import the enhanced D3 SVG utility
+import { 
+  D3SvgChartUtility, 
+  ChartDimensions, 
+  SVGConfig, 
+  ZoomConfig, 
+  AxisConfig, 
+  ScaleConfig, 
+  ReferenceLineConfig,
+  TrackingConfig 
+} from '../d3_utility/svg-utility';
 
 @Component({
   selector: 'app-feasible-chart',
@@ -58,8 +70,9 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private destroy$ = new Subject<void>();
   private svg: any;
   private zoomable: any;
-  private scales!: FeasibleScales;
-  private config!: FeasibleChartConfig;
+  private scales: any;
+  private originalScales: { x?: any; y?: any } = {}; // NEW: Store original scales
+  private dimensions: ChartDimensions;
   private data: FeasiblePoint[] = [];
   private eci: number = 0;
   private centerX: number = 0;
@@ -67,10 +80,10 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private bounds: any = {};
   private rawData: any[] = [];
 
-  // UI elements
-  private trackingLines: { lineX: any, lineY: any } = { lineX: null, lineY: null };
-  private trackingText: { textX: any, textY: any } = { textX: null, textY: null };
+  // UI elements - now managed by utility
+  private trackingElements: { lineX: any; lineY: any; textX: any; textY: any } | null = null;
   private zoom: any;
+  private axes: any; // NEW: Store axis elements for rescaling
 
   // State
   private iconTruthMapping: IconTruthMapping = FeasibleChartUtils.getDefaultIconTruthMapping();
@@ -79,7 +92,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private currentFilterType: FilterType = FilterType.ALL;
   private enabledProductGroups: any[] = [];
 
-  // Search state - now using utility
+  // Search state
   private currentSearchQuery: string = '';
 
   pointSelected: any;
@@ -93,9 +106,16 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     private unifiedDataService: UnifiedDataService,
     private chartService: FeasibleChartService,
     private coordinationService: ChartCoordinationService,
-    private chartUtility: ChartUtility  // ONLY addition - utility
+    private chartUtility: ChartUtility,
+    private d3SvgUtility: D3SvgChartUtility
   ) {
-    this.config = FeasibleChartUtils.getChartConfig();
+    // Setup dimensions from config
+    const config = FeasibleChartUtils.getChartConfig();
+    this.dimensions = {
+      width: config.width,
+      height: config.height,
+      margins: config.margins
+    };
   }
 
   ngOnInit(): void {
@@ -116,43 +136,42 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.destroy$.next();
     this.destroy$.complete();
     
-    if (this.svg) {
-      this.svg.remove();
-    }
-    
-    // Clean up tooltips
-    d3.selectAll('.tooltip').remove();
+    // Use utility cleanup
+    this.d3SvgUtility.cleanup('feasiblediv');
   }
 
   private subscribeToCoordinationService(): void {
-    // SIMPLIFIED search using utility
+    // Search using utility
     this.coordinationService.searchQuery$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(query => {
-        console.log('Feasible chart received search query:', query);
-        this.currentSearchQuery = query;
-        this.performSearch(query);
-      });
-
-    // Keep all your existing subscriptions
-    this.coordinationService.region$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(region => {
-        this.loadData();
-      });
-
-    this.coordinationService.year$
       .pipe(
         skip(1), 
         distinctUntilChanged(),
         takeUntil(this.destroy$))
+      .subscribe(query => {
+        this.currentSearchQuery = query;
+        this.performSearch(query);
+      });
+
+    // Keep all existing subscriptions...
+    this.coordinationService.region$
+      .pipe(
+        skip(1), 
+        distinctUntilChanged(),
+        takeUntil(this.destroy$))
+      .subscribe(region => this.loadData());
+
+    this.coordinationService.year$
+      .pipe(skip(1), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(year => {
         console.log("coordinationService year change:", year);
         this.loadData();
       });
 
     this.coordinationService.grouping$
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        skip(1), 
+        distinctUntilChanged(),
+        takeUntil(this.destroy$))
       .subscribe(grouping => {
         this.currentGrouping = grouping;
         this.loadData();
@@ -175,7 +194,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.coordinationService.productGroups$
       .pipe(takeUntil(this.destroy$))
       .subscribe(productGroups => {
-        this.enabledProductGroups = productGroups.filter(group => group.enabled);
+        //this.enabledProductGroups = productGroups.filter(group => group.enabled);
         this.updateDisplay();
       });
   }
@@ -183,30 +202,18 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private subscribeToUnifiedService(): void {
     this.unifiedDataService.loading$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(loading => {
-        this.loading = loading;
-      });
+      .subscribe(loading => this.loading = loading);
 
     this.unifiedDataService.error$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(error => {
-        this.error = error;
-      });
-
-    this.unifiedDataService.currentRegion$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(region => {
-        // Handle region changes if needed
-      });
+      .subscribe(error => this.error = error);
   }
 
-  // SIMPLIFIED search using utility
   private performSearch(query: string): void {
     const searchFilter = this.chartUtility.createSearchFilter(query, this.data);
     this.updatePointColors(searchFilter.highlightFunction);
   }
 
-  // SIMPLIFIED - just update colors using utility
   private updatePointColors(highlightFunction?: (item: any) => boolean): void {
     const colorOptions: NodeColorOptions = {
       searchQuery: this.chartUtility.getCurrentSearchQuery(),
@@ -229,24 +236,6 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     );
   }
 
-  private updateReferenceLines(): void {
-    if (!this.zoomable || !this.scales) {
-      return;
-    }
-  
-    this.zoomable.selectAll('.eci-line').remove();
-    this.zoomable.selectAll('.center-line').remove();
-    this.zoomable.selectAll('.eci-label').remove();
-  
-    FeasibleChartUtils.createReferenceLines(
-      this.zoomable, 
-      this.scales, 
-      this.eci, 
-      this.centerX, 
-      this.centerY
-    );
-  }
-
   private loadData(): void {
     const region = this.coordinationService.currentRegion || this.unifiedDataService.getCurrentRegion();
     
@@ -261,21 +250,22 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
           this.centerX = result.bounds.centerX;
           this.centerY = result.bounds.centerY;
 
-          console.log(this.centerX, this.centerY, "centerX, centerY");
-
           this.chartDataLoaded.emit({
             dataCount: this.data.length,
             eci: this.eci
           });
 
+          // Recreate scales after data loads
+          this.createScales();
+          this.updateDataCoordinates();
           this.updateReferenceLines();
           this.refreshChart();
 
           setTimeout(() => {
-            this.updateZoomForNewCenter();
+            this.centerViewOnData();
           }, 100);
 
-          // Re-apply current search if active
+          // Re-apply search if active
           const currentQuery = this.chartUtility.getCurrentSearchQuery();
           if (currentQuery) {
             this.performSearch(currentQuery);
@@ -288,158 +278,206 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       });
   }
 
+  // REFACTORED - Using D3 SVG utility
   private initializeChart(): void {
-    this.clearChart();
     this.setupSVG();
-    this.setupScales();
-    this.setupZoom();
+    this.createScales();
+    this.setupAxes();
+    this.setupZoom(); // MOVED: Setup zoom after axes so we have axis elements
     this.setupUI();
     this.renderChart();
   }
 
-  private clearChart(): void {
-    if (this.svg) {
-      this.svg.selectAll("*").remove();
-    }
-    d3.selectAll('.tooltip').remove();
-  }
+  // REFACTORED - Using utility
+  private setupSVG(): void {
+    const svgConfig: SVGConfig = {
+      containerId: 'feasiblediv',
+      dimensions: this.dimensions,
+      background: "white",
+      cursor: "grab",
+      className: "feasible"
+    };
 
-  private extractNaicsDescriptions(data: any[]): any {
-    const naicsDescriptions: any = {};
-    data.forEach(item => {
-      if (item.naics && item.naics_description) {
-        naicsDescriptions[item.naics] = item.naics_description;
+    const result = this.d3SvgUtility.createSVG(svgConfig);
+    this.svg = result.svg;
+    this.zoomable = result.zoomable;
+
+    // Add click handler for info box hiding
+    this.svg.on("click", () => {
+      const infoBox = document.getElementById("info-box");
+      if (infoBox) {
+        infoBox.style.visibility = "hidden";
       }
     });
-    return naicsDescriptions;
   }
 
-  private processDataForGrouping(feasibleData: any[]): FeasiblePoint[] {
-    return this.chartService.aggregateData(
-      feasibleData,
-      this.currentGrouping,
-      this.extractNaicsDescriptions(feasibleData)
-    );
+  // FIXED - Use calculated bounds instead of d3.extent()
+  private createScales(): void {
+    if (!this.data.length || !this.bounds) return;
+
+    console.log("Creating scales with bounds:", this.bounds);
+
+    // Use the CALCULATED BOUNDS from quantiles, not d3.extent()!
+    const basicScaleConfig: ScaleConfig = {
+      x: {
+        type: 'linear',
+        domain: [this.bounds.minDistance, this.bounds.maxDistance], // ✅ Use quantile bounds
+        range: [this.dimensions.margins.left, this.dimensions.width - this.dimensions.margins.right]
+      },
+      y: {
+        type: 'linear',
+        domain: [this.bounds.minPci, this.bounds.maxPci], // ✅ Use quantile bounds
+        range: [this.dimensions.height - this.dimensions.margins.bottom, this.dimensions.margins.top]
+      }
+    };
+
+    const basicScales = this.d3SvgUtility.createScales(basicScaleConfig);
+
+    // PRESERVE ORIGINAL color scales from FeasibleChartUtils - these are domain-specific!
+    const fullScales = FeasibleChartUtils.createScales(this.data, this.bounds);
+
+    // Combine utility scales with domain-specific scales
+    this.scales = {
+      x: basicScales.x,
+      y: basicScales.y,
+      radius: fullScales.radius,
+      color: fullScales.color,           // HS2 threshold scale
+      hs4Color: fullScales.hs4Color,     // HS4 threshold scale  
+      naicsColor: fullScales.naicsColor  // NAICS threshold scale
+    };
+
+    // NEW: Store original scales for zoom rescaling
+    this.originalScales = {
+      x: this.scales.x.copy(),
+      y: this.scales.y.copy()
+    };
+
+    // Log for debugging
+    console.log("Scale domains:", {
+      x: this.scales.x.domain(),
+      y: this.scales.y.domain(),
+      dataExtent: {
+        distance: d3.extent(this.data, d => d.distance),
+        pci: d3.extent(this.data, d => d.pci)
+      }
+    });
   }
 
-  private setupSVG(): void {
-    this.svg = d3.select("#feasiblediv")
-      .append('svg')
-      .attr('width', "100%")
-      .attr('height', this.config.height)
-      .style("background", this.config.background)
-      .style("cursor", "grab")
-      .attr("class", "feasible")
-      .on("click", () => {
-        const infoBox = document.getElementById("info-box");
-        if (infoBox) {
-          infoBox.style.visibility = "hidden";
-        }
-      });
+  // REFACTORED - Using utility
+  private setupAxes(): void {
+    const axisConfig: AxisConfig = {
+      x: {
+        scale: this.scales.x,
+        position: 'bottom',
+        label: 'Distance',
+        labelOffset: 40
+      },
+      y: {
+        scale: this.scales.y,
+        position: 'left',
+        label: 'Product Complexity Index (PCI)',
+        labelOffset: 50
+      }
+    };
+
+    this.axes = this.d3SvgUtility.createAxes(this.svg, this.scales, axisConfig, this.dimensions);
   }
 
-  private setupScales(): void {
-    this.scales = FeasibleChartUtils.createScales(this.data, this.bounds);
-  }
-
+  // ENHANCED - Setup zoom with axis rescaling
   private setupZoom(): void {
-    const scale = 0.75;
-    const margins = this.config.margins;
-    const chartWidth = this.config.width + margins.left + margins.right;
-    const chartHeight = this.config.height - margins.top - margins.bottom;
-    
-    const screenCenterX = margins.left + chartWidth / 2;
-    const screenCenterY = margins.top + chartHeight / 2;
-  
-    const dataCenterX = this.scales.x(this.centerX);
-    const dataCenterY = this.scales.y(this.centerY);
-    
-    const translateX = screenCenterX - dataCenterX * scale;
-    const translateY = screenCenterY - dataCenterY * scale;
-  
-    const transform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
+    const zoomConfig: ZoomConfig = {
+      scaleExtent: [0.1, 10],
+      enablePan: true,
+      enableZoom: true,
+      enableAxisRescaling: true, // NEW: Enable axis rescaling
+      originalScales: this.originalScales, // NEW: Pass original scales
+      axisElements: this.axes, // NEW: Pass axis elements
+   
+    };
 
-    this.zoomable = this.svg
-      .append("g")
-      .attr("class", "zoomable")
-      .attr("transform", transform);
-
-    const axes = FeasibleChartUtils.createAxes(this.svg, this.scales, this.config);
-    this.zoom = FeasibleChartUtils.createZoom(
-      this.svg, 
-      this.zoomable, 
-      this.scales, 
-      axes,
-    );
-
-    this.svg
-      .call(this.zoom)
-      .call(this.zoom.transform, transform);
+    this.zoom = this.d3SvgUtility.setupZoom(this.svg, this.zoomable, zoomConfig);
   }
 
-  private updateZoomForNewCenter(): void {
-    if (!this.svg || !this.scales || !this.zoom) return;
-  
-    const currentTransform = d3.zoomTransform(this.svg.node());
-    const scale = currentTransform.k;
-    const margins = this.config.margins;
-    const chartWidth = this.config.width + margins.left + margins.right;
-    const chartHeight = this.config.height - margins.top - margins.bottom;
-    
-    const screenCenterX = margins.left + chartWidth / 2;
-    const screenCenterY = margins.top + chartHeight / 2;
-
-    const dataCenterX = this.scales.x(this.centerX);
-    const dataCenterY = this.scales.y(this.centerY);
-    
-    const translateX = screenCenterX - dataCenterX * scale;
-    const translateY = screenCenterY - dataCenterY * scale;
-
-    const newTransform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
-
-    this.svg.transition()
-      .duration(750)
-      .call(this.zoom.transform, newTransform);
-  }
-
+  // REFACTORED - Using utility
   private setupUI(): void {
-    this.trackingLines = FeasibleChartUtils.createTrackingLines(this.svg, this.config);
-    this.trackingText = FeasibleChartUtils.createTrackingText(this.svg, this.config);
+    // Create tracking lines using utility
+    if (this.enableTracking) {
+      const trackingConfig: TrackingConfig = {
+        showLines: true,
+        showValues: true,
+        lineStroke: "black",
+        lineStrokeWidth: 1,
+        textColor: "red",
+        textSize: "12px"
+      };
 
-    FeasibleChartUtils.createReferenceLines(
-      this.zoomable, 
-      this.scales, 
-      this.eci, 
-      this.centerX, 
-      this.centerY
+      this.trackingElements = this.d3SvgUtility.createTrackingLines(
+        this.svg, 
+        this.dimensions, 
+        trackingConfig
+      );
+    }
+
+    this.updateReferenceLines();
+  }
+
+  // REFACTORED - Using utility
+  private updateReferenceLines(): void {
+    if (!this.zoomable || !this.scales) return;
+
+    const referenceConfig: ReferenceLineConfig = {
+      x: {
+        value: this.centerX,
+        stroke: "#666",
+        strokeWidth: 2,
+        strokeDasharray: "5,5",
+      },
+      y: {
+        value: this.eci,
+        stroke: "#666",
+        strokeWidth: 2,
+        strokeDasharray: "5,5",
+        label: `ECI: ${this.eci.toFixed(2)}`
+      }
+    };
+
+    this.d3SvgUtility.createReferenceLines(this.zoomable, this.scales, referenceConfig);
+  }
+
+  // REFACTORED - Using utility
+  private centerViewOnData(): void {
+    if (!this.svg || !this.scales || !this.zoom) return;
+
+    const targetX = this.scales.x(this.centerX);
+    const targetY = this.scales.y(this.eci);
+
+    this.d3SvgUtility.centerView(
+      this.svg,
+      this.zoom,
+      targetX,
+      targetY,
+      0.75, // scale
+      this.dimensions,
+      750 // duration
     );
+  }
 
-    FeasibleChartUtils.createAxisLabels(this.svg, this.config);
+  private updateDataCoordinates(): void {
+    if (this.scales && this.data) {
+      this.data = this.data.map(point => ({
+        ...point,
+        x: this.scales.x(point.distance),
+        y: this.scales.y(point.pci)
+      }));
+    }
   }
 
   private renderChart(): void {
     this.renderPoints();
   }
 
-
-  private updateDataCoordinates(): void {
-    // Add scaled x,y coordinates for tooltip positioning
-    if (this.scales && this.data) {
-      this.data = this.data.map(point => ({
-        ...point,
-        x: this.scales.x(point.distance),  // Convert distance to screen x
-        y: this.scales.y(point.pci)        // Convert pci to screen y
-      }));
-    }
-  }
-
-
-  // UPDATED to use utility event handlers
   private renderPoints(): void {
-
-
     this.updateDataCoordinates();
-
 
     const circles = this.zoomable.selectAll(".feasible-point")
       .data(this.data);
@@ -452,8 +490,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       onMouseleave: (event, d) => this.handleCustomMouseleave(event, d),
       onClick: (event, d) => this.handleCustomClick(event, d),
       createTooltip: (d) => this.createPointTooltip(d),
-      enableSelection: true,
-      enableTracking: this.enableTracking
+      enableSelection: true
     });
 
     // Enter selection
@@ -474,19 +511,21 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .on("click", eventHandlers.click)
       .attr("fill", (d: FeasiblePoint) => this.getPointColor(d));
 
-    // Update selection
-    circles.transition()
-      .duration(1000)
-      .attr("cx", (d: FeasiblePoint) => this.scales.x(d.distance))
-      .attr("cy", (d: FeasiblePoint) => this.scales.y(d.pci))
-      .attr("r", (d: FeasiblePoint) => this.scales.radius(d.value))
-      .attr("fill", (d: FeasiblePoint) => this.getPointColor(d));
+    // Update selection using utility animation
+    this.d3SvgUtility.animateElements(circles, {
+      duration: 1000,
+      properties: {
+        "cx": (d: FeasiblePoint) => this.scales.x(d.distance),
+        "cy": (d: FeasiblePoint) => this.scales.y(d.pci),
+        "r": (d: FeasiblePoint) => this.scales.radius(d.value),
+        "fill": (d: FeasiblePoint) => this.getPointColor(d)
+      }
+    });
 
     // Exit selection
     circles.exit().remove();
   }
 
-  // SIMPLIFIED getPointColor using utility
   private getPointColor(point: FeasiblePoint): string {
     return this.chartUtility.getNodeColor(point, {
       searchQuery: this.chartUtility.getCurrentSearchQuery(),
@@ -499,13 +538,12 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     });
   }
 
-  // NEW - Create tooltip using utility
   private createPointTooltip(d: any): any {
     const isNaics = this.coordinationService.isNaicsGrouping();
     const title = isNaics ? `NAICS ${d.hs2}` : `HS ${d.hs2}`;
     const description = isNaics ? d.description : d.description2;
 
-    d.id = d.hs2; // Ensure id is set for tooltip
+    d.id = d.hs2;
 
     const tooltipOptions: TooltipOptions = {
       title: title,
@@ -517,86 +555,70 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       },
       showCloseButton: true,
       onClose: (data: any) => {
-        // Reset point state
         data.state = 0;
         d3.select("#circle-" + data.hs2).style("stroke-width", "1");
       }
     };
 
-    console.log("Creating tooltip for point:", d);
-    console.log("Tooltip options:", tooltipOptions);
-
     return this.chartUtility.createTooltip("#feasiblediv", d, tooltipOptions);
   }
 
-  // Custom event handlers for chart-specific behavior
+  // Custom event handlers
   private handleCustomMouseover(event: any, d: FeasiblePoint): void {
-    // Chart-specific mouseover logic
-    if (d3.select(event.currentTarget).style("fill") !== "rgb(249, 251, 251)") {
-      // Already handled by utility, just add custom logic if needed
-    }
+    // Chart-specific behavior
   }
 
+  // FIXED: Mousemove handler using original scales for tracking
   private handleCustomMousemove(event: any, d: FeasiblePoint): void {
-    if (!this.showTooltips) return;
+    if (!this.showTooltips || !this.trackingElements) return;
 
-    // Update tracking lines if enabled
     if (this.enableTracking && d3.select(event.currentTarget).style("fill") !== "rgb(249, 251, 251)") {
-      const svgElement = this.svg.node();
-      const transform = d3.zoomTransform(svgElement);
-      const transformedX = this.scales.x(d.distance) * transform.k + transform.x;
-      const transformedY = this.scales.y(d.pci) * transform.k + transform.y;
+      const transform = this.d3SvgUtility.getCurrentTransform(this.svg);
       
-      this.updateTrackingLines(transformedX, transformedY, d);
+      // Use original scales to get base coordinates, then apply transform
+      const baseX = this.originalScales.x!(d.distance);
+      const baseY = this.originalScales.y!(d.pci);
+      const [transformedX, transformedY] = this.d3SvgUtility.applyTransform(
+        transform, 
+        baseX, 
+        baseY
+      );
+      
+      // Use utility to update tracking lines
+      this.d3SvgUtility.updateTrackingLines(
+        this.trackingElements,
+        transformedX,
+        transformedY,
+        this.dimensions,
+        {
+          xValue: d.distance.toFixed(4),
+          yValue: d.pci.toFixed(4)
+        }
+      );
     }
   }
 
   private handleCustomMouseleave(event: any, d: FeasiblePoint): void {
-    // Hide tracking lines
-    if (this.enableTracking) {
-      this.trackingLines.lineX.style("opacity", 0);
-      this.trackingLines.lineY.style("opacity", 0);
-      this.trackingText.textX.style("opacity", 0);
-      this.trackingText.textY.style("opacity", 0);
+    if (this.trackingElements && this.enableTracking) {
+      this.d3SvgUtility.hideTrackingLines(this.trackingElements);
     }
   }
 
   private handleCustomClick(event: any, d: FeasiblePoint): void {
-    // Set point as selected (handled by utility, but emit custom events)
     this.nodeSelected.emit({ node: d, data: undefined, connectedProducts: [] });
   }
 
-  private updateTrackingLines(x: number, y: number, d: FeasiblePoint): void {
-    this.trackingLines.lineX
-      .attr("x1", x)
-      .attr("y1", 0)
-      .attr("x2", x)
-      .attr("y2", this.config.height)
-      .style("opacity", 1);
 
-    this.trackingLines.lineY
-      .attr("x1", 0)
-      .attr("y1", y)
-      .attr("x2", this.config.width)
-      .attr("y2", y)
-      .style("opacity", 1);
 
-    this.trackingText.textX
-      .attr("x", x)
-      .text(d.distance.toFixed(4))
-      .style("opacity", 1);
-
-    this.trackingText.textY
-      .attr("y", y)
-      .text(d.pci.toFixed(4))
-      .style("opacity", 1);
-  }
-
+  // Keep existing methods for display modes...
   private updateDisplayMode(): void {
+
     try {
       this.svg.select('g').selectAll("rect").remove();
     } catch {}
 
+
+    // Your existing display mode logic
     switch (this.currentDisplayMode) {
       case DisplayMode.FRONTIER:
         this.displayFrontier();
@@ -611,6 +633,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private displayFrontier(): void {
+  
     const frontierData = this.chartService.getFrontierData(this.data);
     const frontierSet = new Set(frontierData);
 
@@ -631,6 +654,8 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private displayFourQuads(): void {
+ 
+
     const quadData = this.chartService.getFourQuadrantsData(this.data, this.centerX, this.eci);
     this.updatePointsWithData(quadData);
     this.renderQuadrantLegend();
@@ -673,8 +698,8 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
           const transformedY = quad.y * transform.k + transform.y;
 
           this.chartUtility.positionTooltip(quadTooltip, {
-            x: transformedX,
-            y: transformedY
+            x: transformedX - 50 ,
+            y: transformedY - 100
           });
         })
         .on("mouseout", () => {
@@ -703,12 +728,26 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .attr("fill", (d: FeasiblePoint) => this.getPointColor(d));
   }
 
-  // Public methods for external control
-  public updateIconFilter(iconClass: string, enabled: boolean): void {
-    this.iconTruthMapping[iconClass] = enabled;
-    this.updateDisplay();
+ 
+  private extractNaicsDescriptions(data: any[]): any {
+    const naicsDescriptions: any = {};
+    data.forEach(item => {
+      if (item.naics && item.naics_description) {
+        naicsDescriptions[item.naics] = item.naics_description;
+      }
+    });
+    return naicsDescriptions;
   }
 
+  private processDataForGrouping(feasibleData: any[]): FeasiblePoint[] {
+    return this.chartService.aggregateData(
+      feasibleData,
+      this.currentGrouping,
+      this.extractNaicsDescriptions(feasibleData)
+    );
+  }
+
+  // Public methods
   public search(query: string): void {
     this.performSearch(query);
   }
@@ -716,11 +755,9 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   public clearSelections(): void {
     this.data.forEach(point => point.state = 0);
 
-    // Reset visual styles
     this.zoomable.selectAll(".feasible-point")
       .style("stroke-width", "1");
 
-    // Remove all tooltips
     this.chartUtility.removeAllTooltips();
   }
 
@@ -730,5 +767,32 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   public getDataCount(): number {
     return this.data.length;
+  }
+
+  // Optional: Public method to get current outlier stats for debugging
+  public getOutlierStats(): any {
+    if (this.data.length === 0 || !this.bounds) return null;
+    
+    const outsideBounds = this.data.filter(d => 
+      d.distance < this.bounds.minDistance || d.distance > this.bounds.maxDistance ||
+      d.pci < this.bounds.minPci || d.pci > this.bounds.maxPci
+    );
+
+    return {
+      totalPoints: this.data.length,
+      outlierCount: outsideBounds.length,
+      outlierPercentage: (outsideBounds.length / this.data.length) * 100,
+      bounds: this.bounds,
+      dataExtent: {
+        distance: d3.extent(this.data, d => d.distance),
+        pci: d3.extent(this.data, d => d.pci)
+      }
+    };
+  }
+
+  // Public method to update icon filter
+  public updateIconFilter(iconClass: string, enabled: boolean): void {
+    this.iconTruthMapping[iconClass] = enabled;
+    this.updateDisplay();
   }
 }

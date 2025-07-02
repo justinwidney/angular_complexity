@@ -178,7 +178,7 @@ export class ProductSpaceChartUtils {
   // Chart configuration
   static getChartConfig() {
     return {
-      width: "100%",
+      width: 1440,
       height: 700,
       background: "#F9FBFB",
       transform: {

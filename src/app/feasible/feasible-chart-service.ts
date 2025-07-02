@@ -11,6 +11,9 @@ import {
   HSCodes
 } from './feasible-chart-model';
 
+import * as d3 from 'd3';
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -188,13 +191,17 @@ public aggregateData(
     minPci: number,
     maxPci: number
   } {
-    const distances = data.map(d => d.distance);
-    const pcis = data.map(d => d.pci);
 
-    const minDistance = Math.min(...distances);
-    const maxDistance = Math.max(...distances);
-    const minPci = Math.min(...pcis);
-    const maxPci = Math.max(...pcis);
+    const lowerPercentile = 5;   // 5th percentile
+    const upperPercentile =  95;  // 95th percentile
+
+    const distances = data.map(d => d.distance).sort((a, b) => a - b);
+    const pcis = data.map(d => d.pci).sort((a, b) => a - b);
+
+    const minDistance = d3.quantile(distances, lowerPercentile / 100) || distances[0];
+    const maxDistance = d3.quantile(distances, upperPercentile / 100) || distances[distances.length - 1];
+    const minPci = d3.quantile(pcis, lowerPercentile / 100) || pcis[0];
+    const maxPci = d3.quantile(pcis, upperPercentile / 100) || pcis[pcis.length - 1];
 
     const centerX = (minDistance + maxDistance) / 2;
     const centerY = (minPci + maxPci) / 2;

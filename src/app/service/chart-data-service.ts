@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, forkJoin, combineLatest } from 'rxjs';
 import { map, tap, shareReplay, catchError, switchMap, distinctUntilChanged } from 'rxjs/operators';
+import * as d3 from 'd3';
 
 // Interfaces remain the same
 export interface RawTradeData {
@@ -353,19 +354,28 @@ export class UnifiedDataService {
           };
         });
 
-        // Calculate bounds
-        const distances = modifiedData.map(d => d.distance || 0);
-        const pcis = modifiedData.map(d => d.pci || 0);
-
-        const centerX = distances.reduce((sum, d) => sum + d, 0) / distances.length;
-        const centerY = pcis.reduce((sum, p) => sum + p, 0) / pcis.length;
-
+        const lowerPercentile = 1;   // 5th percentile
+        const upperPercentile =  99;  // 95th percentile
+        
+        const distances = modifiedData.map(d => d.distance).filter(d => d !== undefined).sort((a, b) => a - b);
+        const pcis = modifiedData.map(d => d.pci).filter(pci => pci !== undefined).sort((a, b) => a - b);
+        
+        
+          
+        
+        const minDistance = d3.quantile(distances, lowerPercentile / 100) || distances[0];
+        const maxDistance = d3.quantile(distances, upperPercentile / 100) || distances[distances.length - 1];
+        const minPci = d3.quantile(pcis, lowerPercentile / 100) || pcis[0];
+        const maxPci = d3.quantile(pcis, upperPercentile / 100) || pcis[pcis.length - 1];
+        
+        const centerX = (minDistance + maxDistance) / 2;
+        const centerY = (minPci + maxPci) / 2;
         
         const bounds = {
-          minDistance: Math.min(...distances),
-          maxDistance: Math.max(...distances),
-          minPci: Math.min(...pcis),
-          maxPci: Math.max(...pcis),
+          minDistance: minDistance,
+          maxDistance: maxDistance,
+          minPci: minPci,
+          maxPci: maxPci,
           centerX: centerX,
           centerY: centerY
         };

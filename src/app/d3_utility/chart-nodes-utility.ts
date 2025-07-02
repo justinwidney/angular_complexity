@@ -1,4 +1,4 @@
-// enhanced-chart-utility.ts - Comprehensive utility for charts
+// enhanced-chart-utility.ts - Updated with better tooltip zoom handling
 
 import { Injectable } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
@@ -15,6 +15,8 @@ export interface SearchableItem {
   hs4?: string;
   title?: string;
   Title?: string;
+  distance?: number; // NEW: For feasible chart
+  pci?: number; // NEW: For feasible chart
   [key: string]: any;
 }
 
@@ -60,6 +62,8 @@ export interface EventHandlerConfig {
   updateTooltip?: (d: any, tooltip: any) => void;
   enableTracking?: boolean;
   enableSelection?: boolean;
+  // NEW: For better tooltip positioning during zoom
+  originalScales?: { x?: any; y?: any };
 }
 
 @Injectable({
@@ -171,10 +175,7 @@ export class ChartUtility {
   }
 
   private searchByCode(code: string, data: SearchableItem[]): SearchableItem[] {
-
-
-    console.log(`Searching for code: ${code}`);
-    console.log(`Data length`, data);
+  
 
     return data.filter(item => {
       const codes = [
@@ -184,8 +185,6 @@ export class ChartUtility {
         item.hs4
       ].filter(Boolean);
 
-
-      console.log(`Item codes:`, codes);
       let fixed_codes = codes.map(c => c ? c.toString() : c)
 
       return fixed_codes.some(itemCode => {
@@ -225,7 +224,6 @@ export class ChartUtility {
       onClose  
     } = options;
 
-    
     // Remove existing tooltip
     d3.select("#tooltip-" + data.id).remove();
 
@@ -237,10 +235,6 @@ export class ChartUtility {
       .style("position", "absolute")
       .style("opacity", "0")
       .style("pointer-events", "none");
-
-
-    console.log(`Creating tooltip for data:`, data);
-    console.log(tooltip);
 
     // Apply standard styles
     Object.entries(this.TOOLTIP_STYLES).forEach(([key, value]) => {
@@ -275,7 +269,6 @@ export class ChartUtility {
         const closeButton = tooltip.select(".close-button");
         if (!closeButton.empty()) {
           closeButton.on("click", (event) => {
-
             event.stopPropagation(); // Prevent event bubbling
             d3.select("#tooltip-" + data.id).remove();
             this.resetNodeState(data);
@@ -283,7 +276,6 @@ export class ChartUtility {
             if (onClose) {
               onClose(data);
             }
-
           });
         } else {
           console.warn("Close button not found in tooltip:", data.id);
@@ -324,7 +316,7 @@ export class ChartUtility {
       html += `<div >${description}</div>`;
     }
     else {
-      html += `<div style="font-weight: bold; font-size: 14px;">${title}</div>`;
+      html += `<div style="font-size: 14px;">${title}</div>`;
     }
 
     html += '</div></div>';
@@ -332,19 +324,16 @@ export class ChartUtility {
   }
 
   /**
-   * Position tooltip with boundary detection
+   * ENHANCED: Position tooltip with better zoom handling
    */
   public positionTooltip(
     tooltip: d3.Selection<HTMLDivElement, unknown, HTMLElement, any>,
     position: TooltipPosition
   ): void {
-    const {
-      x,
-      y,
-    } = position;
+    const { x, y } = position;
 
-    let tooltipX = x ;
-    let tooltipY = y ;
+    let tooltipX = x;
+    let tooltipY = y;
 
     tooltip
       .style("left", `${tooltipX}px`)
@@ -352,8 +341,6 @@ export class ChartUtility {
       .style("opacity", "0.9")
       .style("pointer-events", "auto");
   }
-
- 
 
   /**
    * Remove all tooltips
@@ -444,12 +431,8 @@ export class ChartUtility {
       return true;
     }
 
-
-
     const productCode = item.product || Number(item.hs4) || 0;
     const hs2Code = Math.floor(productCode);
-
-
 
     return enabledGroups.some(group => {
       return group.hsCodeRanges.some((range: any) => 
@@ -486,7 +469,7 @@ export class ChartUtility {
   // ==================== EVENT HANDLER UTILITIES ====================
 
   /**
-   * Create standardized mouse event handlers
+   * ENHANCED: Create standardized mouse event handlers with better coordinate handling
    */
   public createEventHandlers(config: EventHandlerConfig) {
     const {
@@ -497,7 +480,8 @@ export class ChartUtility {
       onClick,
       createTooltip,
       enableTracking = false,
-      enableSelection = false
+      enableSelection = false,
+      originalScales // NEW: Original scales for coordinate calculations
     } = config;
 
     return {
@@ -510,11 +494,9 @@ export class ChartUtility {
       },
 
       mousemove: (event: any, d: any) => {
-
-
         // Create/update tooltip if handler provided
         if (createTooltip) {
-         let tooltip = d3.select("#tooltip-" + d.id)
+          let tooltip = d3.select("#tooltip-" + d.id)
           
           if (tooltip.empty()) {
             tooltip = createTooltip(d);
@@ -522,13 +504,26 @@ export class ChartUtility {
           
           const svgElement = svg.node()
           const transform = d3.zoomTransform(svgElement);
-          const transformedX = d.x * transform.k + transform.x;
-          const transformedY = d.y * transform.k + transform.y;
+          
+          let transformedX, transformedY;
+          
+          // NEW: Better coordinate calculation using original scales if available
+          if (originalScales && originalScales.x && originalScales.y && d.distance !== undefined && d.pci !== undefined) {
+            // For feasible chart - use original scales and current data
+            const baseX = originalScales.x(d.distance);
+            const baseY = originalScales.y(d.pci);
+            transformedX = baseX * transform.k + transform.x;
+            transformedY = baseY * transform.k + transform.y;
+          } else {
+            // Fallback for other charts - use stored coordinates
+            transformedX = d.x * transform.k + transform.x;
+            transformedY = d.y * transform.k + transform.y;
+          }
 
           // Position tooltip
           this.positionTooltip(tooltip as unknown as d3.Selection<HTMLDivElement, unknown, HTMLElement, any>, {
             x: transformedX - 50,
-            y: transformedY -75,
+            y: transformedY - 75,
           });
         }
 
@@ -573,8 +568,6 @@ export class ChartUtility {
       data.state = 0;
     }
   }
-
- 
 
   /**
    * Convert camelCase to kebab-case for CSS

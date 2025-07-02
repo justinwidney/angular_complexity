@@ -16,6 +16,16 @@ import {
 } from './treemap-chart.model';
 import { CommonModule } from '@angular/common';
 
+import { ChartUtility, NodeColorOptions, TooltipOptions, SearchableItem } from '../d3_utility/chart-nodes-utility';
+import { 
+  D3SvgChartUtility, 
+  ChartDimensions, 
+  SVGConfig, 
+  ScaleConfig
+} from '../d3_utility/svg-utility';
+import { FilterType } from '../feasible/feasible-chart-model';
+
+
 @Component({
   selector: 'app-treemap-chart',
   template: `
@@ -69,10 +79,8 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
   private rawData: any = [];
   private hierarchyData: d3.HierarchyRectangularNode<any> | null = null;
   private config!: TreemapConfig;
-  private dimensions!: TreemapDimensions;
+  private dimensions!: ChartDimensions;
 
-  // NEW: Product group filtering
-  private enabledProductGroups: any[] = [];
 
   // Component state
   loading = false;
@@ -97,7 +105,9 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private unifiedDataService: UnifiedDataService,
-    private coordinationService: ChartCoordinationService
+    private coordinationService: ChartCoordinationService,
+    private chartUtility: ChartUtility, // NEW: Chart utility
+    private d3SvgUtility: D3SvgChartUtility // NEW: D3 SVG utility
   ) {}
 
   ngOnInit(): void {
@@ -131,9 +141,22 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.currentState.currentDepth = this.initialDepth;
 
     // Calculate dimensions
-    this.dimensions = TreemapChartUtils.calculateDimensions({
+        // Calculate dimensions using utility interface
+    const treemapDimensions = TreemapChartUtils.calculateDimensions({
       ...this.config,
     });
+
+    // Convert to utility dimensions format
+    this.dimensions = {
+      width: this.config.width,
+      height: this.config.height,
+      margins: {
+        top: treemapDimensions.margin.top,
+        right: treemapDimensions.margin.right,
+        bottom: treemapDimensions.margin.bottom,
+        left: treemapDimensions.margin.left
+      }
+    };
   }
 
   /**
@@ -179,7 +202,6 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.coordinationService.productGroups$
       .pipe(takeUntil(this.destroy$))
       .subscribe(productGroups => {
-        this.enabledProductGroups = productGroups.filter(group => group.enabled);
         this.updateDisplay(); // Re-render treemap with new product group filtering
       });
   }
@@ -257,8 +279,8 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
       // Create D3 treemap layout
       this.hierarchyData = TreemapChartUtils.createTreemapLayout(
         hierarchyRoot,
-        this.dimensions.innerWidth,
-        this.dimensions.innerHeight,
+        this.dimensions.width - this.dimensions.margins.left - this.dimensions.margins.right,
+        this.dimensions.height - this.dimensions.margins.top - this.dimensions.margins.bottom,
         this.config
       );
 
@@ -296,17 +318,6 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  /**
-   * Reprocess data when filters change - simplified since we use most recent year
-   */
-  private reprocessData(): void {
-    if (!this.rawData || this.rawData.length === 0) {
-      this.loadData();
-      return;
-    }
-
-    this.processTreemapData(this.rawData);
-  }
 
   /**
    * Initialize D3 chart
@@ -357,7 +368,7 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // Create main group
     const chartGroup = this.svg.append('g')
       .attr('class', 'treemap-group')
-      .attr('transform', `translate(${this.dimensions.margin.left}, ${this.dimensions.margin.top})`);
+      .attr('transform', `translate(${this.dimensions.margins.left}, ${this.dimensions.margins.top})`);
 
     // Get leaf nodes (the actual rectangles to display)
     const leaves = this.hierarchyData.leaves();
