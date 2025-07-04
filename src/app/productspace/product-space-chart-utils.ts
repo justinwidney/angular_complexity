@@ -139,8 +139,8 @@ export class ProductSpaceChartUtils {
   // Radius scale function - you'll need to adjust the domain/range based on your data
   static getRadiusScale() {
     return d3.scaleLinear()
-    .domain([-1, 1500000000, 112498112477])
-    .range([20,45,85])
+    .domain([-1, 2647826521, 104117378026])
+    .range([25,35,115])
   }
 
   // Get node fill color

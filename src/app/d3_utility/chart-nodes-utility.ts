@@ -341,21 +341,75 @@ export class ChartUtility {
   /**
    * ENHANCED: Position tooltip with better zoom handling
    */
-  public positionTooltip(
-    tooltip: d3.Selection<HTMLDivElement, unknown, HTMLElement, any>,
-    position: TooltipPosition
-  ): void {
-    const { x, y } = position;
+ public positionTooltip(
+  tooltip: d3.Selection<HTMLDivElement, unknown, HTMLElement, any>,
+  position: TooltipPosition
+): void {
+  const { x, y, containerWidth, containerHeight } = position;
 
-    let tooltipX = x;
-    let tooltipY = y;
+  // First, make tooltip visible but positioned off-screen to measure it
+  tooltip
+    .style("opacity", "0")
+    .style("visibility", "visible")
+    .style("position", "absolute")
+    .style("left", "-9999px")
+    .style("top", "-9999px")
+    .style("pointer-events", "auto");
 
-    tooltip
-      .style("left", `${tooltipX}px`)
-      .style("top", `${tooltipY}px`)
-      .style("opacity", "0.9")
-      .style("pointer-events", "auto");
+  // Get the actual tooltip dimensions after rendering
+  const tooltipNode = tooltip.node();
+  if (!tooltipNode) return;
+
+  const tooltipRect = tooltipNode.getBoundingClientRect();
+  const tooltipWidth = tooltipRect.width;
+  const tooltipHeight = tooltipRect.height;
+
+  // Calculate centered position
+  let tooltipX = x - (tooltipWidth / 2);
+  let tooltipY = y - tooltipHeight - 20; // 10px gap above the node
+
+  // Get container bounds for boundary checking
+  const container = d3.select(tooltipNode.parentElement);
+  const containerNode = container.node();
+  let containerBounds = { width: window.innerWidth, height: window.innerHeight };
+  
+  if (containerNode) {
+    const containerRect = containerNode.getBoundingClientRect();
+    containerBounds = {
+      width: containerRect.width,
+      height: containerRect.height
+    };
   }
+
+  // Boundary adjustments
+  const padding = 10;
+  
+  // Horizontal boundary check
+  if (tooltipX < padding) {
+    tooltipX = padding;
+  } else if (tooltipX + tooltipWidth > containerBounds.width - padding) {
+    tooltipX = containerBounds.width - tooltipWidth - padding;
+  }
+
+  // Vertical boundary check - if tooltip goes above container, show it below the node
+  if (tooltipY < padding) {
+    tooltipY = y + 20; // Show below node with some spacing
+  }
+
+  // If still goes below container, adjust upward
+  if (tooltipY + tooltipHeight > containerBounds.height - padding) {
+    tooltipY = containerBounds.height - tooltipHeight - padding;
+  }
+
+  // Apply final position with smooth transition
+  tooltip
+    .style("left", `${Math.round(tooltipX)}px`)
+    .style("top", `${Math.round(tooltipY)}px`)
+    .style("visibility", "visible")
+    .transition()
+    .duration(200)
+    .style("opacity", "0.9");
+}
 
   /**
    * Remove all tooltips
@@ -543,13 +597,16 @@ export class ChartUtility {
             transformedY = d.y * transform.k + transform.y;
           }
 
-          
+          const containerElement = svg.node().parentElement;
+          const containerRect = containerElement ? containerElement.getBoundingClientRect() : null;
 
           // Position tooltip
           this.positionTooltip(tooltip as unknown as d3.Selection<HTMLDivElement, unknown, HTMLElement, any>, {
-            x: transformedX - 50,
-            y: transformedY - 75,
-          });
+            x: transformedX,
+            y: transformedY,
+            containerWidth: containerRect?.width,
+            containerHeight: containerRect?.height
+        });
         }
 
         if (onMousemove) {

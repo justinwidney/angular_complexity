@@ -419,31 +419,37 @@ export class TreemapChartUtils {
         .attr('width', nodeWidth)
         .attr('height', nodeHeight);
       
+      // Calculate responsive font size based on multiple factors
+      const responsiveFontSizes = TreemapChartUtils.calculateResponsiveFontSizes(
+        nodeWidth, 
+        nodeHeight, 
+        d.data.Title || d.data.product || '',
+        config
+      );
+      
       // Add text container with clipping and proper positioning
       const textElement = group.append('text')
         .attr('clip-path', `url(#${clipId})`)
         .attr('x', 4) // Left padding
         .attr('y', 0) // Start at top of rectangle
-        .attr('dominant-baseline', 'hanging') // This makes text hang from the y position instead of sitting on it
+        .attr('dominant-baseline', 'hanging')
         .style('font-family', config.labelConfig.fontFamily)
-        .style('fill', '#333')
+        .style('fill', '#111')
         .style('pointer-events', 'none');
       
       // Prepare text content
       const title = d.data.Title || d.data.product || '';
       const value = TreemapChartUtils.formatNumber(d.value || 0, config);
       
-      // Calculate optimal font size based on available space
-      const maxFontSize = Math.min(config.labelConfig.fontSize, nodeHeight / 3);
-      const fontSize = Math.max(9, maxFontSize);
-      textElement.style('font-size', `${fontSize}px`);
+      // Use calculated responsive font size
+      textElement.style('font-size', `${responsiveFontSizes.title}px`);
       
-      // Smart word wrapping logic
+      // Smart word wrapping logic with responsive sizing
       const words = title.split(/\s+/);
-      const charWidth = fontSize * 0.6; // Approximate character width
+      const charWidth = responsiveFontSizes.title * 0.6; // Approximate character width
       const maxCharsPerLine = Math.floor((nodeWidth - 8) / charWidth); // 8px total padding
-      const lineHeight = fontSize * 1.3; // Slightly more line spacing
-      const topPadding = 4; // Top padding in pixels
+      const lineHeight = responsiveFontSizes.title * 1.3; // Slightly more line spacing
+      const topPadding = Math.max(4, responsiveFontSizes.title * 0.2); // Responsive padding
       const maxLines = Math.floor((nodeHeight - topPadding * 2) / lineHeight) - 1; // Reserve space for value line
       
       const lines: string[] = [];
@@ -481,7 +487,7 @@ export class TreemapChartUtils {
       lines.forEach((line, lineIndex) => {
         textElement.append('tspan')
           .attr('x', 4) // Small left padding
-          .attr('dy', lineIndex === 0 ? `${topPadding}px` : `${lineHeight}px`) // First line uses top padding, others use line height
+          .attr('dy', lineIndex === 0 ? `${topPadding}px` : `${lineHeight}px`)
           .text(line);
       });
       
@@ -492,10 +498,65 @@ export class TreemapChartUtils {
           .attr('dy', `${lineHeight + 2}px`) // Extra spacing before value
           .attr('fill-opacity', 0.8)
           .style('font-weight', 'bold')
-          .style('font-size', `${Math.max(8, fontSize - 1)}px`) // Slightly smaller for value
+          .style('font-size', `${responsiveFontSizes.value}px`) // Use responsive value font size
           .text(value);
       }
     });
+  }
+
+
+  static calculateResponsiveFontSizes(
+    width: number, 
+    height: number, 
+    text: string,
+    config: TreemapConfig
+  ): { title: number; value: number } {
+    
+    // Calculate box area and use it as a scaling factor
+    const area = width * height;
+    const aspectRatio = width / height;
+    
+    // Base font size calculation using multiple factors
+    const baseFontSize = config.labelConfig.fontSize || 16;
+    
+    // Scale factor based on area (with diminishing returns for very large areas)
+    const areaScale = Math.sqrt(area / 10000); // Normalize against a base area of 100x100
+    const areaScaleCapped = Math.min(areaScale, 3); // Cap at 3x scale
+    
+    // Scale factor based on minimum dimension (prevents text from being too big in very wide/tall boxes)
+    const minDimension = Math.min(width, height);
+    const dimensionScale = minDimension / 100; // Normalize against 100px
+    
+    // Scale factor based on text length (shorter text can be bigger)
+    const textLengthScale = Math.max(0.7, Math.min(1.5, 20 / Math.max(text.length, 1)));
+    
+    // Combine scaling factors with weights
+    const combinedScale = (
+      areaScaleCapped * 0.5 +      // 50% weight on area
+      dimensionScale * 0.3 +       // 30% weight on minimum dimension
+      textLengthScale * 0.2        // 20% weight on text length
+    );
+    
+    // Calculate title font size
+    let titleFontSize = baseFontSize * combinedScale;
+    
+    // Apply aspect ratio adjustment (very wide or tall boxes get slightly smaller text)
+    if (aspectRatio > 3 || aspectRatio < 0.33) {
+      titleFontSize *= 0.9;
+    }
+    
+    // Set reasonable bounds
+    const minTitleSize = 8;
+    const maxTitleSize = Math.min(80, height / 2); // Don't exceed half the box height
+    titleFontSize = Math.max(minTitleSize, Math.min(maxTitleSize, titleFontSize));
+    
+    // Value font size is proportional to title but slightly smaller
+    const valueFontSize = Math.max(6, titleFontSize * 0.85);
+    
+    return {
+      title: Math.round(titleFontSize),
+      value: Math.round(valueFontSize)
+    };
   }
 
   /**

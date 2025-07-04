@@ -1,5 +1,5 @@
 <!-- economic-complexity-definitions.component.html -->
-<div accent="thin" padding="relaxed" width="full">
+<div class="container-padding">
   
   <!-- Header Section -->
   <div class="definitions-header">
@@ -325,21 +325,6 @@
         <li><strong>Positioning:</strong> Current exports determine future opportunities</li>
       </ul>
 
-      <goa-text as="h4">Colors and Indicators:</goa-text>
-      <div class="product-space-legend">
-        <div class="legend-item">
-          <div class="color-indicator green"></div>
-          <goa-text as="p"><strong>Green/Dark:</strong> Products with Comparative Advantage (RCA ≥ 1)</goa-text>
-        </div>
-        <div class="legend-item">
-          <div class="color-indicator light"></div>
-          <goa-text as="p"><strong>Light/Gray:</strong> Products without Comparative Advantage (RCA < 1)</goa-text>
-        </div>
-        <div class="legend-item">
-          <div class="color-indicator size"></div>
-          <goa-text as="p"><strong>Size:</strong> Represents export value or market size</goa-text>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -385,12 +370,6 @@
         <goa-text as="p" size="small" color="secondary">
           Based on the Economic Complexity methodology developed by Ricardo Hausmann and César Hidalgo at Harvard's Growth Lab.
         </goa-text>
-      </div>
-      <div class="col-auto">
-        <goa-button type="primary" (click)="navigateBack()">
-          <goa-icon name="arrow-left" slot="start"></goa-icon>
-          Back to Dashboard
-        </goa-button>
       </div>
     </div>
   </div>

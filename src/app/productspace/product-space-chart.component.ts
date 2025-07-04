@@ -7,7 +7,7 @@ import { ProductSpaceChartService } from './product-space-chart-service';
 import { ProductSpaceChartUtils } from './product-space-chart-utils';
 import { ChartCoordinationService } from '../service/chart-coordination.service';
 import { Link, Node, GroupedData , GroupLabel} from './product-space-chart.models';
-import { FilterType } from '../feasible/feasible-chart-model';
+import { FilterType, GroupingType } from '../feasible/feasible-chart-model';
 
 import { ChartUtility, NodeColorOptions, TooltipOptions } from '../d3_utility/chart-nodes-utility';
 import { 
@@ -77,7 +77,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   ngAfterViewInit(): void {
-    // Chart will be initialized after data is loaded
+    this.coordinationService.setGrouping(GroupingType.HS4)
   }
 
   ngOnDestroy(): void {
@@ -100,7 +100,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
 
     // Keep all existing subscriptions
     this.coordinationService.region$
-      .pipe(skip(1), distinctUntilChanged(), takeUntil(this.destroy$))
+      .pipe( takeUntil(this.destroy$))
       .subscribe(region => {
         this.selectedRegion = region as any;
         this.reloadData();
@@ -395,19 +395,26 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
   }
 
   // Event handlers (keep existing logic)
-  private handleZoom(event: any): void {
-    // Existing zoom logic using utility's transform handling
-    d3.selectAll<HTMLDivElement, TooltipDatum>('div.tooltip')
-      .each((d, i, nodes) => {
-        const el = nodes[i] as HTMLDivElement;
+ private handleZoom(event: any): void {
+  d3.selectAll<HTMLDivElement, any>('div.tooltip')
+    .each((d, i, nodes) => {
+      const tooltipElement = nodes[i] as HTMLDivElement;
+      const tooltip = d3.select(tooltipElement);
+      
+      if (d && d.x !== undefined && d.y !== undefined) {
+        // Recalculate centered position with new transform
+        const [transformedX, transformedY] = this.d3SvgUtility.applyTransform(event.transform, d.x, d.y);
         
-        if (d !== undefined) {
-          const [tx, ty] = this.d3SvgUtility.applyTransform(event.transform, d.x, d.y);
-          d3.select(el)
-            .style('left', `${tx - 50}px`)
-            .style('top',  `${ty - 75}px`);
-        }
-      });
+        // Get current tooltip dimensions
+        const tooltipRect = tooltipElement.getBoundingClientRect();
+        const centeredX = transformedX - (tooltipRect.width / 2);
+        const centeredY = transformedY - tooltipRect.height - 20;
+        
+        tooltip
+          .style('left', `${Math.round(centeredX)}px`)
+          .style('top', `${Math.round(centeredY)}px`);
+      }
+    });
   }
 
   private handleSvgClick(event: any): void {

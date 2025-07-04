@@ -1,9 +1,11 @@
 // economic-complexity-definitions.component.scss
 
+.container-padding{
+    padding: var(--goa-space-3xl);
+}
+
 .definitions-header {
-  padding: var(--goa-space-3xl);
   border-radius: 8px;
-  margin-bottom: 2rem;
 }
 
 .quick-nav {
