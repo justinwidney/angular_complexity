@@ -92,7 +92,11 @@ export interface GroupedData {
     product: string;
     provExpValue: number;
     Title: string;
+    hs2?: number;
+    hs4?: number;
+    groupingType: string;
     naics: string;
+    groupKey: string;
   };
 }
 

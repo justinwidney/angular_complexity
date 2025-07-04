@@ -5,7 +5,22 @@
   height: 700px;
   overflow: hidden;
   position: relative;
+
+.outlined {
+  paint-order: stroke fill;
+  stroke: white;
+  stroke-width: 25px;
+  stroke-linejoin: round;
+  text-anchor: middle;
+  font-family: 'Arial', sans-serif;
+  user-select: none;
+  
+  // Text shadow for better readability
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
 }
+
+}
+
 
 .node {
   cursor: pointer;
@@ -72,7 +87,7 @@
 .outlined {
   paint-order: stroke fill;
   stroke: white;
-  stroke-width: 3px;
+  stroke-width: 25px;
   stroke-linejoin: round;
   text-anchor: middle;
   font-family: 'Arial', sans-serif;

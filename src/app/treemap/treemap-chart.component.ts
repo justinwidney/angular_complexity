@@ -1,11 +1,11 @@
-// treemap-chart.component.ts
+// enhanced-treemap-chart.component.ts
 
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, skip, Subject, takeUntil } from 'rxjs';
 import * as d3 from 'd3';
 import { UnifiedDataService } from '../service/chart-data-service';
 import { ChartCoordinationService } from '../service/chart-coordination.service';
-import { TreemapChartUtils } from './treemap-chart.utils';
+import { TreemapChartUtils, GroupingType } from './treemap-chart.utils';
 import { 
   TreemapConfig, 
   TreemapNode, 
@@ -40,6 +40,8 @@ import { FilterType } from '../feasible/feasible-chart-model';
         <div class="error-message">{{ error }}</div>
         <button class="retry-button" (click)="retryLoad()">Retry</button>
       </div>
+
+      
       
       <!-- Tooltip Container -->
       <div #tooltipContainer id="treemap-tooltip-container" class="tooltip-container"></div>
@@ -61,12 +63,14 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() showCacheStatus: boolean = false;
   @Input() showDebugInfo: boolean = false;
   @Input() initialDepth: number = 2;
+  @Input() initialGrouping: GroupingType = GroupingType.NAICS;
 
   // Output events
   @Output() nodeClicked = new EventEmitter<TreemapTooltipData>();
   @Output() nodeHovered = new EventEmitter<TreemapTooltipData>();
   @Output() dataUpdated = new EventEmitter<TreemapNode[]>();
   @Output() chartDataLoaded = new EventEmitter<{dataCount: number, totalValue: number}>();
+  @Output() groupingChanged = new EventEmitter<GroupingType>();
 
   // Component state
   private destroy$ = new Subject<void>();
@@ -81,12 +85,15 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
   private config!: TreemapConfig;
   private dimensions!: ChartDimensions;
 
-
   // Component state
   loading = false;
   error: string | null = null;
   currentRegion: string = '';
   currentYear: string = '';
+
+  // NEW: Grouping state
+  currentGrouping: GroupingType = GroupingType.NAICS;
+  availableGroupingTypes = TreemapChartUtils.getAvailableGroupingTypes();
 
   // Treemap-specific state
   currentState: TreemapState = {
@@ -106,9 +113,12 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private unifiedDataService: UnifiedDataService,
     private coordinationService: ChartCoordinationService,
-    private chartUtility: ChartUtility, // NEW: Chart utility
-    private d3SvgUtility: D3SvgChartUtility // NEW: D3 SVG utility
-  ) {}
+    private chartUtility: ChartUtility,
+    private d3SvgUtility: D3SvgChartUtility
+  ) {
+    // Set initial grouping
+    this.currentGrouping = this.initialGrouping;
+  }
 
   ngOnInit(): void {
     this.initializeConfig();
@@ -119,6 +129,8 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.initializeChart();
     this.loadData();
+    this.coordinationService.setGrouping(GroupingType.HS4); // Set default grouping
+    
   }
 
   ngOnDestroy(): void {
@@ -141,7 +153,6 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.currentState.currentDepth = this.initialDepth;
 
     // Calculate dimensions
-        // Calculate dimensions using utility interface
     const treemapDimensions = TreemapChartUtils.calculateDimensions({
       ...this.config,
     });
@@ -198,12 +209,47 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
 
-    // NEW: Subscribe to product group changes (same as feasible chart)
+    // NEW: Subscribe to grouping changes from coordination service
+    this.coordinationService.grouping$
+      .pipe(
+        skip(1), 
+        distinctUntilChanged(),
+        takeUntil(this.destroy$))
+      .subscribe(grouping => {
+        if (grouping && this.isValidGroupingType(grouping)) {
+          this.currentGrouping = grouping as GroupingType;
+          this.processTreemapData(this.rawData); // Reprocess with new grouping
+        }
+      });
+
+    // Subscribe to product group changes (same as before)
     this.coordinationService.productGroups$
       .pipe(takeUntil(this.destroy$))
       .subscribe(productGroups => {
         this.updateDisplay(); // Re-render treemap with new product group filtering
       });
+  }
+
+  /**
+   * NEW: Validate if grouping type is supported
+   */
+  private isValidGroupingType(grouping: string): boolean {
+    return Object.values(GroupingType).includes(grouping as GroupingType);
+  }
+
+  /**
+   * NEW: Handle grouping change from UI
+   */
+  onGroupingChange(): void {
+    
+    // Update coordination service
+    this.coordinationService.setGrouping(this.currentGrouping);
+    this.groupingChanged.emit(this.currentGrouping);
+    
+    // Reprocess data with new grouping
+    if (this.rawData && this.rawData.length > 0) {
+      this.processTreemapData(this.rawData);
+    }
   }
 
   public refreshChart(): void {
@@ -233,7 +279,7 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * NEW: Helper method to check if treemap item belongs to enabled product group
+   * Helper method to check if treemap item belongs to enabled product group
    */
   private isItemInEnabledProductGroup(item: RawTreemapItem): boolean {
     // Get all product groups and filter for enabled ones
@@ -244,9 +290,10 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
       return true;
     }
 
-    console.log(item) 
-   
-    const hs2Code = item.product;
+    const hs2Code = Math.floor(item.product ); // Convert HS4 to HS2
+
+    console.log(`Checking item ${item.product} (HS2: ${hs2Code}) against enabled groups`);
+    console.log('Enabled groups:', enabledGroups);
 
     // Check if item's HS2 code falls within any enabled product group's ranges
     return enabledGroups.some(group => {
@@ -256,10 +303,8 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-
-
   /**
-   * Process raw data for treemap - now with product group filtering
+   * ENHANCED: Process raw data for treemap - now with dynamic grouping and product group filtering
    */
   private processTreemapData(rawData: RawTreemapItem[]): void {
     try {
@@ -269,11 +314,16 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      // NEW: Filter data based on enabled product groups
+
+
+      // Filter data based on enabled product groups
       const filteredData = rawData.filter(item => this.isItemInEnabledProductGroup(item));
 
-      // Group by NAICS (equivalent to your groupBy function)
-      const groupedData = TreemapChartUtils.groupByNaics(filteredData);
+      // Get HS descriptions for better labeling
+      const hsDescriptions = this.unifiedDataService.getHSDescriptions();
+
+      // NEW: Group by the selected grouping type instead of always using NAICS
+      const groupedData = TreemapChartUtils.groupByType(filteredData, this.currentGrouping, hsDescriptions);
       const hierarchyRoot = TreemapChartUtils.createTreemapHierarchy(groupedData);
       
       // Create D3 treemap layout
@@ -288,7 +338,7 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.data = this.hierarchyData.children || [];
 
       // Calculate debug info
-      this.debugInfo.dataLength = filteredData.length; // Use filtered data length
+      this.debugInfo.dataLength = filteredData.length;
       this.debugInfo.nodesCount = this.data.length;
       this.debugInfo.totalValue = TreemapChartUtils.calculateTotalValue(filteredData);
 
@@ -303,13 +353,15 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
       // Render the chart
       this.renderTreemap();
 
+      console.log(`✅ Treemap processed with ${this.currentGrouping} grouping: ${this.debugInfo.nodesCount} nodes`);
+
     } catch (error) {
       this.handleError(`Failed to process treemap data: ${error}`);
     }
   }
 
   /**
-   * NEW: Update display when product groups change
+   * Update display when product groups change
    */
   private updateDisplay(): void {
     if (this.rawData && this.rawData.length > 0) {
@@ -317,7 +369,6 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.processTreemapData(this.rawData);
     }
   }
-
 
   /**
    * Initialize D3 chart
@@ -403,7 +454,7 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // Update debug info
     this.debugInfo.nodesCount = leaves.length;
     
-    console.log(`✅ Treemap rendered: ${this.debugInfo.nodesCount} nodes for year ${this.currentYear}`);
+    console.log(`✅ Treemap rendered: ${this.debugInfo.nodesCount} nodes (${this.currentGrouping}) for year ${this.currentYear}`);
 
     // Add animation
     if (this.config.animationDuration > 0) {
@@ -444,7 +495,7 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
       naics: d.data.naics,
       description: d.data.Title,
       percentage: this.debugInfo.totalValue > 0 ? 
-        ((d.value || 0) / this.debugInfo.totalValue * 100) : 0
+        ((d.value || 0) / this.debugInfo.totalValue * 100) : 0,
     };
 
     // Position tooltip
@@ -463,9 +514,9 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
       tooltipY = containerY + 25;
     }
 
-    // Update tooltip
+    // Update tooltip - now with grouping information
     this.tooltip
-      .html(TreemapChartUtils.createTooltipContent(d, this.debugInfo.totalValue))
+      .html(TreemapChartUtils.createTooltipContent(d, this.debugInfo.totalValue, this.currentGrouping))
       .style('left', tooltipX + 'px')
       .style('top', tooltipY + 'px')
       .style('opacity', 0.9);
@@ -487,7 +538,8 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
       naics: d.data.naics,
       description: d.data.Title,
       percentage: this.debugInfo.totalValue > 0 ? 
-        ((d.value || 0) / this.debugInfo.totalValue * 100) : 0
+        ((d.value || 0) / this.debugInfo.totalValue * 100) : 0,
+
     };
 
     this.currentState.selectedNode = d;
@@ -527,6 +579,13 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
+   * NEW: Utility method to format currency for debug display
+   */
+  formatCurrency(value: number): string {
+    return TreemapChartUtils.formatNumber(value, this.config);
+  }
+
+  /**
    * Public API methods
    */
   public retryLoad(): void {
@@ -553,6 +612,15 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.currentYear;
   }
 
+  public getCurrentGrouping(): GroupingType {
+    return this.currentGrouping;
+  }
+
+  public setGrouping(grouping: GroupingType): void {
+    this.currentGrouping = grouping;
+    this.onGroupingChange();
+  }
+
   public getChartData(): TreemapNode[] {
     return TreemapChartUtils.cloneData(this.data);
   }
@@ -563,5 +631,16 @@ export class TreemapChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public hasData(): boolean {
     return this.data && this.data.length > 0;
+  }
+
+  /**
+   * NEW: Get grouping statistics
+   */
+  public getGroupingStats(): { grouping: GroupingType; nodeCount: number; totalValue: number } {
+    return {
+      grouping: this.currentGrouping,
+      nodeCount: this.debugInfo.nodesCount,
+      totalValue: this.debugInfo.totalValue
+    };
   }
 }

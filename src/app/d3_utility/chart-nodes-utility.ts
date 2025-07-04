@@ -24,6 +24,7 @@ export interface TooltipOptions {
   title?: string;
   description?: string;
   value?: number;
+  eci?: number;
   additionalInfo?: { [key: string]: any };
   showCloseButton?: boolean;
   customHtml?: string;
@@ -83,7 +84,7 @@ export class ChartUtility {
     fontSize: '13px',
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
     zIndex: '1000',
-    maxWidth: '300px',
+    maxWidth: '400px',
     opacity: '0.9'
   };
 
@@ -161,6 +162,7 @@ export class ChartUtility {
     return data.filter(item => {
       const searchFields = [
         item.description,
+        item['description2'],
         item.naics_description,
         item.title,
         item.Title
@@ -216,6 +218,7 @@ export class ChartUtility {
       title = '',
       description = '',
       value,
+      eci, 
       additionalInfo = {},
       showCloseButton = true,
       customHtml,
@@ -252,12 +255,12 @@ export class ChartUtility {
         title,
         description,
         value,
+        eci,
         additionalInfo,
         showCloseButton,
         data
       });
 
-      console.log(`Generated tooltip HTML:`, html);
 
       tooltip.html(html);
     }
@@ -293,11 +296,12 @@ export class ChartUtility {
     title: string;
     description: string;
     value?: number;
+    eci?: number;
     additionalInfo: { [key: string]: any };
     showCloseButton: boolean;
     data: any;
   }): string {
-    const { title, description, value, additionalInfo, showCloseButton } = config;
+    const { title, description, value, additionalInfo, showCloseButton, eci } = config;
 
     let html = '<div style="position: relative;">';
     
@@ -312,12 +316,23 @@ export class ChartUtility {
     }
 
     html += '<div>';
+
     if (description) {
       html += `<div >${description}</div>`;
     }
+
     else {
       html += `<div style="font-size: 14px;">${title}</div>`;
     }
+
+    if(eci){
+
+      console.log("ECI in tooltip:", eci);
+
+      html += `<div style="font-size: 14px; font-weight: bold;">ECI: ${eci}</div>`;
+    }
+
+   
 
     html += '</div></div>';
     return html;
@@ -366,6 +381,8 @@ export class ChartUtility {
       enabledProductGroups = []
     } = options;
 
+
+
     // Search filtering - highest priority
     if (searchQuery.trim()) {
       const searchSet = new Set(searchResults.map(result => this.getItemId(result)));
@@ -391,6 +408,8 @@ export class ChartUtility {
     // Apply color scale if available
     if (colorScale) {
       const colorKey = item.product || item.naics || item.hs2 || item.hs4;
+
+
       if (colorKey !== undefined) {
         return colorScale(colorKey);
       }
@@ -445,7 +464,9 @@ export class ChartUtility {
    * Check if item passes value/RCA filters
    */
   private passesValueFilter(item: any, filterType: FilterType): boolean {
-    if (!item.rca && !item.value && !item.Value) {
+
+    if (!item.rca && !item.Value! && item.value ) {
+      console.warn(`Item ${JSON.stringify(item)} does not have rca or value properties.`)
       return filterType === FilterType.ALL;
     }
 
@@ -506,6 +527,7 @@ export class ChartUtility {
           const transform = d3.zoomTransform(svgElement);
           
           let transformedX, transformedY;
+
           
           // NEW: Better coordinate calculation using original scales if available
           if (originalScales && originalScales.x && originalScales.y && d.distance !== undefined && d.pci !== undefined) {
@@ -515,10 +537,13 @@ export class ChartUtility {
             transformedX = baseX * transform.k + transform.x;
             transformedY = baseY * transform.k + transform.y;
           } else {
+
             // Fallback for other charts - use stored coordinates
             transformedX = d.x * transform.k + transform.x;
             transformedY = d.y * transform.k + transform.y;
           }
+
+          
 
           // Position tooltip
           this.positionTooltip(tooltip as unknown as d3.Selection<HTMLDivElement, unknown, HTMLElement, any>, {
@@ -534,9 +559,12 @@ export class ChartUtility {
 
       mouseleave: (event: any, d: any) => {
         // Reset styling if not selected
+
+
         if (!enableSelection || d.state === 0) {
           d3.select(event.currentTarget).style("stroke-width", "1");
           d3.select("#tooltip-" + d.id).remove();
+
         }
 
         if (onMouseleave) {

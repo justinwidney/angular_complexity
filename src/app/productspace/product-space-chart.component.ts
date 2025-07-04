@@ -284,7 +284,7 @@ export class ProductSpaceChartComponent implements OnInit, AfterViewInit, OnDest
 
     // Use utility animation for updates
     this.d3SvgUtility.animateElements(enterSel.merge(nodesSel as any), {
-      duration: 1000,
+      duration: 100,
       properties: {
         "cx": (d: unknown) => (d as Node).x,
         "cy": (d: unknown) => (d as Node).y,

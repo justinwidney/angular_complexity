@@ -1,4 +1,4 @@
-// treemap-chart.utils.ts
+// enhanced-treemap-chart.utils.ts
 
 import * as d3 from 'd3';
 import { 
@@ -10,6 +10,21 @@ import {
   RawTreemapItem,
   TreemapDimensions
 } from './treemap-chart.model';
+
+export enum GroupingType {
+  HS2 = 'hs2',
+  HS4 = 'hs4',
+  NAICS = 'naics',
+  NAICS2 = 'naics2',
+  NAICS4 = 'naics4'
+}
+
+export interface GroupingConfig {
+  type: GroupingType;
+  getKey: (item: RawTreemapItem) => string;
+  getDescription: (item: RawTreemapItem, hsDescriptions?: any[]) => string;
+  getDisplayName: (key: string) => string;
+}
 
 export class TreemapChartUtils {
 
@@ -52,18 +67,96 @@ export class TreemapChartUtils {
   }
 
   /**
-   * Group data by NAICS code (equivalent to your groupBy function)
+   * Get grouping configuration for different grouping types
    */
-  static groupByNaics(data: RawTreemapItem[]): GroupedData {
+  static getGroupingConfig(groupingType: GroupingType, hsDescriptions: any[] = []): GroupingConfig {
+    const configs: Record<GroupingType, GroupingConfig> = {
+      [GroupingType.HS2]: {
+        type: GroupingType.HS2,
+        getKey: (item: RawTreemapItem) => {
+          const hs2 = Math.floor(item.product / 100).toString().padStart(2, '0');
+          return hs2;
+        },
+        getDescription: (item: RawTreemapItem, hsDescriptions?: any[]) => {
+          const hs2 = Math.floor(item.product / 100);
+          return this.getHS2Description(hs2) || `HS2: ${hs2.toString().padStart(2, '0')}`;
+        },
+        getDisplayName: (key: string) => `HS2: ${key}`
+      },
+
+      [GroupingType.HS4]: {
+        type: GroupingType.HS4,
+        getKey: (item: RawTreemapItem) => item.product.toString().padStart(4, '0'),
+        getDescription: (item: RawTreemapItem, hsDescriptions?: any[]) => {
+          const hs4Description = hsDescriptions?.find(x => Number(x.HS4) === item.product)?.['HS4 Short Name'];
+          return hs4Description || `HS4: ${item.product.toString().padStart(4, '0')}`;
+        },
+        getDisplayName: (key: string) => `HS4: ${key}`
+      },
+
+
+      [GroupingType.NAICS]: {
+        type: GroupingType.NAICS,
+        getKey: (item: RawTreemapItem) => item.naics?.toString() || 'Unknown',
+        getDescription: (item: RawTreemapItem) => item.naics_description || `NAICS: ${item.naics || 'Unknown'}`,
+        getDisplayName: (key: string) => key === 'Unknown' ? 'Unknown NAICS' : `NAICS: ${key}`
+      },
+
+      [GroupingType.NAICS2]: {
+        type: GroupingType.NAICS2,
+        getKey: (item: RawTreemapItem) => {
+          if (!item.naics) return 'Unknown';
+          const naics2 = Math.floor(Number(item.naics) / Math.pow(10, item.naics.toString().length - 2));
+          return naics2.toString().padStart(2, '0');
+        },
+        getDescription: (item: RawTreemapItem) => {
+          if (!item.naics) return 'Unknown NAICS2';
+          const naics2 = Math.floor(Number(item.naics) / Math.pow(10, item.naics.toString().length - 2));
+          return this.getNAICS2Description(naics2) || `NAICS2: ${naics2.toString().padStart(2, '0')}`;
+        },
+        getDisplayName: (key: string) => key === 'Unknown' ? 'Unknown NAICS2' : `NAICS2: ${key}`
+      },
+
+      [GroupingType.NAICS4]: {
+        type: GroupingType.NAICS4,
+        getKey: (item: RawTreemapItem) => {
+          if (!item.naics) return 'Unknown';
+          const naicsStr = item.naics.toString();
+          const naics4 = naicsStr.length >= 4 ? naicsStr.substring(0, 4) : naicsStr.padEnd(4, '0');
+          return naics4;
+        },
+        getDescription: (item: RawTreemapItem) => {
+          if (!item.naics) return 'Unknown NAICS4';
+          const naicsStr = item.naics.toString();
+          const naics4 = naicsStr.length >= 4 ? naicsStr.substring(0, 4) : naicsStr.padEnd(4, '0');
+          return `NAICS4: ${naics4}`;
+        },
+        getDisplayName: (key: string) => key === 'Unknown' ? 'Unknown NAICS4' : `NAICS4: ${key}`
+      }
+    };
+
+    return configs[groupingType];
+  }
+
+  /**
+   * Generic grouping function that works with any grouping type
+   */
+  static groupByType(data: RawTreemapItem[], groupingType: GroupingType, hsDescriptions: any[] = []): GroupedData {
+    const config = this.getGroupingConfig(groupingType, hsDescriptions);
+    
     return data.reduce((result: GroupedData, currentItem: RawTreemapItem) => {
-      const groupKey = currentItem.naics;
+      const groupKey = config.getKey(currentItem);
       
       if (!result[groupKey]) {
         result[groupKey] = {
           product: groupKey,
           provExpValue: 0,
-          Title: currentItem.naics_description,
-          naics: groupKey
+          Title: config.getDescription(currentItem, hsDescriptions),
+          naics: groupingType.includes('naics') ? currentItem.naics : 'undefined',
+          hs2: groupingType.includes('hs') ? Math.floor(currentItem.product / 100) : 0,
+          hs4: groupingType.includes('hs') ? currentItem.product : 0,
+          groupingType: groupingType,
+          groupKey: groupKey
         };
       }
       
@@ -72,6 +165,153 @@ export class TreemapChartUtils {
       
       return result;
     }, {});
+  }
+
+  /**
+   * Legacy method - now delegates to the generic grouping function
+   */
+  static groupByNaics(data: RawTreemapItem[]): GroupedData {
+    return this.groupByType(data, GroupingType.NAICS);
+  }
+
+  /**
+   * Get HS2 category descriptions
+   */
+  static getHS2Description(hs2Code: number): string {
+    const hs2Descriptions: Record<number, string> = {
+      1: "Live Animals",
+      2: "Meat and Edible Meat Offal",
+      3: "Fish and Crustaceans",
+      4: "Dairy Products",
+      5: "Products of Animal Origin",
+      6: "Live Trees and Plants",
+      7: "Edible Vegetables",
+      8: "Edible Fruits and Nuts",
+      9: "Coffee, Tea, and Spices",
+      10: "Cereals",
+      11: "Products of Milling Industry",
+      12: "Oil Seeds and Oleaginous Fruits",
+      13: "Lac; Gums and Resins",
+      14: "Vegetable Plaiting Materials",
+      15: "Animal or Vegetable Fats and Oils",
+      16: "Preparations of Meat or Fish",
+      17: "Sugars and Sugar Confectionery",
+      18: "Cocoa and Cocoa Preparations",
+      19: "Preparations of Cereals",
+      20: "Preparations of Vegetables",
+      21: "Miscellaneous Edible Preparations",
+      22: "Beverages, Spirits and Vinegar",
+      23: "Residues from Food Industries",
+      24: "Tobacco and Manufactured Tobacco",
+      25: "Salt; Sulphur; Earths and Stone",
+      26: "Ores, Slag and Ash",
+      27: "Mineral Fuels and Oils",
+      28: "Inorganic Chemicals",
+      29: "Organic Chemicals",
+      30: "Pharmaceutical Products",
+      31: "Fertilizers",
+      32: "Tanning and Dyeing Extracts",
+      33: "Essential Oils and Perfumes",
+      34: "Soap and Cleaning Preparations",
+      35: "Albuminoidal Substances",
+      36: "Explosives and Pyrotechnics",
+      37: "Photographic or Cinematographic Goods",
+      38: "Miscellaneous Chemical Products",
+      39: "Plastics and Articles Thereof",
+      40: "Rubber and Articles Thereof",
+      41: "Raw Hides and Skins",
+      42: "Articles of Leather",
+      43: "Furskins and Artificial Fur",
+      44: "Wood and Articles of Wood",
+      45: "Cork and Articles of Cork",
+      46: "Manufactures of Straw",
+      47: "Pulp of Wood",
+      48: "Paper and Paperboard",
+      49: "Printed Books and Newspapers",
+      50: "Silk",
+      51: "Wool and Animal Hair",
+      52: "Cotton",
+      53: "Other Vegetable Textile Fibres",
+      54: "Man-made Filaments",
+      55: "Man-made Staple Fibres",
+      56: "Wadding, Felt and Nonwovens",
+      57: "Carpets and Textile Floor Coverings",
+      58: "Special Woven Fabrics",
+      59: "Impregnated Textile Fabrics",
+      60: "Knitted or Crocheted Fabrics",
+      61: "Articles of Apparel, Knitted",
+      62: "Articles of Apparel, Not Knitted",
+      63: "Other Made-up Textile Articles",
+      64: "Footwear",
+      65: "Headgear",
+      66: "Umbrellas and Walking Sticks",
+      67: "Prepared Feathers and Down",
+      68: "Articles of Stone and Plaster",
+      69: "Ceramic Products",
+      70: "Glass and Glassware",
+      71: "Natural Pearls and Precious Stones",
+      72: "Iron and Steel",
+      73: "Articles of Iron or Steel",
+      74: "Copper and Articles Thereof",
+      75: "Nickel and Articles Thereof",
+      76: "Aluminum and Articles Thereof",
+      78: "Lead and Articles Thereof",
+      79: "Zinc and Articles Thereof",
+      80: "Tin and Articles Thereof",
+      81: "Other Base Metals",
+      82: "Tools and Cutlery of Base Metal",
+      83: "Miscellaneous Articles of Base Metal",
+      84: "Nuclear Reactors and Machinery",
+      85: "Electrical Machinery and Equipment",
+      86: "Railway Locomotives",
+      87: "Vehicles Other than Railway",
+      88: "Aircraft and Spacecraft",
+      89: "Ships and Boats",
+      90: "Optical and Precision Instruments",
+      91: "Clocks and Watches",
+      92: "Musical Instruments",
+      93: "Arms and Ammunition",
+      94: "Furniture and Bedding",
+      95: "Toys and Games",
+      96: "Miscellaneous Manufactured Articles",
+      97: "Works of Art"
+    };
+
+    return hs2Descriptions[hs2Code];
+  }
+
+  /**
+   * Get NAICS2 sector descriptions
+   */
+  static getNAICS2Description(naics2Code: number): string {
+    const naics2Descriptions: Record<number, string> = {
+      11: "Agriculture, Forestry, Fishing and Hunting",
+      21: "Mining, Quarrying, and Oil and Gas Extraction",
+      22: "Utilities",
+      23: "Construction",
+      31: "Manufacturing",
+      32: "Manufacturing",
+      33: "Manufacturing",
+      42: "Wholesale Trade",
+      44: "Retail Trade",
+      45: "Retail Trade",
+      48: "Transportation and Warehousing",
+      49: "Transportation and Warehousing",
+      51: "Information",
+      52: "Finance and Insurance",
+      53: "Real Estate and Rental and Leasing",
+      54: "Professional, Scientific, and Technical Services",
+      55: "Management of Companies and Enterprises",
+      56: "Administrative and Support and Waste Management Services",
+      61: "Educational Services",
+      62: "Health Care and Social Assistance",
+      71: "Arts, Entertainment, and Recreation",
+      72: "Accommodation and Food Services",
+      81: "Other Services (except Public Administration)",
+      92: "Public Administration"
+    };
+
+    return naics2Descriptions[naics2Code];
   }
 
   /**
@@ -337,19 +577,26 @@ export class TreemapChartUtils {
   }
 
   /**
-   * Create tooltip content
+   * Create tooltip content with grouping-specific information
    */
-  static createTooltipContent(node: d3.HierarchyRectangularNode<any>, totalValue: number): string {
+  static createTooltipContent(node: d3.HierarchyRectangularNode<any>, totalValue: number, groupingType?: GroupingType): string {
     const data = node.data;
     const value = node.value || 0;
     const percentage = totalValue > 0 ? ((value / totalValue) * 100).toFixed(1) : '0';
+    
+    let groupingInfo = '';
+    if (data.groupingType && data.groupKey) {
+      groupingInfo = `<div class="tooltip-grouping">${data.groupingType.toUpperCase()}: ${data.groupKey}</div>`;
+    } else if (data.naics) {
+      groupingInfo = `<div class="tooltip-naics">NAICS: ${data.naics}</div>`;
+    }
     
     return `
       <div class="treemap-tooltip">
         <div class="tooltip-title">${data.Title || data.product}</div>
         <div class="tooltip-value">${TreemapChartUtils.formatNumber(value, TreemapChartUtils.getDefaultConfig())}</div>
         <div class="tooltip-percentage">${percentage}% of total</div>
-        <div class="tooltip-naics">NAICS: ${data.naics}</div>
+        ${groupingInfo}
       </div>
     `;
   }
@@ -388,13 +635,12 @@ export class TreemapChartUtils {
     
     // Check required fields
     const hasRequiredFields = data.every(item => 
-      item.naics && 
-      item.naics_description && 
+      item.product !== undefined && 
       (item.Value !== undefined && item.Value !== null)
     );
     
     if (!hasRequiredFields) {
-      console.warn('Treemap data missing required fields (naics, naics_description, Value)');
+      console.warn('Treemap data missing required fields (product, Value)');
       return false;
     }
     
@@ -457,5 +703,18 @@ export class TreemapChartUtils {
    */
   static sortNodesByValue(a: d3.HierarchyRectangularNode<any>, b: d3.HierarchyRectangularNode<any>): number {
     return (b.value || 0) - (a.value || 0);
+  }
+
+  /**
+   * Get available grouping types
+   */
+  static getAvailableGroupingTypes(): { value: GroupingType; label: string }[] {
+    return [
+      { value: GroupingType.HS2, label: 'HS2 (Product Categories)' },
+      { value: GroupingType.HS4, label: 'HS4 (Product Subcategories)' },
+      { value: GroupingType.NAICS, label: 'NAICS (Industry Classification)' },
+      { value: GroupingType.NAICS2, label: 'NAICS2 (Industry Sectors)' },
+      { value: GroupingType.NAICS4, label: 'NAICS4 (Industry Subsectors)' }
+    ];
   }
 }

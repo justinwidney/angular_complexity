@@ -16,6 +16,7 @@ import { OvertimeChartComponent } from '../timeChart/overtime-chart.component';
 import { ECIChartComponent } from '../eci/eci-chart.component';
 import { TreemapChartComponent } from '../treemap/treemap-chart.component';
 import { TableComponent } from '../dataTable/data-table.component';
+import { EconomicComplexityDefinitionsComponent } from '../definitions/definitions.component';
 
 interface NodeData {
   node: any;
@@ -49,6 +50,7 @@ interface GroupLabel {
     ECIChartComponent, 
     TreemapChartComponent,
     TableComponent,
+    EconomicComplexityDefinitionsComponent
   ],
   standalone: true,
   encapsulation: ViewEncapsulation.None,
@@ -225,6 +227,17 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.updateDashboardStatsFromFilteredTotals();
         this.cdr.markForCheck();
       });
+
+    this.coordinationService.grouping$
+      .pipe(
+        skip(1), 
+        distinctUntilChanged(),
+        takeUntil(this.destroy$))
+      .subscribe(grouping => {
+        this.currentGrouping = grouping;
+        this.cdr.detectChanges();
+      });
+
 
     // NEW: Subscribe to product groups
     this.coordinationService.productGroups
@@ -489,9 +502,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       case 'grouping':
         const groupingMap: { [key: string]: GroupingType } = {
+          'NAICS4': GroupingType.NAICS4,
+          'NAICS2': GroupingType.NAICS2,
           'HS2': GroupingType.HS2,
           'HS4': GroupingType.HS4,
-          'HS6': GroupingType.HS6
         };
         this.currentGrouping = groupingMap[value] || GroupingType.HS2;
         this.coordinationService.setGrouping(this.currentGrouping);
@@ -627,6 +641,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         return 'HS4';
       case GroupingType.HS6:
         return 'HS6';
+      case GroupingType.NAICS4:
+        return 'NAICS4';
       default:
         return 'HS2';
     }
@@ -896,6 +912,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     }
     
-    return 'Search by product description or HS code';
+    return 'Search for product';
   }
 }

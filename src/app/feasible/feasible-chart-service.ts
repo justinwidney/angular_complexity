@@ -104,6 +104,9 @@ public aggregateData(
     groupingType: GroupingType, 
     naicsDescriptions?: NaicsDescriptions
   ): FeasiblePoint[] {
+
+    console.log(data, "Raw Data");
+
     
     // If naicsDescriptions not provided, extract them from data
     if (!naicsDescriptions) {
@@ -121,6 +124,7 @@ public aggregateData(
     let dataGroups: Map<any, any[]>;
     let isNaicsGrouping = false;
 
+
     switch (groupingType) {
       case GroupingType.HS4:
         dataGroups = this.groupBy(data, d => d.hs4);
@@ -129,7 +133,7 @@ public aggregateData(
         dataGroups = this.groupBy(data, d => d.hs2);
         break;
       case GroupingType.NAICS2:
-        dataGroups = this.groupBy(data, d => d.naics2);
+        dataGroups = this.groupBy(data, d => d.naics);
         isNaicsGrouping = true;
         break;
       case GroupingType.NAICS4:
@@ -140,8 +144,12 @@ public aggregateData(
         dataGroups = this.groupBy(data, d => d.hs4);
     }
 
+    console.log(dataGroups, "Data Groups");
+
     const aggregatedData: FeasiblePoint[] = [];
 
+    
+    // TODO UPdate Formula
     dataGroups.forEach((group, key) => {
       const pci = group.reduce((acc, curr) => acc + curr.pci, 0) / group.length;
       const distance = group.reduce((acc, curr) => acc + curr.distance, 0) / group.length;
@@ -149,14 +157,20 @@ public aggregateData(
       const rca = group.reduce((acc, curr) => acc + curr.rca, 0) / group.length;
       const Date = group[0].Date;
 
+      const description = groupingType === GroupingType.HS4 
+        ? (group[0].description || '----')
+        : groupingType === GroupingType.HS2 
+        ? this.getHSCodes()[key.toString()] || '----'
+        : (isNaicsGrouping ? (naicsDescriptions[key] || '----') : '----');
+
       const point: FeasiblePoint = {
         pci,
         distance,
         description: isNaicsGrouping ? (naicsDescriptions[key] || '----') : '----',
-        description2: group[0].description || '',
+        description2: description,
         value,
         hs2: key,
-        hs4: key,
+        hs4: groupingType === GroupingType.HS2 ? Math.floor(key * 100) : key, // For HS4, use the key directly; for HS2, divide by 100
         length: group.length,
         rca,
         Date,

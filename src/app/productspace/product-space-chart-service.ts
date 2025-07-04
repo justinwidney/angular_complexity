@@ -3,7 +3,7 @@
 import { Injectable } from '@angular/core';
 import { forkJoin, map, Observable, of } from 'rxjs';
 import { Link, Node, GroupedData, HSDescription, RawNode } from './product-space-chart.models';
-import { UnifiedDataService } from '../service/chart-data-service';
+import { RawTradeData, UnifiedDataService } from '../service/chart-data-service';
 
 @Injectable({
   providedIn: 'root'
@@ -29033,10 +29033,37 @@ export class ProductSpaceChartService {
     return nodes.find(node => node.id === id);
   }
 
+  createDefault<T>(defaults: T): () => T {
+    return () => ({ ...defaults });
+  }
+
+
+
+
+
   findGroupedDataByProduct(grouped: GroupedData[], productId: string): GroupedData | undefined {
 
-    return this.unifiedDataService.findDataByProduct(grouped as any[], productId) as GroupedData;
-    
+
+
+    const returnValue = this.unifiedDataService.findDataByProduct(grouped as any[], productId) as GroupedData | undefined;
+
+
+    if (returnValue) {
+      return returnValue
+    } else {
+
+      const descriptionFromHS = this.unifiedDataService.getHSDescriptions().find(desc => desc.HS4 === productId);
+
+      const defaultData: GroupedData = {
+        product: Number(productId),
+        description: descriptionFromHS ? descriptionFromHS["HS4 Short Name"] : "Unknown Product",
+        Value: 0,
+        Date: "9999",
+        prio: 0
+      };
+      return defaultData;  
+      
+    }
   }
 
   // Methods to update data if needed

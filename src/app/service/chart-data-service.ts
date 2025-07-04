@@ -98,6 +98,10 @@ export class UnifiedDataService {
     this.hsDescriptions = descriptions;
   }
 
+  getHSDescriptions(): HSDescription[] {
+    return this.hsDescriptions; 
+  }
+
 
   setCurrentRegion(region: keyof typeof this.apiMap): void {
     this.currentRegionSubject.next(region);
@@ -341,12 +345,14 @@ export class UnifiedDataService {
 
         // Process data similar to your feasible chart service
         const modifiedData = rawData.map(obj => {
+          let description = this.hsDescriptions.find(x => Number(x.HS4) === obj.product)?.['HS4 Short Name'] || 'Unknown';
           const hs2 = Math.floor(obj.product / 100);
           const naics2 = obj.naics ? Math.floor(obj.naics / 10) : 0;
           const hs4 = obj.product;
 
           return {
             hs2,
+            description,
             hs4,
             naics2,
             state: 0,
@@ -441,14 +447,13 @@ export class UnifiedDataService {
     rawData: RawTradeData[];
     region: string;
   }> {
+
     const targetRegion = region || this.getCurrentRegion() as keyof typeof this.apiMap;
     
-    console.log(`🕐 Getting overtime chart data for ${targetRegion} (all years)`);
     
     return this.getRawData(targetRegion, { includeHistoricalData: true }).pipe(
       map(rawData => {
         const years = [...new Set(rawData.map(d => new Date(d.Date).getFullYear()))].sort();
-        console.log(`🕐 Found data for years: ${years.join(', ')}`);
 
         // Group by year and category
         const groupedByYear = this.groupByYearAndCategory(rawData);
@@ -610,6 +615,15 @@ export class UnifiedDataService {
 
     return data.find(item => item.product === Number(productId));
 
+    const productIdNumber = Number(productId);
+
+    const returnValue = data.find(item => item.product === productIdNumber);
+
+    if (!returnValue) {
+      console.warn(`No data found for product ID: ${productId}`);
+    }
+
+    return returnValue
   }
 
   /**

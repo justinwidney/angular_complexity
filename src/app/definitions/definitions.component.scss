@@ -1,0 +1,411 @@
+// economic-complexity-definitions.component.scss
+
+.definitions-header {
+  padding: var(--goa-space-3xl);
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.quick-nav {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #004f84;
+  
+  .nav-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+}
+
+.definition-section {
+  scroll-margin-top: 2rem;
+  margin-bottom: 3rem;
+  
+  h2 {
+    color: #004f84;
+    border-bottom: 2px solid #004f84;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.definition-content {
+  margin-top: 1.5rem;
+  
+  h4 {
+    color: #0066cc;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  h5 {
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.definition-list {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  
+  li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+    
+    strong {
+      color: #004f84;
+    }
+  }
+}
+
+// ECI Interpretation Grid
+.interpretation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.interpretation-item {
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+  
+  &.positive {
+    background: #e8f5e8;
+    border-left-color: #28a745;
+  }
+  
+  &.neutral {
+    background: #fff3cd;
+    border-left-color: #ffc107;
+  }
+  
+  &.negative {
+    background: #f8d7da;
+    border-left-color: #dc3545;
+  }
+  
+  h5 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+// PCI Complexity Examples
+.complexity-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.complexity-level {
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  
+  &.high {
+    background: #e8f4f8;
+    border-left: 4px solid #007bff;
+  }
+  
+  &.medium {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+  }
+  
+  &.low {
+    background: #f8d7da;
+    border-left: 4px solid #dc3545;
+  }
+  
+  h5 {
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+  
+  ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    
+    li {
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Formula Box
+.formula-box {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  margin: 1rem 0;
+  
+  goa-text[as="code"] {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #004f84;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+}
+
+// RCA Interpretation
+.rca-interpretation {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.rca-item {
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+  
+  &.advantage {
+    background: #e8f5e8;
+    border-left-color: #28a745;
+  }
+  
+  &.no-advantage {
+    background: #f8d7da;
+    border-left-color: #dc3545;
+  }
+  
+  h5 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+// Distance Levels
+.distance-levels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.distance-level {
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+  
+  &.close {
+    background: #e8f5e8;
+    border-left-color: #28a745;
+  }
+  
+  &.medium {
+    background: #fff3cd;
+    border-left-color: #ffc107;
+  }
+  
+  &.far {
+    background: #f8d7da;
+    border-left-color: #dc3545;
+  }
+  
+  h5 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+// Frontier Analysis
+.frontier-analysis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.frontier-quadrant {
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  background: #f8f9fa;
+  
+  h5 {
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: #004f84;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+// Product Space Legend
+.product-space-legend {
+  margin-top: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  
+  .color-indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid #dee2e6;
+    
+    &.green {
+      background: #28a745;
+    }
+    
+    &.light {
+      background: #f8f9fa;
+    }
+    
+    &.size {
+      background: linear-gradient(45deg, #007bff, #0056b3);
+    }
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+// Additional Concepts
+.additional-concepts {
+  margin-top: 3rem;
+  
+  h2 {
+    color: #004f84;
+    border-bottom: 2px solid #004f84;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.concept-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.concept-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  h4 {
+    color: #004f84;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+  }
+}
+
+.definitions-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .definitions-header {
+    padding: 1rem;
+    
+    .row {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+  
+  .quick-nav .nav-buttons {
+    flex-direction: column;
+  }
+  
+  .interpretation-grid,
+  .complexity-examples,
+  .rca-interpretation,
+  .distance-levels,
+  .frontier-analysis,
+  .concept-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .definitions-footer .row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+// Utility Classes
+.row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.col {
+  flex: 1;
+}
+
+.col-auto {
+  flex: 0 0 auto;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.space-between {
+  justify-content: space-between;
+}

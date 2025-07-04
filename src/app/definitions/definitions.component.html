@@ -1,0 +1,398 @@
+<!-- economic-complexity-definitions.component.html -->
+<div accent="thin" padding="relaxed" width="full">
+  
+  <!-- Header Section -->
+  <div class="definitions-header">
+    <div class="row align-items-center">
+      <div class="col">
+        <goa-text as="h1" mt="none" mb="s">
+          Economic Complexity: Definitions & Terminology
+        </goa-text>
+      </div>
+  
+    </div>
+          <div class="row">
+             <p>
+            A comprehensive guide to understanding economic complexity metrics and concepts
+             <p>
+        </div>
+  </div>
+
+  <goa-spacer vspacing="l"></goa-spacer>
+  <goa-divider></goa-divider>
+  <goa-spacer vspacing="l"></goa-spacer>
+
+  <!-- Quick Navigation -->
+  <div class="quick-nav">
+    <goa-text as="h3" mb="s">Quick Navigation</goa-text>
+    <div class="nav-buttons">
+      <goa-button type="tertiary" size="compact" (click)="scrollToSection('eci-section')">
+        Economic Complexity Index (ECI)
+      </goa-button>
+      <goa-button type="tertiary" size="compact" (click)="scrollToSection('pci-section')">
+        Product Complexity Index (PCI)
+      </goa-button>
+      <goa-button type="tertiary" size="compact" (click)="scrollToSection('rca-section')">
+        Revealed Comparative Advantage (RCA)
+      </goa-button>
+      <goa-button type="tertiary" size="compact" (click)="scrollToSection('distance-section')">
+        Distance
+      </goa-button>
+      <goa-button type="tertiary" size="compact" (click)="scrollToSection('frontier-section')">
+        Frontier
+      </goa-button>
+      <goa-button type="tertiary" size="compact" (click)="scrollToSection('product-space-section')">
+        Product Space
+      </goa-button>
+    </div>
+  </div>
+
+  <goa-spacer vspacing="l"></goa-spacer>
+
+  <!-- ECI Section -->
+  <div id="eci-section" class="definition-section">
+    <goa-text as="h2" color="primary">
+      Economic Complexity Index (ECI)
+    </goa-text>
+    
+    <goa-callout type="information" heading="What is ECI?">
+      <p>The Economic Complexity Index (ECI) measures the diversity and sophistication of a country's or region's export basket. It reflects the knowledge and capabilities embedded in the economy.</p>
+    </goa-callout>
+
+    <goa-spacer vspacing="m"></goa-spacer>
+
+    <div class="definition-content">
+      <goa-text as="h4">Key Characteristics:</goa-text>
+      <ul class="definition-list">
+        <li><strong>Higher ECI:</strong> Indicates more complex, knowledge-intensive exports</li>
+        <li><strong>Lower ECI:</strong> Suggests reliance on simpler, resource-based exports</li>
+        <li><strong>Relative Measure:</strong> Countries are ranked relative to each other</li>
+        <li><strong>Predictive Power:</strong> Higher ECI is associated with faster economic growth</li>
+      </ul>
+
+      <goa-text as="h4">Calculation:</goa-text>
+      <goa-text as="p">
+        ECI is calculated using an iterative process that considers both the diversity of exports and the ubiquity of those exports. It's derived from the Method of Reflections, which balances:
+      </goa-text>
+      <ul class="definition-list">
+        <li>The number of products a country exports competitively</li>
+        <li>The complexity of those products (measured by how few countries export them)</li>
+      </ul>
+
+      <goa-text as="h4">Interpretation:</goa-text>
+      <div class="interpretation-grid">
+        <div class="interpretation-item positive">
+          <goa-text as="h5">ECI > 1</goa-text>
+          <goa-text as="p">High complexity economy with sophisticated export capabilities</goa-text>
+        </div>
+        <div class="interpretation-item neutral">
+          <goa-text as="h5">ECI: -1 to 1</goa-text>
+          <goa-text as="p">Moderate complexity with mixed export portfolio</goa-text>
+        </div>
+        <div class="interpretation-item negative">
+          <goa-text as="h5">ECI < -1</goa-text>
+          <goa-text as="p">Lower complexity, often resource-dependent economy</goa-text>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <goa-spacer vspacing="xl"></goa-spacer>
+
+  <!-- PCI Section -->
+  <div id="pci-section" class="definition-section">
+    <goa-text as="h2" color="primary">
+      Product Complexity Index (PCI)
+    </goa-text>
+    
+    <goa-callout type="information" heading="What is PCI?">
+      <p>The Product Complexity Index (PCI) measures how complex or sophisticated a particular product is, based on the capabilities required to produce it competitively.</p>
+    </goa-callout>
+
+    <goa-spacer vspacing="m"></goa-spacer>
+
+    <div class="definition-content">
+      <goa-text as="h4">Key Characteristics:</goa-text>
+      <ul class="definition-list">
+        <li><strong>Capability Requirements:</strong> Higher PCI products require more sophisticated capabilities</li>
+        <li><strong>Export Exclusivity:</strong> Complex products are exported by fewer countries</li>
+        <li><strong>Knowledge Intensity:</strong> High PCI indicates technology and skill requirements</li>
+        <li><strong>Market Access:</strong> Complex products often have higher barriers to entry</li>
+      </ul>
+
+      <goa-text as="h4">Examples by Complexity Level:</goa-text>
+      <div class="complexity-examples">
+        <div class="complexity-level high">
+          <goa-text as="h5">High Complexity (PCI > 1)</goa-text>
+          <ul>
+            <li>Pharmaceuticals</li>
+            <li>Precision instruments</li>
+            <li>Advanced machinery</li>
+            <li>Electronic components</li>
+          </ul>
+        </div>
+        <div class="complexity-level medium">
+          <goa-text as="h5">Medium Complexity (PCI: -1 to 1)</goa-text>
+          <ul>
+            <li>Textiles</li>
+            <li>Basic chemicals</li>
+            <li>Processed foods</li>
+            <li>Simple machinery</li>
+          </ul>
+        </div>
+        <div class="complexity-level low">
+          <goa-text as="h5">Low Complexity (PCI < -1)</goa-text>
+          <ul>
+            <li>Raw materials</li>
+            <li>Agricultural products</li>
+            <li>Basic minerals</li>
+            <li>Petroleum products</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <goa-spacer vspacing="xl"></goa-spacer>
+
+  <!-- RCA Section -->
+  <div id="rca-section" class="definition-section">
+    <goa-text as="h2" color="primary">
+      Revealed Comparative Advantage (RCA)
+    </goa-text>
+    
+    <goa-callout type="information" heading="What is RCA?">
+      <p>Revealed Comparative Advantage (RCA) measures whether a country or region has a comparative advantage in exporting a particular product, relative to the global average.</p>
+    </goa-callout>
+
+    <goa-spacer vspacing="m"></goa-spacer>
+
+    <div class="definition-content">
+      <goa-text as="h4">Formula:</goa-text>
+      <div class="formula-box">
+        <goa-text as="code">
+          RCA = (Xij / Xit) / (Xwj / Xwt)
+        </goa-text>
+        <goa-text as="p" size="small">
+          Where: Xij = exports of product j from country i, Xit = total exports from country i, 
+          Xwj = world exports of product j, Xwt = total world exports
+        </goa-text>
+      </div>
+
+      <goa-text as="h4">Interpretation:</goa-text>
+      <div class="rca-interpretation">
+        <div class="rca-item advantage">
+          <goa-text as="h5">RCA ≥ 1</goa-text>
+          <goa-text as="p"><strong>Comparative Advantage:</strong> The region exports this product more intensively than the world average</goa-text>
+        </div>
+        <div class="rca-item no-advantage">
+          <goa-text as="h5">RCA < 1</goa-text>
+          <goa-text as="p"><strong>No Comparative Advantage:</strong> The region exports this product less intensively than the world average</goa-text>
+        </div>
+      </div>
+
+      <goa-text as="h4">Practical Applications:</goa-text>
+      <ul class="definition-list">
+        <li><strong>Trade Policy:</strong> Identify products where a region has competitive strengths</li>
+        <li><strong>Economic Development:</strong> Target products aligned with existing capabilities</li>
+        <li><strong>Investment Decisions:</strong> Guide resource allocation toward competitive sectors</li>
+        <li><strong>Market Analysis:</strong> Understand relative positioning in global markets</li>
+      </ul>
+    </div>
+  </div>
+
+  <goa-spacer vspacing="xl"></goa-spacer>
+
+  <!-- Distance Section -->
+  <div id="distance-section" class="definition-section">
+    <goa-text as="h2" color="primary">
+      Distance
+    </goa-text>
+    
+    <goa-callout type="information" heading="What is Distance?">
+      <p>Distance measures how far a product is from a country's current export basket in terms of required capabilities. It indicates the feasibility of developing exports in that product.</p>
+    </goa-callout>
+
+    <goa-spacer vspacing="m"></goa-spacer>
+
+    <div class="definition-content">
+      <goa-text as="h4">Key Concepts:</goa-text>
+      <ul class="definition-list">
+        <li><strong>Capability Similarity:</strong> Products requiring similar capabilities are "closer"</li>
+        <li><strong>Development Feasibility:</strong> Lower distance suggests easier market entry</li>
+        <li><strong>Strategic Planning:</strong> Helps identify logical next steps for export diversification</li>
+        <li><strong>Path Dependency:</strong> Economic development follows predictable patterns</li>
+      </ul>
+
+      <goa-text as="h4">Distance Levels:</goa-text>
+      <div class="distance-levels">
+        <div class="distance-level close">
+          <goa-text as="h5">Close Distance (< 0.5)</goa-text>
+          <goa-text as="p">Product requires capabilities similar to current exports - relatively easy to develop</goa-text>
+        </div>
+        <div class="distance-level medium">
+          <goa-text as="h5">Medium Distance (0.5 - 1.0)</goa-text>
+          <goa-text as="p">Moderate capability stretch - possible with focused development</goa-text>
+        </div>
+        <div class="distance-level far">
+          <goa-text as="h5">Far Distance (> 1.0)</goa-text>
+          <goa-text as="p">Requires significantly different capabilities - challenging to develop</goa-text>
+        </div>
+      </div>
+
+      <goa-text as="h4">Strategic Implications:</goa-text>
+      <ul class="definition-list">
+        <li><strong>Low Distance + High Complexity:</strong> Ideal opportunities for economic upgrading</li>
+        <li><strong>High Distance + High Complexity:</strong> Requires substantial capability building</li>
+        <li><strong>Low Distance + Low Complexity:</strong> Easy wins but limited growth potential</li>
+      </ul>
+    </div>
+  </div>
+
+  <goa-spacer vspacing="xl"></goa-spacer>
+
+  <!-- Frontier Section -->
+  <div id="frontier-section" class="definition-section">
+    <goa-text as="h2" color="primary">
+      Frontier
+    </goa-text>
+    
+    <goa-callout type="information" heading="What is the Frontier?">
+      <p>The Frontier represents the optimal set of products that maximize both complexity and feasibility - products that are sophisticated yet achievable given current capabilities.</p>
+    </goa-callout>
+
+    <goa-spacer vspacing="m"></goa-spacer>
+
+    <div class="definition-content">
+      <goa-text as="h4">Frontier Characteristics:</goa-text>
+      <ul class="definition-list">
+        <li><strong>Pareto Optimal:</strong> No product offers both higher complexity and lower distance</li>
+        <li><strong>Strategic Focus:</strong> Represents the best opportunities for economic development</li>
+        <li><strong>Dynamic:</strong> Changes as capabilities evolve and new products emerge</li>
+        <li><strong>Policy Relevant:</strong> Guides industrial policy and investment priorities</li>
+      </ul>
+
+      <goa-text as="h4">Frontier Analysis:</goa-text>
+      <div class="frontier-analysis">
+        <div class="frontier-quadrant">
+          <goa-text as="h5">High Complexity, Low Distance</goa-text>
+          <goa-text as="p"><strong>Prime Opportunities:</strong> Sophisticated products within reach</goa-text>
+        </div>
+        <div class="frontier-quadrant">
+          <goa-text as="h5">High Complexity, High Distance</goa-text>
+          <goa-text as="p"><strong>Long-term Targets:</strong> Require significant capability development</goa-text>
+        </div>
+        <div class="frontier-quadrant">
+          <goa-text as="h5">Low Complexity, Low Distance</goa-text>
+          <goa-text as="p"><strong>Quick Wins:</strong> Easy to develop but limited impact</goa-text>
+        </div>
+        <div class="frontier-quadrant">
+          <goa-text as="h5">Low Complexity, High Distance</goa-text>
+          <goa-text as="p"><strong>Avoid:</strong> Neither feasible nor valuable</goa-text>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <goa-spacer vspacing="xl"></goa-spacer>
+
+  <!-- Product Space Section -->
+  <div id="product-space-section" class="definition-section">
+    <goa-text as="h2" color="primary">
+      Product Space
+    </goa-text>
+    
+    <goa-callout type="information" heading="What is Product Space?">
+      <p>The Product Space is a network visualization that maps the relationships between different products based on the capabilities required to produce them. Connected products require similar capabilities.</p>
+    </goa-callout>
+
+    <goa-spacer vspacing="m"></goa-spacer>
+
+    <div class="definition-content">
+      <goa-text as="h4">Network Structure:</goa-text>
+      <ul class="definition-list">
+        <li><strong>Nodes:</strong> Individual products or product categories</li>
+        <li><strong>Edges:</strong> Connections indicating capability similarity</li>
+        <li><strong>Clusters:</strong> Groups of related products (e.g., chemicals, machinery)</li>
+        <li><strong>Density:</strong> Indicates how interconnected product capabilities are</li>
+      </ul>
+
+      <goa-text as="h4">Key Insights:</goa-text>
+      <ul class="definition-list">
+        <li><strong>Dense Areas:</strong> Products with many connections offer more diversification opportunities</li>
+        <li><strong>Sparse Areas:</strong> Products with few connections may be dead ends</li>
+        <li><strong>Pathways:</strong> Connected products show potential development paths</li>
+        <li><strong>Positioning:</strong> Current exports determine future opportunities</li>
+      </ul>
+
+      <goa-text as="h4">Colors and Indicators:</goa-text>
+      <div class="product-space-legend">
+        <div class="legend-item">
+          <div class="color-indicator green"></div>
+          <goa-text as="p"><strong>Green/Dark:</strong> Products with Comparative Advantage (RCA ≥ 1)</goa-text>
+        </div>
+        <div class="legend-item">
+          <div class="color-indicator light"></div>
+          <goa-text as="p"><strong>Light/Gray:</strong> Products without Comparative Advantage (RCA < 1)</goa-text>
+        </div>
+        <div class="legend-item">
+          <div class="color-indicator size"></div>
+          <goa-text as="p"><strong>Size:</strong> Represents export value or market size</goa-text>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <goa-spacer vspacing="xl"></goa-spacer>
+
+  <!-- Additional Concepts -->
+  <div class="additional-concepts">
+    <goa-text as="h2" color="primary">Additional Concepts</goa-text>
+    
+    <goa-spacer vspacing="m"></goa-spacer>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <goa-text as="h4">Opportunity Gain</goa-text>
+        <goa-text as="p">The potential ECI increase from developing exports in a particular product</goa-text>
+      </div>
+      
+      <div class="concept-card">
+        <goa-text as="h4">Ubiquity</goa-text>
+        <goa-text as="p">Number of countries that export a product competitively - lower ubiquity indicates higher complexity</goa-text>
+      </div>
+      
+      <div class="concept-card">
+        <goa-text as="h4">Diversity</goa-text>
+        <goa-text as="p">Number of products a country exports competitively - higher diversity can indicate more capabilities</goa-text>
+      </div>
+      
+      <div class="concept-card">
+        <goa-text as="h4">Feasible Products</goa-text>
+        <goa-text as="p">Products that are close to current capabilities and could be developed with reasonable effort</goa-text>
+      </div>
+    </div>
+  </div>
+
+  <goa-spacer vspacing="xl"></goa-spacer>
+
+  <!-- Footer -->
+  <div class="definitions-footer">
+    <goa-divider></goa-divider>
+    <goa-spacer vspacing="m"></goa-spacer>
+    <div class="row">
+      <div class="col">
+        <goa-text as="p" size="small" color="secondary">
+          Based on the Economic Complexity methodology developed by Ricardo Hausmann and César Hidalgo at Harvard's Growth Lab.
+        </goa-text>
+      </div>
+      <div class="col-auto">
+        <goa-button type="primary" (click)="navigateBack()">
+          <goa-icon name="arrow-left" slot="start"></goa-icon>
+          Back to Dashboard
+        </goa-button>
+      </div>
+    </div>
+  </div>
+
+</div>

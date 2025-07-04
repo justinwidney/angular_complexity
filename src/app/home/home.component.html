@@ -1,10 +1,61 @@
 <goa-container accent="thin" padding="relaxed" width="full">
 
-  <div class="flex-container">
+
+  <div class="flex-container" *ngIf="selectedChartType === 'DEF'">
+
+    <div class="row">
+
+      <div class="col-7">
+
+      </div>
+
+
+        <div class="col-5">
+          <div class="row">
+            <div class="col">
+              <goa-form-item label="Display Type" labelSize="small">
+                <div class="modern-chart-toggles">
+                  <mat-button-toggle-group 
+                    name="chartType" 
+                    aria-label="Display Type" 
+                    [value]="selectedChartType" 
+                    (change)="onChartTypeChange($event)"
+                    [disabled]="isLoadingData">
+                    <mat-button-toggle value="ProductSpace">Product Space</mat-button-toggle>
+                    <mat-button-toggle value="Feasible">Feasible</mat-button-toggle>
+                    <mat-button-toggle value="Trends">Trends</mat-button-toggle>
+                    <mat-button-toggle value="Exports">Exports</mat-button-toggle>
+                    <mat-button-toggle value="ECI">ECI</mat-button-toggle>
+                    <mat-button-toggle value="DEF">Definitions</mat-button-toggle>
+                  </mat-button-toggle-group>
+                </div>
+              </goa-form-item>
+            </div>
+          </div>
+                  <goa-spacer vspacing="m"></goa-spacer>
+
+        </div>
+
+        <goa-spacer vspacing="m"></goa-spacer>
+
+        </div>
+
+
+    <div class="row" >
+      <div class="col-12">
+        <app-definitions>
+        </app-definitions>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="flex-container" *ngIf="selectedChartType !== 'DEF'">
 
     <!-- First Row: Dropdowns + Chart Type -->
     <div class="row">
-      <div class="col-8">
+      <div class="col-7">
         <div class="row">
           <div class="col">
             <div class="data-setting-wrapper">
@@ -37,7 +88,7 @@
           
           <goa-spacer hspacing="m"></goa-spacer>
 
-          <div class="col">
+          <div class="col" *ngIf=" selectedChartType !== 'Trends' && selectedChartType !== 'ECI' ">
             <div class="data-setting-wrapper">
               <div class="data-setting-component">
                 <goa-form-item label="Year" labelSize="regular">
@@ -61,9 +112,10 @@
             </div>
           </div>
 
+
           <goa-spacer hspacing="m"></goa-spacer>
 
-          <div class="col">
+          <div class="col"  *ngIf=" selectedChartType !== 'ECI' ">
             <div class="data-setting-wrapper">
               <div class="data-setting-component">
                 <goa-form-item label="Grouping" labelSize="regular">
@@ -75,9 +127,9 @@
                     (_change)="onChange($event, 'grouping')"
                     [disabled]="isLoadingData"
                   >
-                    <goa-dropdown-item value="HS2" label="HS 2"></goa-dropdown-item>
+                    <goa-dropdown-item value="HS2" label="HS 2" *ngIf=" selectedChartType !== 'ProductSpace' "></goa-dropdown-item>
                     <goa-dropdown-item value="HS4" label="HS 4"></goa-dropdown-item>
-                    <goa-dropdown-item value="NAICS2" label="NAICS 2"></goa-dropdown-item>
+                    <goa-dropdown-item value="NAICS2" label="NAICS 2"*ngIf=" selectedChartType !== 'ProductSpace' "></goa-dropdown-item>
                     <goa-dropdown-item value="NAICS4" label="NAICS 4"></goa-dropdown-item>
 
                   </goa-dropdown>
@@ -88,14 +140,14 @@
         </div>
       </div>
       
-      <div class="col-4">
+      <div class="col-5">
         <div class="row">
           <div class="col">
-            <goa-form-item label="Chart Type" labelSize="small">
+            <goa-form-item label="Display Type" labelSize="small">
               <div class="modern-chart-toggles">
                 <mat-button-toggle-group 
                   name="chartType" 
-                  aria-label="Chart Type" 
+                  aria-label="Display Type" 
                   [value]="selectedChartType" 
                   (change)="onChartTypeChange($event)"
                   [disabled]="isLoadingData">
@@ -104,6 +156,7 @@
                   <mat-button-toggle value="Trends">Trends</mat-button-toggle>
                   <mat-button-toggle value="Exports">Exports</mat-button-toggle>
                   <mat-button-toggle value="ECI">ECI</mat-button-toggle>
+                  <mat-button-toggle value="DEF">Definitions</mat-button-toggle>
                 </mat-button-toggle-group>
               </div>
             </goa-form-item>
@@ -171,9 +224,11 @@
                     [value]="currentDisplayFilter" 
                     (_change)="onFilterChange($event)"
                     >
+                    <goa-block gap="2xs" direction="row">
                     <goa-radio-item value="default" label="All Data"></goa-radio-item>
                     <goa-radio-item value="advantage" label="Advantage"></goa-radio-item>
                     <goa-radio-item value="feasible" label="Feasible"></goa-radio-item>
+                    </goa-block>
                   </goa-radio-group>
                 </goa-form-item>
               </form>
@@ -181,7 +236,7 @@
         </div>
 
       <!-- Enhanced Search with Autocomplete -->
-      <div class="col">
+      <div class="col" *ngIf=" selectedChartType === 'ProductSpace' || selectedChartType === 'Feasible'">
         <goa-form-item>
           <div class="search-container-goa" [class.has-suggestions]="showSuggestions">
             <!-- Search Input -->
@@ -191,26 +246,17 @@
               type="search" 
               [placeholder]="searchPlaceholder"
               width="250px"
+              leadingicon="search"
+              [trailingicon]= "currentSearchQuery.length > 0 ? 'close' : 'null'"
+              handletrailingiconclick=true
               [value]="currentSearchQuery"
+              (_trailingIconClick)="clearSearch()"
               (_input)="onSearchInput($event)"
               (_change)="onSearchChange($event)"
               (keydown)="onSearchKeyDown($event)"
               (blur)="onSearchBlur()"
               (focus)="onSearchFocus()"
               [disabled]="isSearchLoading">
-              <goa-icon name="search" slot="prefix"></goa-icon>
-              <!-- Loading spinner when searching -->
-              <goa-icon name="refresh" slot="suffix" *ngIf="isSearchLoading" class="spinning-icon"></goa-icon>
-              <!-- Clear button -->
-              <goa-button 
-                *ngIf="currentSearchQuery.length > 0 && !isSearchLoading"
-                slot="suffix"
-                type="tertiary"
-                size="compact"
-                (click)="clearSearch()"
-                title="Clear search">
-                <goa-icon name="close"></goa-icon>
-              </goa-button>
             </goa-input>
 
    
@@ -421,7 +467,8 @@
     </div>
 
 
-    <div class="row icons justify-content-center custom-flex">
+
+    <div class="row icons justify-content-center custom-flex" *ngIf="selectedChartType !== 'ECI'">
       <!-- Agricultural & Food Products (HS 1-24) -->
       <div class="tooltipx" 
            [class.disabled]="!isProductGroupEnabled('animal-food')"

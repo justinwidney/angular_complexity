@@ -19,11 +19,12 @@ export class ECIChartUtils {
     return {
       margin: {
         top: 10,
-        right: 60,
+        right: 20,
         bottom: 30,
-        left: 60
+        left: 80
       },
-      width: 1440,
+      background: "#F9FBFB",
+      width: 1342,
       height: 700,
       colors: [...d3.schemeCategory10],
       defaultPadding: 0.05,
@@ -50,7 +51,7 @@ export class ECIChartUtils {
    */
   static getChartDimensions(config: ECIChartConfig): { width: number; height: number } {
     return {
-      width: config.width - config.margin.left - config.margin.right,
+      width: config.width ,
       height: config.height - config.margin.top - config.margin.bottom
     };
   }
@@ -117,21 +118,25 @@ export class ECIChartUtils {
   /**
    * Setup tooltip
    */
-  static setupTooltip(containerId: string): d3.Selection<HTMLDivElement, unknown, HTMLElement, any> {
-    return d3.select(containerId)
-      .append("div")
-      .style("opacity", 0)
-      .attr("class", "eci-tooltip")
-      .style("position", "absolute")
-      .style("background-color", "rgba(0, 33, 69, 0.9)")
-      .style("color", "white")
-      .style("border", "solid")
-      .style("border-width", "1px")
-      .style("border-radius", "5px")
-      .style("padding", "10px")
-      .style("pointer-events", "none")
-      .style("z-index", "1000");
-  }
+   static setupTooltip(container: string): d3.Selection<HTMLDivElement, unknown, HTMLElement, any> {
+     // Remove existing tooltip
+     d3.select(container).selectAll('.eci-tooltip-container').remove();
+     
+     return d3.select(container)
+       .append('div')
+       .attr('class', 'eci-tooltip-container')
+       .style('opacity', 0)
+       .style('position', 'absolute')
+       .style('background-color', 'rgba(0, 33, 69, 0.95)')
+       .style('color', 'white')
+       .style('padding', '12px')
+       .style('border-radius', '6px')
+       .style('pointer-events', 'none')
+       .style('font-size', '13px')
+       .style('box-shadow', '0 4px 12px rgba(0, 0, 0, 0.3)')
+       .style('z-index', '1000')
+       .style('max-width', '300px');
+   }
 
   /**
    * Create axes

@@ -74,6 +74,8 @@ export class ProductSpaceChartUtils {
   ): void {
     const labels = customLabels || this.getGroupLabels();
     
+
+
     labels.forEach(label => {
       const labelGroup = svgGroup
         .append("text")
@@ -82,6 +84,14 @@ export class ProductSpaceChartUtils {
         .style("fill", label.fill || "black")
         .style("font-size", `${label.fontSize || 65}px`)
         .style("font-weight", label.fontWeight || "bold")
+        .style("stroke", "white")
+        .style("stroke-width", "25px")
+        .style("paint-order", "stroke fill")
+        .style("text-anchor", "middle")
+        .style("font-family", "'Arial', sans-serif")
+        .style("user-select", "none")
+        .style("stroke-linejoin", "round")
+  
         .text(label.text!)
         .attr("transform", label.transform || "translate(-655, 0) scale(1)")
         .style("pointer-events", "none")
@@ -178,7 +188,7 @@ export class ProductSpaceChartUtils {
   // Chart configuration
   static getChartConfig() {
     return {
-      width: 1440,
+      width: 1342,
       height: 700,
       background: "#F9FBFB",
       transform: {

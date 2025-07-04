@@ -1,13 +1,20 @@
-// eci-chart.component.ts
+// refactored-eci-chart.component.ts
 
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { Subject, takeUntil, combineLatest } from 'rxjs';
+import { Subject, takeUntil, distinctUntilChanged, skip } from 'rxjs';
 import * as d3 from 'd3';
 import { ECIChartService } from './eci-chart.service';
 import { ECIChartUtils } from './eci-chart-utils';
 import { ChartCoordinationService } from '../service/chart-coordination.service';
-import { UnifiedDataService } from '../service/chart-data-service';
 import { CommonModule } from '@angular/common';
+
+import { ChartUtility, NodeColorOptions, TooltipOptions } from '../d3_utility/chart-nodes-utility';
+import { 
+  D3SvgChartUtility, 
+  ChartDimensions, 
+  SVGConfig, 
+  ZoomConfig 
+} from '../d3_utility/svg-utility';
 
 import { 
   ECIRawDataItem,
@@ -17,22 +24,25 @@ import {
   ECITooltipData,
   ECIChartStats,
   ECIDisplayMode,
-  ECIChartEvents,
   ECIDataPoint
 } from './eci-chart.models';
 
 @Component({
   selector: 'app-eci-chart',
   template: `
-    <div #chartContainer class="eci-chart-wrapper">
-      <!-- Chart Container -->
-      <div class="chart-container">
-        <svg #svgContainer [attr.width]="chartWidth" [attr.height]="chartHeight"></svg>
+    <div #chartContainer class="eci-chart-wrapper" id="eci-chart-div">
+      <!-- Loading indicator -->
+      <div *ngIf="isLoading" class="loading-overlay">
+        <div class="loading-spinner">Loading ECI chart data...</div>
       </div>
       
-      <!-- Tooltip Container -->
+      <!-- Error overlay -->
+      <div *ngIf="errorMessage" class="error-overlay">
+        <div class="error-message">{{ errorMessage }}</div>
+        <button class="retry-button" (click)="retryDataLoad()">Retry</button>
+      </div>
+
       <div #tooltipContainer id="eci-tooltip-container" class="tooltip-container"></div>
-     
     </div>
   `,
   styleUrls: ['./eci-chart.component.scss'],
@@ -41,20 +51,18 @@ import {
 export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('chartContainer', { static: true }) chartContainer!: ElementRef;
-  @ViewChild('svgContainer', { static: true }) svgContainer!: ElementRef<SVGElement>;
   @ViewChild('tooltipContainer', { static: true }) tooltipContainer!: ElementRef<HTMLDivElement>;
 
   // Input properties
   @Input() showControls: boolean = true;
   @Input() showStats: boolean = true;
-  @Input() showCacheStatus: boolean = true;
   @Input() enableTooltips: boolean = true;
   @Input() enableLegend: boolean = true;
-  @Input() chartWidth: number = 1440;
+  @Input() chartWidth: number = 1342;
   @Input() chartHeight: number = 650;
   @Input() customConfig?: Partial<ECIChartConfig>;
   @Input() selectedProvinces: string[] = [];
-  @Input() autoLoadProvinces?: string[]; // Specific provinces to load on init
+  @Input() autoLoadProvinces?: string[];
 
   // Output events
   @Output() lineHovered = new EventEmitter<ECITooltipData>();
@@ -66,10 +74,13 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Component state
   private destroy$ = new Subject<void>();
-  private svg: any
+  private svg: any;
+  private zoomable: any;
   private tooltip: d3.Selection<HTMLDivElement, unknown, HTMLElement, any> | null = null;
   private scales: ECIScales | null = null;
   private config: ECIChartConfig;
+  private dimensions: ChartDimensions;
+  private zoom: any;
 
   private rawData: ECIRawDataItem[] = [];
   private lineData: ECILineData[] = [];
@@ -77,27 +88,36 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // UI state
   isLoading: boolean = false;
-  unifiedLoading: boolean = false;
   errorMessage: string = '';
-  unifiedError: string | null = null;
   chartStats: ECIChartStats | null = null;
   displayMode: ECIDisplayMode = ECIDisplayMode.ALL_PROVINCES;
   DisplayModes = ECIDisplayMode; // For template access
   availableProvinces: string[] = [];
   currentRegion: string = '';
   highlightedProvince: string = '';
-  isCached: boolean = false;
-  loadingProvinces: number = 0;
 
   constructor(
     private eciService: ECIChartService,
     private coordinationService: ChartCoordinationService,
-    private unifiedDataService: UnifiedDataService
+    private chartUtility: ChartUtility, // NEW: Chart utility
+    private d3SvgUtility: D3SvgChartUtility // NEW: D3 SVG utility
   ) {
     this.config = ECIChartUtils.mergeConfigs(
       ECIChartUtils.getDefaultConfig(),
       this.customConfig || {}
     );
+
+    // Setup dimensions
+    this.dimensions = {
+      width: this.chartWidth,
+      height: this.chartHeight,
+      margins: { 
+        top: this.config.margin.top, 
+        right: this.config.margin.right, 
+        bottom: this.config.margin.bottom, 
+        left: this.config.margin.left 
+      }
+    };
   }
 
   ngOnInit(): void {
@@ -105,64 +125,40 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.initializeChart();
     this.loadData();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.destroyChart();
+    
+    // Use utility cleanup
+    this.d3SvgUtility.cleanup('eci-chart-div');
   }
 
   private subscribeToServices(): void {
-    // Subscribe to coordination service
     this.subscribeToCoordinationService();
-    
-    // Subscribe to unified data service
-    this.subscribeToUnifiedDataService();
   }
 
   private subscribeToCoordinationService(): void {
-    // Subscribe to region changes (though ECI typically shows all provinces)
+    // Subscribe to region changes
     this.coordinationService.region$
       .pipe(takeUntil(this.destroy$))
       .subscribe(region => {
         this.currentRegion = region;
-        // ECI chart typically doesn't filter by region, but you could highlight it
         this.highlightProvince(region);
       });
-  }
 
-  private subscribeToUnifiedDataService(): void {
-    // Subscribe to loading state
-    this.unifiedDataService.loading$
+    // Subscribe to search queries (ECI chart could highlight provinces based on search)
+    this.coordinationService.searchQuery$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(loading => {
-        this.unifiedLoading = loading;
-      });
-
-    // Subscribe to error state
-    this.unifiedDataService.error$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(error => {
-        this.unifiedError = error;
+      .subscribe(query => {
+        console.log('ECI chart received search query:', query);
+        this.handleSearch(query);
       });
   }
 
-  private initializeChart(): void {
-    try {
-      // Create D3 SVG selection
-      this.svg = d3.select(this.svgContainer.nativeElement);
-      
-      // Setup tooltip
-      this.tooltip = ECIChartUtils.setupTooltip('#eci-tooltip-container');
-
-    } catch (error) {
-      //this.handleError(`Failed to initialize chart: ${error}`);
-    }
-  }
-
+ 
   private loadData(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -172,50 +168,98 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
       ? this.eciService.loadECIDataForProvinces(this.autoLoadProvinces)
       : this.eciService.loadECIData();
 
-    // Update loading message
-    this.loadingProvinces = this.autoLoadProvinces?.length || this.unifiedDataService.getAvailableRegions().length;
-
     loadPromise
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
-          console.log(`📊 ECI data loaded: ${data.length} data points`);
+          console.log(`📊 ECI data loaded:`, data);
           
           if (this.eciService.validateData(data)) {
             this.rawData = data;
-            this.checkCacheStatus();
             this.processData();
           } else {
-            //this.handleError('Invalid data format received');
+            this.handleError('Invalid data format received');
           }
         },
         error: (error) => {
-          //this.handleError(`Failed to load data: ${error.message}`);
+          this.handleError(`Failed to load data: ${error.message}`);
         }
       });
   }
 
-  private checkCacheStatus(): void {
-    // Check if data came from cache
-    const cacheStatus = this.unifiedDataService.getCacheStatus();
-    this.isCached = cacheStatus.some(status => status.cached);
-  }
-
   private processData(): void {
     try {
-
       this.lineData = this.eciService.transformDataToLines(this.rawData);
       this.availableProvinces = this.eciService.getAvailableProvinces(this.lineData);
+      this.chartStats = this.eciService.calculateChartStats(this.lineData);
       
       // Apply current filter
       this.applyFilter();
-      this.renderChart();
-          
+
+      
+      // Initialize chart if not already done
+      if (!this.svg) {
+        this.initializeChart();
+      } else {
+
+      if (this.scales) {
+              this.updateDataCoordinates();
+            }
+
+        this.renderChart();
+      }
+      
+      // Emit events
+      this.chartDataLoaded.emit(this.chartStats);
       this.isLoading = false;
 
     } catch (error) {
-      //this.handleError(`Failed to process data: ${error}`);
+      this.handleError(`Failed to process data: ${error}`);
     }
+  }
+
+  // REFACTORED - Using D3 SVG utility
+  private initializeChart(): void {
+    this.setupSVG();
+    this.setupTooltip();
+    this.setupZoom();
+    this.renderChart();
+  }
+
+  // REFACTORED - Using utility
+  private setupSVG(): void {
+    const svgConfig: SVGConfig = {
+      containerId: 'eci-chart-div',
+      dimensions: this.dimensions,
+      background: this.config.background || '#fff',
+      cursor: "crosshair"
+    };
+
+    const result = this.d3SvgUtility.createSVG(svgConfig);
+    this.svg = result.svg;
+    this.zoomable = result.zoomable;
+
+    // Add click handler to clear selections
+    this.svg.on("click", (event: any) => this.handleSvgClick(event));
+  }
+
+  // REFACTORED - Using ECIChartUtils for tooltip setup
+  private setupTooltip(): void {
+    this.tooltip = ECIChartUtils.setupTooltip('#eci-tooltip-container');
+  }
+
+  // REFACTORED - Using utility
+  private setupZoom(): void {
+    const zoomConfig: ZoomConfig = {
+      scaleExtent: [0.5, 5],
+      enablePan: false,
+      enableZoom: false,
+      onZoom: (transform) => {
+        this.handleZoom({ transform });
+      }
+    };
+
+    //this.zoom = this.d3SvgUtility.setupZoom(this.svg, this.zoomable, zoomConfig);
   }
 
   private applyFilter(): void {
@@ -244,12 +288,16 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // Clear existing chart
     this.clearChart();
 
+    // Create scales
     this.scales = ECIChartUtils.createScales(this.filteredLineData, this.config);
 
+    this.updateDataCoordinates();
+
+    // Create axes and labels
     ECIChartUtils.createAxes(this.svg, this.scales, this.config);
     ECIChartUtils.createAxisLabels(this.svg, this.config);
 
-    // Render lines and points
+    // Render lines and points with utility functions
     this.renderLines();
     this.renderPoints();
 
@@ -258,8 +306,13 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.renderLegend();
     }
 
-    // Animate entrance
-    ECIChartUtils.animateChartEntrance(this.svg, this.config);
+    // Animate entrance using utility
+    this.d3SvgUtility.animateElements(this.zoomable.selectAll('*'), {
+      duration: this.config.transitionDuration,
+      properties: {
+        'opacity': 1
+      }
+    });
   }
 
   private renderLines(): void {
@@ -267,49 +320,66 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const lineGenerator = ECIChartUtils.createLineGenerator(this.scales);
 
-    const lines = this.svg.selectAll("path.eci-line")
+    // Use chart utility for event handling
+    const eventHandlers = this.chartUtility.createEventHandlers({
+      svg: this.svg,
+      onMouseover: (event, d) => this.handleLineMouseover(event, d),
+      onMousemove: (event, d) => this.handleLineMousemove(event, d),
+      onMouseleave: (event, d) => this.handleLineMouseleave(event, d),
+      //createTooltip: (d) => this.createPointTooltip(d, "lineData.name"),
+      onClick: (event, d) => this.handleLineClick(event, d),
+      enableSelection: true
+    });
+
+    const chartGroup = this.zoomable.append('g')
+      .attr('class', 'chart-content')
+      .attr('transform', `translate(${this.config.margin.left}, ${this.config.margin.top})`);
+
+    const lines = chartGroup.selectAll("path.eci-line")
       .data(this.filteredLineData);
 
     lines.enter()
       .append("path")
       .attr("class", "eci-line")
-      .attr("d", (d: { values: Iterable<ECIDataPoint> | ECIDataPoint[]; }) => lineGenerator(d.values))
-      .attr("stroke", (d: { name: string; }) => this.scales!.color(d.name))
+      .attr("d", (d: any) => lineGenerator(d.values))
+      .attr("stroke", (d: any) => this.scales!.color(d.name))
       .style("stroke-width", this.config.strokeWidth)
       .style("fill", "none")
-      .attr("transform", `translate(${this.config.margin.left}, ${this.config.margin.top})`)
-      .on("mouseover", (event: MouseEvent, d: ECILineData) => this.handleLineMouseover(event, d))
-      .on("mousemove", (event: MouseEvent, d: ECILineData) => this.handleLineMousemove(event, d))
-      .on("mouseout", (event: MouseEvent, d: ECILineData) => this.handleLineMouseleave(event, d))
-      .on("click", (event: MouseEvent, d: ECILineData) => this.handleLineClick(event, d));
-
-    // Update existing lines
-    lines.transition()
-      .duration(this.config.transitionDuration)
-      .attr("d", (d: { values: Iterable<ECIDataPoint> | ECIDataPoint[]; }) => lineGenerator(d.values))
-      .attr("stroke", (d: { name: string; }) => this.scales!.color(d.name));
-
-    // Remove old lines
-    lines.exit().remove();
+      .style("cursor", "pointer")
+      .on("mouseover", eventHandlers.mouseover)
+      .on("mousemove", eventHandlers.mousemove)
+      .on("mouseout", eventHandlers.mouseleave)
+      .on("click", eventHandlers.click);
   }
 
   private renderPoints(): void {
     if (!this.svg || !this.scales) return;
 
+    const chartGroup = this.zoomable.select('.chart-content');
+
     // Create point groups for each line
-    const pointGroups = this.svg.selectAll("g.point-group")
+    const pointGroups = chartGroup.selectAll("g.point-group")
       .data(this.filteredLineData);
 
     const pointGroupsEnter = pointGroups.enter()
       .append("g")
-      .attr("class", "point-group")
-      .attr("transform", `translate(${this.config.margin.left}, ${this.config.margin.top})`);
+      .attr("class", "point-group");
 
     const pointGroupsMerged = pointGroupsEnter.merge(pointGroups as any);
 
-    // Create circles for each data point
-    pointGroupsMerged.each((lineData: any, i: number, nodes:any ) => {
+    // Create circles for each data point with utility event handlers
+    pointGroupsMerged.each((lineData: any, i: number, nodes: any) => {
       const group = d3.select(nodes[i]);
+      
+      const eventHandlers = this.chartUtility.createEventHandlers({
+        svg: this.svg,
+        onMouseover: (event, d) => this.handlePointMouseover(event, d, lineData.name),
+        onMouseleave: (event, d) => this.handlePointMouseleave(event, d),
+        onMousemove: (event, d) => this.handleLineMousemove(event, d),
+        onClick: (event, d) => this.handlePointClick(event, d, lineData.name),
+        createTooltip: (d) => this.createPointTooltip(d, lineData.name),
+        enableSelection: false
+      });
       
       const circles = group.selectAll("circle.eci-point")
         .data(lineData.values);
@@ -317,19 +387,34 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
       circles.enter()
         .append("circle")
         .attr("class", "eci-point")
-        .attr("cx", (d) => this.scales!.x((d as { year: number; eci: number }).year))
-        .attr("cy", d => this.scales!.y((d as { year: number; eci: number }).eci))
+        .attr("cx", (d: any) => this.scales!.x(d.year))
+        .attr("cy", (d: any) => this.scales!.y(d.eci))
         .attr("r", this.config.circleRadius)
         .attr("fill", this.scales!.color(lineData.name))
         .attr("data-province", lineData.name)
-        .on("mouseover", (event, d) => this.handlePointMouseover(event, d, lineData.name))
-        .on("mouseout", (event, d) => this.handlePointMouseleave(event, d));
-
-      circles.exit().remove();
+        .style("cursor", "pointer")
+        .on("mouseover", eventHandlers.mouseover)
+        .on("mouseout", eventHandlers.mouseleave)
+        .on("mousemove", eventHandlers.mousemove)
+        .on("click", eventHandlers.click);
     });
 
     pointGroups.exit().remove();
   }
+
+private updateDataCoordinates(): void {
+  if (!this.scales || !this.filteredLineData) return;
+
+  // Update coordinates for all line data points
+  this.filteredLineData = this.filteredLineData.map(lineData => ({
+    ...lineData,
+    values: lineData.values.map(point => ({
+      ...point,
+      x: this.scales!.x(point.year),
+      y: this.scales!.y(point.eci)
+    }))
+  }));
+}
 
   private renderLegend(): void {
     if (!this.svg || !this.scales) return;
@@ -346,48 +431,89 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private clearChart(): void {
-    if (this.svg) {
-      this.svg.selectAll("*").remove();
+    if (this.zoomable) {
+      this.zoomable.selectAll('.chart-content').remove();
+      this.zoomable.selectAll('.axis').remove();
+      this.zoomable.selectAll('.axis-label').remove();
+      this.zoomable.selectAll('.legend').remove();
     }
   }
 
-  // Event handlers
+
+  private createPointTooltip(d: any, provinceName: string): any {
+
+
+    console.log('Creating tooltip for point:', d, 'Province:', provinceName);
+
+
+
+    const tooltipOptions: TooltipOptions = {
+      title: `${this.eciService.getProvinceShortName(provinceName)} - ${d.year}`,
+      description: `${provinceName}, ${d.year}`,
+      eci: d.eci,
+      additionalInfo: {
+        'Province': provinceName,
+      },
+      showCloseButton: false
+    };
+
+    return this.chartUtility.createTooltip("#eci-chart-div", d, tooltipOptions);
+  }
+
+  private handleSearch(query: string): void {
+    if (!query || query.trim().length === 0) {
+      this.resetHighlighting();
+      return;
+    }
+
+    // Search for province names that match the query
+    const matchingProvinces = this.availableProvinces.filter(province => 
+      province.toLowerCase().includes(query.toLowerCase()) ||
+      this.eciService.getProvinceShortName(province).toLowerCase().includes(query.toLowerCase())
+    );
+
+    if (matchingProvinces.length > 0) {
+      // Highlight the first matching province
+      this.highlightProvince(matchingProvinces[0]);
+    } else {
+      this.resetHighlighting();
+    }
+  }
+
+  // Event handlers using utility functions
+  private handleZoom(event: any): void {
+
+    return 
+    // Handle tooltip repositioning during zoom using utility
+    const tooltips = d3.selectAll('#eci-chart-div .tooltip');
+    tooltips.each((d: any, i: number, nodes: any) => {
+      if (d && d.x !== undefined && d.y !== undefined) {
+        const [tx, ty] = this.d3SvgUtility.applyTransform(event.transform, d.x, d.y);
+        d3.select(nodes[i])
+          .style('left', `${tx}px`)
+          .style('top', `${ty}px`);
+      }
+    });
+  }
+
+  private handleSvgClick(event: any): void {
+    // Clear selections and hide info box
+    this.clearSelections();
+    const infoBox = document.getElementById("info-box");
+    if (infoBox) {
+      infoBox.style.visibility = "hidden";
+    }
+  }
+
   private handleLineMouseover = (event: MouseEvent, d: ECILineData): void => {
-    if (!this.enableTooltips) return;
-    
     this.highlightProvince(d.name);
   };
 
   private handleLineMousemove = (event: MouseEvent, d: ECILineData): void => {
-    if (!this.enableTooltips || !this.tooltip || !this.scales) return;
-
-    const mousePos = ECIChartUtils.getMousePosition(event, this.scales, this.config);
-    const closestPoint = this.eciService.findClosestDataPoint(this.filteredLineData, mousePos.year, d.name);
-
-    if (closestPoint) {
-      const tooltipContent = ECIChartUtils.formatTooltipContent(
-        closestPoint.province,
-        closestPoint.year,
-        closestPoint.eci,
-        this.eciService['provinceMapping']
-      );
-
-      ECIChartUtils.updateTooltipPosition(this.tooltip, event, tooltipContent);
-
-      // Emit hover event
-      this.lineHovered.emit({
-        provinceName: closestPoint.province,
-        year: closestPoint.year,
-        eci: closestPoint.eci,
-        fullProvinceName: closestPoint.province
-      });
-    }
+    if (!this.enableTooltips || !this.scales) return;
   };
 
   private handleLineMouseleave = (event: MouseEvent, d: ECILineData): void => {
-    if (this.tooltip) {
-      ECIChartUtils.hideTooltip(this.tooltip);
-    }
     this.resetHighlighting();
   };
 
@@ -410,23 +536,27 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   };
 
-  private handlePointMouseover = (event: MouseEvent, d: any, provinceName: string): void => {
-    if (!this.enableTooltips || !this.tooltip) return;
-
-    const tooltipContent = ECIChartUtils.formatTooltipContent(
-      provinceName,
-      d.year,
-      d.eci,
-      this.eciService['provinceMapping']
-    );
-
-    ECIChartUtils.updateTooltipPosition(this.tooltip, event, tooltipContent);
+  private handlePointMouseover = (event: MouseEvent, d: ECIDataPoint, provinceName: string): void => {
+    this.highlightProvince(provinceName);
   };
 
-  private handlePointMouseleave = (event: MouseEvent, d: any): void => {
-    if (this.tooltip) {
-      ECIChartUtils.hideTooltip(this.tooltip);
-    }
+  private handlePointMouseleave = (event: MouseEvent, d: ECIDataPoint): void => {
+    this.resetHighlighting();
+  };
+
+  private handlePointClick = (event: MouseEvent, d: ECIDataPoint, provinceName: string): void => {
+    this.updateInfoBox({
+      province: provinceName,
+      year: d.year,
+      eci: d.eci
+    });
+
+    this.lineClicked.emit({
+      provinceName: provinceName,
+      year: d.year,
+      eci: d.eci,
+      fullProvinceName: provinceName
+    });
   };
 
   private onLegendHover(provinceName: string): void {
@@ -442,6 +572,7 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private updateInfoBox(data: { province: string; year: number; eci: number }): void {
+    // Keep existing info box logic
     const infoBox = document.getElementById('info-box');
     if (infoBox) {
       infoBox.style.visibility = "visible";
@@ -484,44 +615,12 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadData();
   }
 
-  public refreshAllData(): void {
-    // Clear cache before refreshing
-    this.unifiedDataService.clearCache();
-    this.loadData();
-    this.dataRefreshed.emit();
-  }
-
-  public refreshProvinceData(province: string): void {
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    this.eciService.refreshProvinceData(province)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (newData) => {
-          console.log(`📊 Refreshed data for ${province}:`, newData.length, 'points');
-          
-          // Merge new data with existing data
-          const otherData = this.rawData.filter(d => d.origin !== province);
-          this.rawData = [...otherData, ...newData];
-          
-          this.processData();
-        },
-        error: (error) => {
-          //this.handleError(`Failed to refresh ${province} data: ${error.message}`);
-        }
-      });
-  }
-
-  public retryDataLoad(): void {
-    this.errorMessage = '';
-    this.unifiedError = null;
-    this.loadData();
-  }
-
   public clearSelections(): void {
     this.resetHighlighting();
     this.highlightedProvince = '';
+    
+    // Use utility to remove tooltips
+    this.chartUtility.removeAllTooltips();
   }
 
   public highlightProvince(provinceName: string): void {
@@ -545,71 +644,29 @@ export class ECIChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.highlightedProvince = '';
   }
 
-  public updateRegion(region: string): void {
-    this.currentRegion = region;
-    this.highlightProvince(region);
+
+
+
+  public getProvinceShortName(province: string): string {
+    return this.eciService.getProvinceShortName(province);
   }
 
-  public exportData(): string {
-    return this.eciService.exportToCSV(this.lineData);
-  }
-
-  public getChartData(): ECILineData[] {
-    return ECIChartUtils.cloneLineData(this.lineData);
+  public retryDataLoad(): void {
+    this.errorMessage = '';
+    this.loadData();
   }
 
   public isChartReady(): boolean {
-    return !this.isLoading && !this.unifiedLoading && !this.errorMessage && !this.unifiedError && this.lineData.length > 0;
+    return !this.isLoading && !this.errorMessage && this.lineData.length > 0;
   }
 
   public hasData(): boolean {
     return this.lineData && this.lineData.length > 0;
   }
 
-  public getCacheStatus(): { region: string; cached: boolean; lastUpdated?: Date }[] {
-    return this.unifiedDataService.getCacheStatus();
-  }
-
-  // UI event handlers
-  public onDisplayModeChange(): void {
-    this.applyFilter();
-    this.renderChart();
-  }
-
-  public toggleProvinceSelection(province: string, event: Event): void {
-    const target = event.target as HTMLInputElement;
-    
-    if (target.checked) {
-      if (!this.selectedProvinces.includes(province)) {
-        this.selectedProvinces.push(province);
-      }
-    } else {
-      const index = this.selectedProvinces.indexOf(province);
-      if (index > -1) {
-        this.selectedProvinces.splice(index, 1);
-      }
-    }
-
-    this.provinceSelectionChanged.emit([...this.selectedProvinces]);
-    this.applyFilter();
-    this.renderChart();
-  }
-
-  public isProvinceSelected(province: string): boolean {
-    return this.selectedProvinces.includes(province);
-  }
-
-  public getProvinceShortName(province: string): string {
-    return this.eciService.getProvinceShortName(province);
-  }
-
- 
-
-  private destroyChart(): void {
-    this.clearChart();
-    
-    if (this.tooltip) {
-      this.tooltip.remove();
-    }
+  private handleError(message: string): void {
+    this.isLoading = false;
+    this.errorMessage = message;
+    console.error('ECI Chart Error:', message);
   }
 }

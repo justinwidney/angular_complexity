@@ -61,16 +61,16 @@ export class TableComponent implements AfterViewInit, OnDestroy {
       data,
       columns: [
         { data: 'Date',        title: 'Year' },
-        { data: 'product',     title: 'Product',    className: 'dt-body-right', orderData: [6,1] },
-        { data: 'description', title: 'Description',className: 'dt-body-right', orderData: [6,2] },
-        { data: 'Value',       title: 'Value',      className: 'dt-body-right', orderData: [6,3] },
-        { data: 'rca',         title: 'RCA',        className: 'dt-body-right', orderData: [6,4] },
-        { data: 'pci',         title: 'PCI',        className: 'dt-body-right', orderData: [6,5] },
-        { data: 'prio',        title: 'prio',       className: 'dt-body-right', visible: false }
+        { data: 'product',     title: 'Product',    className: 'dt-body-right',  },
+        { data: 'description', title: 'Description',className: 'dt-body-right', },
+        { data: 'Value',       title: 'Value',      className: 'dt-body-right',  },
+        { data: 'rca',         title: 'RCA',        className: 'dt-body-right', },
+        { data: 'distance',         title: 'Distance',    className: 'dt-body-right',},
+        { data: 'pci',         title: 'PCI',        className: 'dt-body-right',  },
       ],
       columnDefs: [
         {
-          targets: [4,5],
+          targets: [4,5,6],
           render: (val: number) => val.toFixed(3)
         },
         {

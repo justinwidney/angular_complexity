@@ -1,7 +1,8 @@
+import { GroupingType } from './../feasible/feasible-chart-model';
 // debugged-overtime-chart.component.ts
 
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, map, Observable, skip, Subject, takeUntil } from 'rxjs';
 import * as d3 from 'd3';
 import { UnifiedDataService } from '../service/chart-data-service'; // Import unified service
 import { OvertimeChartService } from './overtime-chart.service'; // Keep for utility methods
@@ -86,6 +87,7 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   // NEW: Product group filtering
   private enabledProductGroups: any[] = [];
+  private currentGrouping: GroupingType = GroupingType.HS4;
 
   // Chart dimensions
   private chartWidthCalculated: number = 0;
@@ -115,6 +117,7 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.initializeConfig();
     this.subscribeToUnifiedService();
     this.subscribeToCoordinationService();
+    this.coordinationService.setGrouping(GroupingType.HS2); // Set default grouping
   }
 
   ngAfterViewInit(): void {
@@ -145,6 +148,17 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .subscribe(error => {
         this.error = error;
       });
+
+    this.coordinationService.grouping$
+      .pipe(
+        skip(1), 
+        distinctUntilChanged(),
+        takeUntil(this.destroy$))
+      .subscribe(grouping => {
+        this.currentGrouping = grouping;
+        this.loadData();
+      });
+    
 
     // Subscribe to current region changes
     this.unifiedDataService.currentRegion$

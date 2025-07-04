@@ -4,11 +4,13 @@ export interface ECIRawDataItem {
     year: string;
     origin: string;
     eci: string | number;
+      id?: string; // Add this optional field
   }
   
   export interface ECIDataPoint {
     year: number;
     eci: number;
+     id?: string; // Add this optional field
   }
   
   export interface ECILineData {
@@ -25,6 +27,7 @@ export interface ECIRawDataItem {
     };
     width: number;
     height: number;
+    background: string;
     colors: string[];
     defaultPadding: number;
     strokeWidth: number;
