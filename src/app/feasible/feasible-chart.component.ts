@@ -73,6 +73,8 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private scales: any;
   private originalScales: { x?: any; y?: any } = {}; // NEW: Store original scales
   private dimensions: ChartDimensions;
+  private sortedData: FeasiblePoint[] = []; // NEW: Sorted data for rendering
+
   private data: FeasiblePoint[] = [];
   private eci: number = 0;
   private centerX: number = 0;
@@ -97,7 +99,6 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   pointSelected: any;
   pointHovered: any;
-  private config: FeasibleChartConfig;
 
   // Loading and error states
   loading = false;
@@ -111,25 +112,22 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     private d3SvgUtility: D3SvgChartUtility
   ) {
     // Setup dimensions from config
-     this.config = FeasibleChartUtils.getChartConfig();
+    const config = FeasibleChartUtils.getChartConfig();
     this.dimensions = {
-      width: this.config.width,
-      height: this.config.height,
-      margins: this.config.margins
+      width: config.width,
+      height: config.height,
+      margins: config.margins
     };
   }
 
   ngOnInit(): void {
     this.subscribeToCoordinationService();
     this.subscribeToUnifiedService();
-
   }
 
   ngAfterViewInit(): void {
     this.loadData();
     this.initializeChart();
-        this.coordinationService.setGrouping(GroupingType.HS4); // Set default grouping
-
   }
 
   public refreshChart(): void {
@@ -162,7 +160,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
         skip(1), 
         distinctUntilChanged(),
         takeUntil(this.destroy$))
-        .subscribe(region => this.loadData());
+      .subscribe(region => this.loadData());
 
     this.coordinationService.year$
       .pipe(skip(1), distinctUntilChanged(), takeUntil(this.destroy$))
@@ -182,30 +180,21 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       });
 
     this.coordinationService.displayMode$
-      .pipe(        
-        skip(1), 
-        distinctUntilChanged(),
-        takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe(displayMode => {
         this.currentDisplayMode = displayMode;
         this.updateDisplayMode();
       });
 
     this.coordinationService.filterType$
-      .pipe(        
-        skip(1), 
-        distinctUntilChanged(),
-        takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe(filterType => {
         this.currentFilterType = filterType;
         this.updateDisplay();
       });
 
     this.coordinationService.productGroups$
-      .pipe(
-        skip(1), 
-        distinctUntilChanged(),
-        takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe(productGroups => {
         //this.enabledProductGroups = productGroups.filter(group => group.enabled);
         this.updateDisplay();
@@ -224,21 +213,14 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private performSearch(query: string): void {
     const searchFilter = this.chartUtility.createSearchFilter(query, this.data);
-
     this.updatePointColors(searchFilter.highlightFunction);
-
   }
 
   private updatePointColors(highlightFunction?: (item: any) => boolean): void {
-
-    const colorScale =
-      this.currentGrouping === GroupingType.NAICS4 ? this.scales.naicsColor :
-      this.currentGrouping === GroupingType.HS4 ? this.scales.hs4Color : this.scales.color;
-
     const colorOptions: NodeColorOptions = {
       searchQuery: this.chartUtility.getCurrentSearchQuery(),
       searchResults: this.chartUtility.getCurrentSearchResults(),
-      colorScale: colorScale,
+      colorScale: this.coordinationService.isNaicsGrouping() ? this.scales.naicsColor : this.scales.hs4Color,
       defaultColor: 'rgb(249, 251, 251)',
       dimmedColor: 'rgb(249, 251, 251)',
       filterType: this.currentFilterType,
@@ -298,6 +280,15 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       });
   }
 
+
+  private prepareSortedData(): void {
+    this.sortedData = [...this.data].sort((a, b) => {
+      const radiusA = this.scales?.radius ? this.scales.radius(a.value) : a.value;
+      const radiusB = this.scales?.radius ? this.scales.radius(b.value) : b.value;
+      return radiusB - radiusA; // Largest radius first
+    });
+  }
+
   // REFACTORED - Using D3 SVG utility
   private initializeChart(): void {
     this.setupSVG();
@@ -310,13 +301,10 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   // REFACTORED - Using utility
   private setupSVG(): void {
-
-
-
     const svgConfig: SVGConfig = {
       containerId: 'feasiblediv',
       dimensions: this.dimensions,
-      background: this.config.background,
+      background: "white",
       cursor: "grab",
       className: "feasible"
     };
@@ -375,15 +363,8 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
       y: this.scales.y.copy()
     };
 
-    // Log for debugging
-    console.log("Scale domains:", {
-      x: this.scales.x.domain(),
-      y: this.scales.y.domain(),
-      dataExtent: {
-        distance: d3.extent(this.data, d => d.distance),
-        pci: d3.extent(this.data, d => d.pci)
-      }
-    });
+    this.prepareSortedData();
+
   }
 
   // REFACTORED - Using utility
@@ -486,12 +467,21 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private updateDataCoordinates(): void {
+
+
     if (this.scales && this.data) {
       this.data = this.data.map(point => ({
         ...point,
         x: this.scales.x(point.distance),
         y: this.scales.y(point.pci)
       }));
+      
+      this.sortedData = this.sortedData.map(point => ({
+              ...point,
+              x: this.scales.x(point.distance),
+              y: this.scales.y(point.pci)
+            }));
+
     }
   }
 
@@ -503,7 +493,7 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.updateDataCoordinates();
 
     const circles = this.zoomable.selectAll(".feasible-point")
-      .data(this.data);
+      .data(this.sortedData);
 
     // Create event handlers using utility
     const eventHandlers = this.chartUtility.createEventHandlers({
@@ -550,17 +540,10 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private getPointColor(point: FeasiblePoint): string {
-
-    const colorScale =
-      this.currentGrouping === GroupingType.NAICS4 ? this.scales.naicsColor :
-      this.currentGrouping === GroupingType.HS4 ? this.scales.hs4Color : this.scales.color;
-
-
-      
     return this.chartUtility.getNodeColor(point, {
       searchQuery: this.chartUtility.getCurrentSearchQuery(),
       searchResults: this.chartUtility.getCurrentSearchResults(),
-      colorScale: colorScale,
+      colorScale: this.coordinationService.isNaicsGrouping() ? this.scales.naicsColor : this.scales.hs4Color,
       defaultColor: 'rgb(249, 251, 251)',
       dimmedColor: 'rgb(249, 251, 251)',
       filterType: this.currentFilterType,
@@ -574,8 +557,6 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
     const description = isNaics ? d.description : d.description2;
 
     d.id = d.hs2;
-
-    console.log("Creating tooltip for point:", d);
 
     const tooltipOptions: TooltipOptions = {
       title: title,
@@ -602,10 +583,6 @@ export class FeasibleChartComponent implements OnInit, AfterViewInit, OnDestroy 
 
   // FIXED: Mousemove handler using original scales for tracking
   private handleCustomMousemove(event: any, d: FeasiblePoint): void {
-
-    console.log("Mousemove on point:", d);
-
-
     if (!this.showTooltips || !this.trackingElements) return;
 
     if (this.enableTracking && d3.select(event.currentTarget).style("fill") !== "rgb(249, 251, 251)") {

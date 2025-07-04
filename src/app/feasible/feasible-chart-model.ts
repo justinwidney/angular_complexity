@@ -30,6 +30,7 @@ export interface FeasiblePoint {
   Date: string;
   state: number;
   color?: string;
+  distanceFromMouse?: number;
 }
 
 export interface QuadrantInfo {
