@@ -115,7 +115,7 @@
 
           <goa-spacer hspacing="m"></goa-spacer>
 
-          <div class="col"  *ngIf=" selectedChartType !== 'ECI' ">
+          <div class="col"  *ngIf=" selectedChartType !== 'ECI' && selectedChartType !== 'Trends' ">
             <div class="data-setting-wrapper">
               <div class="data-setting-component">
                 <goa-form-item label="Grouping" labelSize="regular">
@@ -205,9 +205,11 @@
                     [value]="currentDisplayFilter" 
                     (_change)="onFilterChange($event)"
                     >
+                    <goa-block gap="2xs" direction="row">
                     <goa-radio-item [value]="DisplayMode.DEFAULT" label="All Data"></goa-radio-item>
                     <goa-radio-item [value]="DisplayMode.FRONTIER" label="Frontier"></goa-radio-item>
                     <goa-radio-item  [value]="DisplayMode.FOUR_QUADS" label="Quadrants"></goa-radio-item>
+                    </goa-block>  
                   </goa-radio-group>
                 </goa-form-item>
               </form>

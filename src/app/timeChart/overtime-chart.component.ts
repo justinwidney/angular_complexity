@@ -1,11 +1,10 @@
-import { GroupingType } from './../feasible/feasible-chart-model';
-// debugged-overtime-chart.component.ts
+// enhanced-overtime-chart.component.ts
 
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { distinctUntilChanged, map, Observable, skip, Subject, takeUntil } from 'rxjs';
 import * as d3 from 'd3';
-import { UnifiedDataService } from '../service/chart-data-service'; // Import unified service
-import { OvertimeChartService } from './overtime-chart.service'; // Keep for utility methods
+import { UnifiedDataService } from '../service/chart-data-service';
+import { OvertimeChartService } from './overtime-chart.service';
 import { OvertimeChartUtils } from './overtime-chart.utils';
 import { ChartCoordinationService } from '../service/chart-coordination.service';
 import { 
@@ -17,6 +16,7 @@ import {
   ChartEvents
 } from './overtime-chart.model';
 import { CommonModule } from '@angular/common';
+import { GroupingType } from './../feasible/feasible-chart-model';
 
 @Component({
   selector: 'app-overtime-chart',
@@ -40,6 +40,7 @@ import { CommonModule } from '@angular/common';
       
       <!-- Tooltip Container -->
       <div #tooltipContainer id="overtime-tooltip-container" class="tooltip-container"></div>
+    </div>
   `,
   styleUrls: ['./overtime-chart.component.scss'],
   imports: [CommonModule]
@@ -58,8 +59,8 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   @Input() chartWidth: number = 1342;
   @Input() chartHeight: number = 650;
   @Input() customConfig?: Partial<ChartConfig>;
-  @Input() showCacheStatus: boolean = false; // Debug option
-  @Input() showDebugInfo: boolean = false; // Debug option
+  @Input() showCacheStatus: boolean = false;
+  @Input() showDebugInfo: boolean = false;
 
   // Output events
   @Output() categoryToggled = new EventEmitter<{category: string, isVisible: boolean}>();
@@ -71,6 +72,7 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   // Component state
   private destroy$ = new Subject<void>();
   private svg: any;
+  private chartGroup: any;
   private tooltip: d3.Selection<HTMLDivElement, unknown, HTMLElement, any> | null = null;
   private xScale: d3.ScaleLinear<number, number> | null = null;
   private yScale: d3.ScaleLinear<number, number> | null = null;
@@ -79,13 +81,22 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private stackGenerator: d3.Stack<any, any, string> | null = null;
   private areaGenerator: d3.Area<any> | null = null;
 
+  // NEW: Interactive elements
+  private verticalLine: any;
+  private horizontalTopLine: any;
+  private horizontalBottomLine: any;
+  private yearLabel: any;
+  private topValueLabel: any;
+  private bottomValueLabel: any;
+  private interactionOverlay: any;
+
   private data: ChartDataPoint[] = [];
   private originalData: RawDataItem[] = [];
-  private rawData: RawDataItem[] = []; // Store raw data for reprocessing
+  private rawData: RawDataItem[] = [];
   private config!: ChartConfig;
   private dataTableInstance: any = null;
 
-  // NEW: Product group filtering
+  // Product group filtering
   private enabledProductGroups: any[] = [];
   private currentGrouping: GroupingType = GroupingType.HS4;
 
@@ -100,16 +111,10 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   currentRegion: string = '';
   currentYear: string = '';
 
-  // Debug info
-  debugInfo = {
-    areasCount: 0,
-    maxValue: 0,
-    dataLength: 0
-  };
 
   constructor(
-    private unifiedDataService: UnifiedDataService, // Inject unified service
-    private overtimeService: OvertimeChartService, // Inject overtime service
+    private unifiedDataService: UnifiedDataService,
+    private overtimeService: OvertimeChartService,
     private coordinationService: ChartCoordinationService
   ) {}
 
@@ -117,7 +122,7 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.initializeConfig();
     this.subscribeToUnifiedService();
     this.subscribeToCoordinationService();
-    this.coordinationService.setGrouping(GroupingType.HS2); // Set default grouping
+    this.coordinationService.setGrouping(GroupingType.HS2);
   }
 
   ngAfterViewInit(): void {
@@ -131,18 +136,13 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.destroyChart();
   }
 
-  /**
-   * Subscribe to unified data service for loading states and errors
-   */
   private subscribeToUnifiedService(): void {
-    // Subscribe to loading state
     this.unifiedDataService.loading$
       .pipe(takeUntil(this.destroy$))
       .subscribe(loading => {
         this.loading = loading;
       });
 
-    // Subscribe to error state
     this.unifiedDataService.error$
       .pipe(takeUntil(this.destroy$))
       .subscribe(error => {
@@ -158,9 +158,7 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
         this.currentGrouping = grouping;
         this.loadData();
       });
-    
 
-    // Subscribe to current region changes
     this.unifiedDataService.currentRegion$
       .pipe(takeUntil(this.destroy$))
       .subscribe(region => {
@@ -180,26 +178,21 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private subscribeToCoordinationService(): void {
-    // Subscribe to region changes
     this.coordinationService.region$
       .pipe(takeUntil(this.destroy$))
       .subscribe(region => {
         this.unifiedDataService.setCurrentRegion(region as any);
       });
 
-    // NEW: Subscribe to product group changes (same as feasible chart)
     this.coordinationService.productGroups$
       .pipe(takeUntil(this.destroy$))
       .subscribe(productGroups => {
         this.enabledProductGroups = productGroups.filter(group => group.enabled);
         console.log('Product groups changed in overtime chart:', this.enabledProductGroups);
-        this.updateDisplay(); // Re-process and re-render chart with new product group filtering
+        this.updateDisplay();
       });
   }
 
-  /**
-   * Load data using unified data service
-   */
   private loadData(): void {
     const region = this.coordinationService.currentRegion || this.unifiedDataService.getCurrentRegion();
 
@@ -208,9 +201,7 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
       .subscribe({
         next: (result) => {
           this.rawData = result.rawData;
-          this.originalData = [...result.rawData]; // Clone data
-        
-          // NEW: Apply product group filtering if enabled
+          this.originalData = [...result.rawData];
           this.processDataWithFiltering();
         },
         error: (error) => {
@@ -220,37 +211,21 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
       });
   }
 
-  /**
-   * NEW: Process data with product group filtering
-   */
   private processDataWithFiltering(): void {
     try {
-      // Apply product group filtering to raw data
       let filteredData = this.rawData;
       
       if (this.enabledProductGroups && this.enabledProductGroups.length > 0) {
-        // Check if all product groups are enabled
         const allProductGroups = this.coordinationService.currentProductGroups || [];
         const allEnabled = this.enabledProductGroups.length === allProductGroups.length;
         
         if (!allEnabled) {
-          // Filter data by enabled product groups
           filteredData = this.overtimeService.filterByProductGroups(this.rawData, this.enabledProductGroups);
           console.log(`Filtered overtime data: ${this.rawData.length} → ${filteredData.length} items`);
         }
       }
 
-      // Process filtered data
       this.data = this.overtimeService.processRawDataToChart(filteredData);
-
-      const maxValue = this.overtimeService.getMaxTotal(this.data);
-      this.debugInfo.maxValue = maxValue;
-      this.debugInfo.dataLength = this.data.length;
-      
-      this.chartDataLoaded.emit({
-        dataCount: this.data.length,
-        maxValue: maxValue
-      });
 
       this.renderChart();
 
@@ -259,38 +234,23 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  /**
-   * NEW: Update display when product groups change
-   */
   private updateDisplay(): void {
     if (this.rawData && this.rawData.length > 0) {
-      // Reprocess data with new product group filters
       this.processDataWithFiltering();
     }
   }
 
-  
-
-  /**
-   * Retry loading data
-   */
   public retryLoad(): void {
     this.error = null;
     this.loadData();
   }
 
-  /**
-   * Refresh data by clearing cache
-   */
   public refreshData(): void {
     const currentRegion = this.unifiedDataService.getCurrentRegion();
     this.unifiedDataService.clearCache(currentRegion as any);
     this.loadData();
   }
 
-  /**
-   * Check if data is cached
-   */
   public isDataCached(): boolean {
     const currentRegion = this.unifiedDataService.getCurrentRegion();
     return this.unifiedDataService.getCachedData(currentRegion as any) !== null;
@@ -318,6 +278,7 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.clearChart();
     this.setupChart();
     this.renderAreas();
+    this.setupInteractiveElements();
   }
 
   private clearChart(): void {
@@ -329,8 +290,7 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private setupChart(): void {
     if (!this.svg) return;
 
-    // Calculate inner dimensions
-    const innerWidth = this.chartWidthCalculated - this.margin.left ;
+    const innerWidth = this.chartWidthCalculated - this.margin.left;
     const innerHeight = this.chartHeightCalculated - this.margin.top - this.margin.bottom;
 
     const maxTotal = this.overtimeService.getMaxTotal(this.data);
@@ -338,25 +298,19 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
     this.xScale = OvertimeChartUtils.createXScale(this.data, innerWidth);
     this.yScale = OvertimeChartUtils.createYScale(maxTotal, innerHeight);
     
-    // Create area generator
     this.areaGenerator = d3.area<any>()
       .x((d: any) => this.xScale!(d.data.Date))
       .y0((d: any) => this.yScale!(d[0]))
       .y1((d: any) => this.yScale!(d[1]))
       .curve(d3.curveMonotoneX);
 
-    // Setup tooltip
     this.setupTooltip();
-
-    // Add axes
     this.addAxes();
   }
 
   private setupTooltip(): void {
-    // Remove existing tooltip
     d3.select('#overtime-tooltip-container').selectAll('.tooltip').remove();
     
-    // Create new tooltip
     this.tooltip = d3.select('#overtime-tooltip-container')
       .append('div')
       .attr('class', 'tooltip')
@@ -376,19 +330,18 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
   private addAxes(): void {
     if (!this.svg || !this.xScale || !this.yScale) return;
 
-    // Create main chart group
-    const chartGroup = this.svg.append('g')
+    this.chartGroup = this.svg.append('g')
       .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
 
     // Y axis
-    this.yAxis = chartGroup.append("g")
+    this.yAxis = this.chartGroup.append("g")
       .attr("class", "y-axis")
       .call(d3.axisLeft(this.yScale).tickFormat((d: any) => {
         return this.formatAxisValue(d);
       }));
 
     // X axis
-    chartGroup.append("g")
+    this.chartGroup.append("g")
       .attr("class", "x-axis")
       .attr("transform", `translate(0, ${this.chartHeightCalculated - this.margin.top - this.margin.bottom})`)
       .call(d3.axisBottom(this.xScale)
@@ -408,7 +361,6 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
       return;
     }
 
-    // Generate stacked data
     const stackedData = this.stackGenerator(this.data);
 
     if (!stackedData || stackedData.length === 0) {
@@ -416,17 +368,13 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
       return;
     }
 
-    // Create chart group if it doesn't exist
-    let chartGroup = this.svg.select('.chart-group');
-    if (chartGroup.empty()) {
-      chartGroup = this.svg.append('g')
+    if (!this.chartGroup) {
+      this.chartGroup = this.svg.append('g')
         .attr('class', 'chart-group')
         .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
     }
 
-
-    // Create areas for multiple data points
-    const areas = chartGroup
+    const areas = this.chartGroup
       .selectAll(".area")
       .data(stackedData)
       .enter()
@@ -441,175 +389,218 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
         const path = this.areaGenerator!(d);
         console.log(`Area ${d.key} path:`, path);
         return path;
-      })
-      .on("mouseover", (event: MouseEvent, d: any) => this.handleMouseover(event, d))
-      .on("mousemove", (event: MouseEvent, d: any) => this.handleMousemove(event, d))
-      .on("mouseout", (event: MouseEvent, d: any) => this.handleMouseleave(event, d))
-      .on("click", (event: MouseEvent, d: any) => this.handleMouseclick(event, d));
+      });
   }
 
+  // NEW: Setup interactive elements
+  private setupInteractiveElements(): void {
+    if (!this.chartGroup || !this.xScale || !this.yScale) return;
 
-
-  private updateChart(): void {
-    if (!this.svg || !this.stackGenerator || !this.areaGenerator || !this.yScale || !this.yAxis) return;
-
-    // Recalculate scales
-    const maxTotal = this.overtimeService.getMaxTotal(this.data);
     const innerHeight = this.chartHeightCalculated - this.margin.top - this.margin.bottom;
-    
-    this.yScale.domain([0, maxTotal]);
 
-    // Update Y axis
-    this.yAxis.transition()
-      .duration(750)
-      .call(d3.axisLeft(this.yScale).tickFormat((d: any) => this.formatAxisValue(d)));
+    // Create vertical line (initially hidden)
+    this.verticalLine = this.chartGroup
+      .append("line")
+      .attr("class", "vertical-guide-line")
+      .attr("y1", 0)
+      .attr("y2", innerHeight)
+      .style("stroke", "#2c3e50")
+      .style("stroke-width", 2)
+      .style("opacity", 0)
+      .style("pointer-events", "none");
 
-    // Update areas
-    const stackedData = this.stackGenerator(this.data);
-    
-    this.svg.select('.chart-group')
-      .selectAll(".area")
-      .data(stackedData)
-      .transition()
-      .duration(750)
-      .attr("d", this.areaGenerator);
+    // Create horizontal lines (initially hidden)
+    this.horizontalTopLine = this.chartGroup
+      .append("line")
+      .attr("class", "horizontal-guide-line-top")
+      .attr("x1", 0)
+      .attr("x2", -this.margin.left + 10)
+      .style("stroke", "#444")
+      .style("stroke-width", 1)
+      .style("stroke-dasharray", "3,3")
+      .style("opacity", 0)
+      .style("pointer-events", "none");
+
+    this.horizontalBottomLine = this.chartGroup
+      .append("line")
+      .attr("class", "horizontal-guide-line-bottom")
+      .attr("x1", 0)
+      .attr("x2", -this.margin.left + 10)
+      .style("stroke", "#444")
+      .style("stroke-width", 1)
+      .style("stroke-dasharray", "3,3")
+      .style("opacity", 0)
+      .style("pointer-events", "none");
+
+    // Create year label (initially hidden)
+    this.yearLabel = this.chartGroup
+      .append("text")
+      .attr("class", "year-label")
+      .attr("y", innerHeight + 20)
+      .style("text-anchor", "middle")
+      .style("font-size", "14px")
+      .style("font-weight", "bold")
+      .style("fill", "#2c3e50")
+      .style("opacity", 0)
+      .style("pointer-events", "none");
+
+    // Create value labels (initially hidden)
+    this.topValueLabel = this.chartGroup
+      .append("text")
+      .attr("class", "top-value-label")
+      .attr("x", -10)
+      .style("text-anchor", "end")
+      .style("font-size", "12px")
+      .style("font-weight", "bold")
+      .style("fill", "#7f8c8d")
+      .style("opacity", 0)
+      .style("pointer-events", "none");
+
+    this.bottomValueLabel = this.chartGroup
+      .append("text")
+      .attr("class", "bottom-value-label")
+      .attr("x", -10)
+      .style("text-anchor", "end")
+      .style("font-size", "12px")
+      .style("font-weight", "bold")
+      .style("fill", "#7f8c8d")
+      .style("opacity", 0)
+      .style("pointer-events", "none");
+
+    // Create invisible overlay for mouse interactions
+    this.interactionOverlay = this.chartGroup
+      .append("rect")
+      .attr("class", "interaction-overlay")
+      .attr("width", this.chartWidthCalculated - this.margin.left)
+      .attr("height", innerHeight)
+      .style("fill", "none")
+      .style("pointer-events", "all")
+      .on("mousemove", (event: MouseEvent) => this.handleChartMouseMove(event))
+      .on("mouseleave", () => this.hideInteractiveElements())
   }
 
-  // Mouse event handlers
-  private handleMouseover = (event: MouseEvent, d: any): void => {
-    if (this.tooltip) {
-      this.tooltip
-        .style("opacity", 1)
-        .style("display", "block");
+  // NEW: Handle mouse movement over chart
+  private handleChartMouseMove = (event: MouseEvent): void => {
+    if (!this.xScale || !this.yScale || !this.stackGenerator) return;
+
+    const [mouseX, mouseY] = d3.pointer(event, this.chartGroup.node());
+    
+    // Snap to nearest year
+    const year = Math.round(this.xScale.invert(mouseX));
+    const snappedX = this.xScale(year);
+    
+    // Find data for this year
+    const dataPoint = this.data.find(d => d.Date === year);
+    if (!dataPoint) return;
+
+    // Generate stacked data to find which segment we're hovering over
+    const stackedData = this.stackGenerator(this.data);
+    const stackedDataPoint = stackedData.map(layer => 
+      layer.find(d => d.data.Date === year)
+    ).filter(d => d !== undefined);
+
+    // Find which segment the mouse is over
+    let hoveredSegment: any = null;
+    let segmentKey = '';
+    
+    for (let i = 0; i < stackedDataPoint.length; i++) {
+      const segment = stackedDataPoint[i];
+      if (segment) {
+        const y0 = this.yScale(segment[0]);
+        const y1 = this.yScale(segment[1]);
+        
+        if (mouseY >= y1 && mouseY <= y0) {
+          hoveredSegment = segment;
+          segmentKey = stackedData[i].key;
+          break;
+        }
+      }
+    }
+
+    if (hoveredSegment && segmentKey) {
+      this.showInteractiveElements(snappedX, year, hoveredSegment, segmentKey, dataPoint);
     }
   };
 
-  private handleMousemove = (event: MouseEvent, d: any): void => {
-    if (!this.tooltip || !this.xScale || !this.showTooltips) return;
+  // NEW: Show interactive elements
+  private showInteractiveElements(x: number, year: number, segment: any, segmentKey: string, dataPoint: ChartDataPoint): void {
+    if (!this.yScale) return;
 
-    // Get mouse position relative to the chart container and SVG
-    // This approach prevents tooltips from going offscreen by using container-relative positioning
-    const svgElement = this.svg.node();
-    const containerElement = this.chartContainer.nativeElement;
-    
-    // Get coordinates relative to SVG for data calculation
-    const [mouseX, mouseY] = d3.pointer(event, svgElement);
-    const adjustedMouseX = mouseX - this.margin.left;
-        
-    // Find closest data point
-    const year = Math.round(this.xScale.invert(adjustedMouseX));
-    const dataPoint = this.data.find(dp => dp.Date === year);
+    const topY = this.yScale(segment[1]);
+    const bottomY = this.yScale(segment[0]);
+    const segmentValue = segment[1] - segment[0];
+    const midY = (topY + bottomY) / 2;
 
-    const stackedData = this.stackGenerator!(this.data);
-    const categoryStack = stackedData.find(stack => stack.key === d.key);
-    const dataPointInStack = categoryStack?.find(point => point.data.Date === year);
+    // Show vertical line
+    this.verticalLine
+      .attr("x1", x)
+      .attr("x2", x)
+      .style("opacity", 0.8);
 
-    
-    if (dataPoint) {
+    // Show horizontal lines extending from y-axis to current mouse position
+    this.horizontalTopLine
+      .attr("x1", -this.margin.left + 5)
+      .attr("x2", x)
+      .attr("y1", topY)
+      .attr("y2", topY)
+      .style("opacity", 0.9);
+
+    this.horizontalBottomLine
+      .attr("x1", -this.margin.left + 5)
+      .attr("x2", x)
+      .attr("y1", bottomY)
+      .attr("y2", bottomY)
+      .style("opacity", 0.9);
+
+    // Show year label
+    this.yearLabel
+      .attr("x", x)
+      .text(year.toString())
+      .style("opacity", 1);
+
+    // Show single value label for the segment value at the middle
+    this.topValueLabel
+      .attr("x", -15)
+      .attr("y", midY + 4)
+      .text(this.overtimeService.abbreviateNumber(segmentValue))
+      .style("opacity", 1);
+
+    // Hide bottom value label since we're only showing one value
+    this.bottomValueLabel.style("opacity", 0);
+
+    // Update tooltip
+    if (this.tooltip && this.showTooltips) {
       const tooltipData: TooltipData = {
-        category: d.key,
-        value: dataPoint[d.key] || 0,
+        category: segmentKey,
+        value: segmentValue,
         year: year
       };
 
-      const point = svgElement.createSVGPoint();
-      point.x = this.xScale(year); // X coordinate from year
-      point.y = this.yScale!((dataPointInStack![0] + dataPointInStack![1]) / 2); // Y coordinate at middle of stack segment
-      
-      // Apply any zoom/pan transforms (if you have zoom functionality)
-      const transform = d3.zoomTransform(svgElement);
-      const transformedX = point.x * transform.k + transform.x + this.margin.left;
-      const transformedY = point.y * transform.k + transform.y + this.margin.top;
-
-      // Update tooltip content and position relative to container
       this.tooltip
-        .html(`${tooltipData.category}: ${this.overtimeService.abbreviateNumber(tooltipData.value)} (${tooltipData.year})`)
-        .style("left", transformedX + "px")
-        .style("top", transformedY + "px")
+        .html(`
+          <div><strong>${segmentKey}</strong></div>
+          <div>Value: ${this.overtimeService.abbreviateNumber(segmentValue)}</div>
+          <div>Year: ${year}</div>
+        `)
+        .style("left", (x + this.margin.left + 10) + "px")
+        .style("top", (midY + this.margin.top) + "px")
         .style("opacity", 0.9);
 
-      // Update hover line using direct positioning
-      const hoverLine = d3.select("#hover-line");
-      if (!hoverLine.empty()) {
-        hoverLine
-          .attr("x1", adjustedMouseX)
-          .attr("x2", adjustedMouseX)
-          .style("opacity", 1);
-      }
-
-      // Emit hover event
       this.nodeHovered.emit(tooltipData);
     }
-  };
-
-  private handleMouseleave = (event: MouseEvent, d: any): void => {
-    if (this.tooltip) {
-      this.tooltip.style("opacity", 0);
-    }
-  };
-
-  private handleMouseclick = (event: MouseEvent, d: any): void => {
-    if (!this.xScale) return;
-
-    // Get mouse position relative to the chart
-    const [mouseX] = d3.pointer(event, this.svg.node());
-    const adjustedMouseX = mouseX - this.margin.left;
-    
-    // Find closest data point
-    const year = Math.round(this.xScale.invert(adjustedMouseX));
-    const dataPoint = this.data.find(dp => dp.Date === year);
-    
-    if (dataPoint) {
-      const tooltipData: TooltipData = {
-        category: d.key,
-        value: dataPoint[d.key] || 0,
-        year: year
-      };
-
-      this.updateInfoBox(tooltipData);
-
-      // Emit click event
-      this.nodeClicked.emit(tooltipData);
-    }
-  };
-
-  private updateInfoBox(data: TooltipData): void {
-    const infoBox = document.getElementById('info-box');
-    if (infoBox) {
-      infoBox.style.visibility = "visible";
-    }
-
-    const elements = {
-      title: document.getElementById("ProductTitle"),
-      description: document.getElementById("ProductDescription"),
-      trade: document.getElementById("CountryTrade"),
-      rca: document.getElementById("RCA"),
-      pci: document.getElementById("PCI")
-    };
-
-    if (elements.title) {
-      elements.title.innerHTML = data.category;
-    }
-    
-    if (elements.description) {
-      const mapping = this.config.iconMapping[data.category];
-      elements.description.innerHTML = mapping 
-        ? `HS ${mapping.min} - ${mapping.max}` 
-        : "Unknown mapping";
-    }
-    
-    if (elements.trade) {
-      elements.trade.innerHTML = `$${this.overtimeService.abbreviateNumber(data.value)}`;
-    }
-    
-    if (elements.rca) {
-      elements.rca.innerHTML = "---";
-    }
-    
-    if (elements.pci) {
-      elements.pci.innerHTML = "---";
-    }
   }
+
+  // NEW: Hide interactive elements
+  private hideInteractiveElements(): void {
+    if (this.verticalLine) this.verticalLine.style("opacity", 0);
+    if (this.horizontalTopLine) this.horizontalTopLine.style("opacity", 0);
+    if (this.horizontalBottomLine) this.horizontalBottomLine.style("opacity", 0);
+    if (this.yearLabel) this.yearLabel.style("opacity", 0);
+    if (this.topValueLabel) this.topValueLabel.style("opacity", 0);
+    if (this.bottomValueLabel) this.bottomValueLabel.style("opacity", 0);
+    if (this.tooltip) this.tooltip.style("opacity", 0);
+  }
+
 
   private handleError(message: string): void {
     this.loading = false;
@@ -625,7 +616,7 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  // Public API methods for parent component
+  // Public API methods
   public refreshChart(): void {
     this.loadData();
   }
@@ -645,7 +636,4 @@ export class OvertimeChartComponent implements OnInit, AfterViewInit, OnDestroy 
         console.log('Regions preloaded for overtime chart');
       });
   }
-
- 
-
 }
